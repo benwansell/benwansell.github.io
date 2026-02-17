@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Democracy in Ancient Greece: 1000 BC – Alexander the Great</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  :root {
+    --bg: #faf6f0;
+    --bg-dark: #f0e8d8;
+    --primary: #1a4a6e;
+    --primary-light: #2c6e9e;
+    --secondary: #b8541a;
+    --accent: #8b7d3c;
+    --accent-light: #c4a84d;
+    --text: #2d2926;
+    --text-light: #5c5650;
+    --card-bg: #ffffff;
+    --shadow: 0 2px 12px rgba(0,0,0,0.08);
+    --border: #d4c8b0;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+  }
+
+  /* Sidebar Navigation */
+  .sidebar {
+    position: fixed; top: 0; left: 0; width: 260px; height: 100vh;
+    background: var(--primary);
+    color: #e8dcc8;
+    padding: 20px 0;
+    overflow-y: auto;
+    z-index: 100;
+    transition: transform 0.3s;
+  }
+  .sidebar h2 {
+    font-size: 1rem;
+    padding: 0 20px 15px;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--accent-light);
+  }
+  .sidebar a {
+    display: block; padding: 10px 20px;
+    color: #c8bca8; text-decoration: none;
+    font-size: 0.9rem; transition: all 0.2s;
+    border-left: 3px solid transparent;
+  }
+  .sidebar a:hover, .sidebar a.active {
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+    border-left-color: var(--accent-light);
+  }
+  .sidebar .sub { padding-left: 35px; font-size: 0.82rem; }
+
+  /* Menu toggle for mobile */
+  .menu-toggle {
+    display: none; position: fixed; top: 15px; left: 15px;
+    z-index: 200; background: var(--primary); color: #fff;
+    border: none; padding: 10px 14px; border-radius: 6px;
+    font-size: 1.2rem; cursor: pointer;
+  }
+
+  /* Main content */
+  .main { margin-left: 260px; }
+
+  /* Hero */
+  .hero {
+    background: linear-gradient(135deg, var(--primary) 0%, #0d2d42 100%);
+    color: #fff; padding: 80px 60px 60px; text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .hero::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, var(--secondary), var(--accent-light), var(--secondary));
+  }
+  .hero h1 {
+    font-size: 2.8rem; margin-bottom: 15px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    letter-spacing: 1px;
+  }
+  .hero .subtitle {
+    font-size: 1.15rem; opacity: 0.85;
+    max-width: 700px; margin: 0 auto;
+    font-style: italic;
+  }
+
+  /* Sections */
+  section { padding: 50px 60px; max-width: 1100px; margin: 0 auto; }
+  section h2 {
+    font-size: 1.9rem; color: var(--primary);
+    margin-bottom: 25px; padding-bottom: 10px;
+    border-bottom: 3px solid var(--accent-light);
+    display: inline-block;
+  }
+  section h3 {
+    font-size: 1.35rem; color: var(--secondary);
+    margin: 25px 0 12px;
+  }
+  section p { margin-bottom: 15px; text-align: justify; }
+
+  /* Cards */
+  .card {
+    background: var(--card-bg);
+    border-radius: 10px;
+    padding: 25px 30px;
+    margin: 20px 0;
+    box-shadow: var(--shadow);
+    border-left: 4px solid var(--primary);
+  }
+  .card.accent { border-left-color: var(--secondary); }
+  .card.gold { border-left-color: var(--accent-light); }
+  .card h4 {
+    font-size: 1.1rem; color: var(--primary);
+    margin-bottom: 10px;
+  }
+  .card.accent h4 { color: var(--secondary); }
+
+  /* Grid */
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin: 20px 0; }
+
+  /* Expandable sections */
+  .expandable { margin: 15px 0; }
+  .expandable summary {
+    cursor: pointer; font-weight: bold;
+    color: var(--primary); padding: 12px 18px;
+    background: var(--bg-dark); border-radius: 6px;
+    list-style: none; display: flex; align-items: center;
+    transition: background 0.2s;
+  }
+  .expandable summary:hover { background: #e8dcc4; }
+  .expandable summary::before {
+    content: '\25B6'; margin-right: 10px;
+    font-size: 0.7rem; transition: transform 0.2s;
+  }
+  .expandable[open] summary::before { transform: rotate(90deg); }
+  .expandable .content { padding: 15px 20px; }
+
+  /* Tabs */
+  .tabs { margin: 25px 0; }
+  .tab-buttons { display: flex; gap: 0; border-bottom: 2px solid var(--border); }
+  .tab-btn {
+    padding: 12px 24px; border: none; background: none;
+    cursor: pointer; font-family: inherit;
+    font-size: 0.95rem; color: var(--text-light);
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px; transition: all 0.2s;
+  }
+  .tab-btn:hover { color: var(--primary); background: var(--bg-dark); }
+  .tab-btn.active {
+    color: var(--primary); font-weight: bold;
+    border-bottom-color: var(--secondary);
+  }
+  .tab-content { display: none; padding: 25px 5px; }
+  .tab-content.active { display: block; }
+
+  /* Table */
+  table {
+    width: 100%; border-collapse: collapse;
+    margin: 20px 0; background: var(--card-bg);
+    border-radius: 8px; overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  th {
+    background: var(--primary); color: #fff;
+    padding: 12px 16px; text-align: left; font-size: 0.9rem;
+  }
+  td {
+    padding: 11px 16px; border-bottom: 1px solid #eee;
+    font-size: 0.9rem;
+  }
+  tr:hover td { background: #f8f4ec; }
+
+  /* Map container */
+  .map-container {
+    background: var(--card-bg); border-radius: 12px;
+    box-shadow: var(--shadow);
+    margin: 25px 0; position: relative; overflow: hidden;
+  }
+  #leafletMap { width: 100%; height: 520px; border-radius: 12px; z-index: 1; }
+
+  /* Vertical Timeline */
+  .vtl { position: relative; padding: 20px 0; margin: 25px 0; }
+  .vtl::before {
+    content: ''; position: absolute; left: 50%; top: 0; bottom: 0;
+    width: 4px; background: var(--primary); transform: translateX(-50%);
+    border-radius: 2px;
+  }
+  .vtl-event {
+    position: relative; width: 45%; padding: 14px 18px;
+    background: var(--card-bg); border-radius: 8px;
+    box-shadow: var(--shadow); margin-bottom: 20px;
+    border-left: 4px solid var(--primary);
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: default;
+  }
+  .vtl-event:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,0,0,0.12); }
+  .vtl-event.left { margin-left: 0; margin-right: auto; }
+  .vtl-event.right { margin-left: auto; margin-right: 0; }
+  .vtl-event.cat-athens { border-left-color: var(--primary); }
+  .vtl-event.cat-syracuse { border-left-color: #8b2e8b; }
+  .vtl-event.cat-other { border-left-color: var(--accent); }
+  .vtl-event .vtl-year {
+    font-size: 0.8rem; font-weight: bold; margin-bottom: 4px;
+  }
+  .vtl-event.cat-athens .vtl-year { color: var(--primary); }
+  .vtl-event.cat-syracuse .vtl-year { color: #8b2e8b; }
+  .vtl-event.cat-other .vtl-year { color: var(--accent); }
+  .vtl-event .vtl-text { font-size: 0.88rem; color: var(--text); line-height: 1.4; }
+  .vtl-dot {
+    position: absolute; top: 18px; width: 16px; height: 16px;
+    border-radius: 50%; border: 3px solid var(--card-bg);
+    z-index: 2;
+  }
+  .vtl-event.left .vtl-dot { right: -32px; }
+  .vtl-event.right .vtl-dot { left: -32px; }
+  .vtl-dot.athens { background: var(--primary); box-shadow: 0 0 0 2px var(--primary); }
+  .vtl-dot.syracuse { background: #8b2e8b; box-shadow: 0 0 0 2px #8b2e8b; }
+  .vtl-dot.other { background: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+  .vtl-era {
+    text-align: center; font-size: 1rem; font-weight: bold;
+    color: var(--primary); padding: 10px 0; margin: 10px 0;
+    position: relative; z-index: 2;
+  }
+  .vtl-era span {
+    background: var(--bg); padding: 0 16px;
+  }
+  /* Filter buttons */
+  .tl-filters { display: flex; gap: 8px; margin: 15px 0; flex-wrap: wrap; }
+  .tl-filter-btn {
+    padding: 6px 16px; border: 2px solid var(--border); border-radius: 20px;
+    background: var(--card-bg); cursor: pointer; font-family: inherit;
+    font-size: 0.85rem; transition: all 0.2s; color: var(--text);
+  }
+  .tl-filter-btn:hover { border-color: var(--primary); }
+  .tl-filter-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+  .tl-filter-btn.active-syr { background: #8b2e8b; color: #fff; border-color: #8b2e8b; }
+  .tl-filter-btn.active-other { background: var(--accent); color: #fff; border-color: var(--accent); }
+  @media (max-width: 900px) {
+    .vtl::before { left: 20px; }
+    .vtl-event { width: calc(100% - 50px); margin-left: 50px !important; }
+    .vtl-event.left .vtl-dot, .vtl-event.right .vtl-dot { left: -40px; right: auto; }
+  }
+
+  /* Tooltip */
+  .tooltip {
+    display: none; position: absolute;
+    background: #2d2926; color: #fff;
+    padding: 10px 14px; border-radius: 6px;
+    font-size: 0.82rem; max-width: 280px;
+    z-index: 50; pointer-events: none;
+    line-height: 1.5;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  }
+  .tooltip::after {
+    content: ''; position: absolute;
+    bottom: -6px; left: 20px;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid #2d2926;
+  }
+
+  /* Leaflet popup overrides */
+  .leaflet-popup-content-wrapper { border-radius: 8px; font-family: Georgia, serif; }
+  .leaflet-popup-content { font-size: 0.85rem; line-height: 1.5; max-width: 280px; }
+  .leaflet-popup-content h4 { color: var(--primary); margin: 0 0 6px; font-size: 1rem; }
+  .leaflet-popup-content .popup-link { color: var(--secondary); cursor: pointer; font-weight: bold; font-size: 0.82rem; }
+  .leaflet-popup-content .popup-link:hover { text-decoration: underline; }
+
+  /* Key fact callout */
+  .callout {
+    background: linear-gradient(135deg, #f8f0e0, #f0e8d4);
+    border-radius: 8px; padding: 18px 22px;
+    margin: 20px 0; border: 1px solid var(--border);
+    position: relative;
+  }
+  .callout::before {
+    content: '\2139'; position: absolute; top: 14px; left: -12px;
+    background: var(--accent-light); color: #fff;
+    width: 24px; height: 24px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem; font-weight: bold;
+  }
+  .callout strong { color: var(--primary); }
+
+  /* Quote */
+  blockquote {
+    border-left: 4px solid var(--accent-light);
+    padding: 15px 25px; margin: 20px 0;
+    background: var(--bg-dark); border-radius: 0 8px 8px 0;
+    font-style: italic; color: var(--text-light);
+  }
+  blockquote cite { display: block; margin-top: 8px; font-style: normal; font-weight: bold; font-size: 0.9rem; color: var(--primary); }
+
+  /* Comparison feature */
+  .comparison { display: flex; gap: 0; margin: 25px 0; border-radius: 10px; overflow: hidden; box-shadow: var(--shadow); }
+  .comparison .col { flex: 1; padding: 25px; }
+  .comparison .col:first-child { background: #e8f0f6; }
+  .comparison .col:last-child { background: #fef0e4; }
+  .comparison h4 { text-align: center; margin-bottom: 15px; }
+  .comparison ul { list-style: none; }
+  .comparison li { padding: 6px 0; font-size: 0.9rem; }
+  .comparison li::before { content: '\2022 '; color: var(--primary); font-weight: bold; }
+  .comparison .col:last-child li::before { color: var(--secondary); }
+
+  /* (timeline styles are above with .vtl) */
+
+  /* Legend */
+  .legend { display: flex; gap: 20px; margin: 15px 0; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.85rem; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 50%; }
+
+  /* Quiz */
+  .quiz-card {
+    background: var(--card-bg); border-radius: 10px;
+    padding: 25px 30px; margin: 15px 0;
+    box-shadow: var(--shadow); border: 2px solid var(--border);
+  }
+  .quiz-card h4 { color: var(--primary); margin-bottom: 12px; }
+  .quiz-option {
+    display: block; width: 100%;
+    padding: 10px 16px; margin: 6px 0;
+    background: var(--bg); border: 2px solid var(--border);
+    border-radius: 6px; cursor: pointer;
+    font-family: inherit; font-size: 0.9rem;
+    text-align: left; transition: all 0.2s;
+  }
+  .quiz-option:hover { border-color: var(--primary); background: #eef4f8; }
+  .quiz-option.correct { border-color: #2e7d32; background: #e8f5e9; color: #2e7d32; }
+  .quiz-option.wrong { border-color: #c62828; background: #ffebee; color: #c62828; }
+  .quiz-feedback { margin-top: 10px; font-size: 0.9rem; display: none; padding: 10px; border-radius: 6px; }
+
+  /* Footer */
+  footer {
+    background: var(--primary); color: #bbb;
+    text-align: center; padding: 30px 60px;
+    font-size: 0.85rem; margin-left: 0;
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.open { transform: translateX(0); }
+    .menu-toggle { display: block; }
+    .main { margin-left: 0; }
+    .hero { padding: 60px 25px 40px; }
+    .hero h1 { font-size: 1.8rem; }
+    section { padding: 30px 20px; }
+    .grid, .grid-3 { grid-template-columns: 1fr; }
+    .comparison { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<button class="menu-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">&#9776;</button>
+
+<nav class="sidebar" id="sidebar">
+  <h2>Navigation</h2>
+  <a href="#hero">Introduction</a>
+  <a href="#map">Map of the Greek World</a>
+  <a href="#timeline">Interactive Timeline</a>
+  <a href="#background">Origins &amp; Background</a>
+  <a href="#athens" class="sub">Athens</a>
+  <a href="#syracuse" class="sub">Syracuse</a>
+  <a href="#others" class="sub">Other City-States</a>
+  <a href="#voting">Voting Rules</a>
+  <a href="#courts">Courts &amp; Justice</a>
+  <a href="#ostracism">Ostracism &amp; Petalism</a>
+  <a href="#sortition">Sortition</a>
+  <a href="#dismissal">Dismissing Leaders</a>
+  <a href="#comparison">Athens vs. Syracuse</a>
+  <a href="#quiz">Test Your Knowledge</a>
+  <a href="#sources">Sources &amp; Further Reading</a>
+</nav>
+
+<div class="main">
+
+<!-- Hero -->
+<header class="hero" id="hero">
+  <h1>Democracy in Ancient Greece</h1>
+  <p class="subtitle">From the Dark Ages to Alexander the Great (c. 1000–323 BC): How the Greeks invented, practiced, and struggled with self-governance</p>
+</header>
+
+<!-- Map Section -->
+<section id="map">
+  <h2>Map of the Greek World</h2>
+  <p>The democratic experiments of ancient Greece took place across a wide geographic area, from Sicily in the west to the coast of Asia Minor in the east. Click on any city to learn about its political system.</p>
+
+  <div class="map-container" id="mapContainer">
+    <div id="leafletMap"></div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#c62828;"></div> Athens (primary focus)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#8b2e8b;"></div> Syracuse (primary focus)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#e65100;"></div> Peloponnesian city-states</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#1565c0;"></div> Ionian / Island cities</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#4a148c;"></div> Macedonian capital</div>
+  </div>
+</section>
+
+<!-- Timeline Section -->
+<section id="timeline">
+  <h2>Interactive Timeline</h2>
+  <p>Key events in the development of Greek democratic institutions, from the rise of the polis to the end of Athenian independence. Filter by city-state.</p>
+
+  <div class="tl-filters">
+    <button class="tl-filter-btn active" onclick="filterTimeline('all', this)">All Events</button>
+    <button class="tl-filter-btn" onclick="filterTimeline('athens', this)">Athens</button>
+    <button class="tl-filter-btn" onclick="filterTimeline('syracuse', this)">Syracuse</button>
+    <button class="tl-filter-btn" onclick="filterTimeline('other', this)">Other</button>
+  </div>
+
+  <div class="vtl" id="vtlContainer">
+    <!-- Events populated by JS -->
+  </div>
+</section>
+
+<!-- Background -->
+<section id="background">
+  <h2>Origins of Greek Democracy</h2>
+
+  <p>The story of Greek democracy does not begin with a single moment of invention but with centuries of gradual political evolution. During the Greek Dark Ages (c. 1100–800 BC), following the collapse of Mycenaean palace civilization, Greece fragmented into small, independent communities. Power rested with local chieftains and warrior-aristocrats whose authority derived from lineage, land, and martial prowess.</p>
+
+  <p>By the eighth century BC, the <em>polis</em> (city-state) had emerged as the fundamental unit of Greek political life. Each polis was fiercely independent, and their small scale — most had only a few thousand citizens — made political experimentation possible. The transition from aristocratic rule to broader participation happened differently in each city, but several common pressures drove change: growing populations, colonization, the rise of hoplite warfare (which empowered ordinary landowners who served as soldiers), increasing trade, and the resulting tensions between old landed aristocracies and newly wealthy merchants.</p>
+
+  <div class="card">
+    <h4>The Hoplite Revolution</h4>
+    <p>The shift from aristocratic cavalry warfare to the hoplite phalanx (c. 700–650 BC) was politically transformative. When the state depended on massed ranks of ordinary citizen-soldiers for its defense, those citizens gained political leverage. As the historian Victor Davis Hanson argues, men who fought together in the phalanx came to expect a share of political power.</p>
+  </div>
+
+  <p>Many poleis passed through a cycle of aristocracy, tyranny, and then some form of broader governance. Tyrants — unconstitutional sole rulers who seized power, often with popular support — frequently served as transitional figures who broke the grip of aristocratic factions and paved the way for wider citizen participation. This pattern played out prominently in both Athens and Syracuse.</p>
+</section>
+
+<!-- Athens -->
+<section id="athens">
+  <h2>Athens: The Birthplace of Democracy</h2>
+
+  <p>Athens developed the most extensive and best-documented democracy in the ancient world. Its evolution from aristocratic rule to radical direct democracy took roughly two centuries of reform, revolution, and counter-revolution.</p>
+
+  <details class="expandable" open>
+    <summary>Draco's Laws (621 BC) — Written Law Replaces Custom</summary>
+    <div class="content">
+      <p>Draco produced Athens' first written law code, replacing oral aristocratic custom with publicly accessible written rules. While his laws were notoriously harsh — the death penalty applied to even minor offenses, giving rise to the term "draconian" — the act of writing law down was itself revolutionary. It meant that the rules applied equally, could be consulted by anyone, and could no longer be bent by aristocratic judges interpreting unwritten tradition to suit their interests.</p>
+      <p>Draco's code also formalized the distinction between intentional and accidental homicide, establishing specialized courts for each — an important step toward a rational legal system.</p>
+    </div>
+  </details>
+
+  <details class="expandable" open>
+    <summary>Solon's Reforms (594 BC) — The Foundations</summary>
+    <div class="content">
+      <p>Appointed as archon and mediator during a severe social crisis, Solon enacted sweeping reforms that laid the groundwork for later democracy:</p>
+      <div class="grid">
+        <div class="card">
+          <h4>Economic Reforms</h4>
+          <p>The <em>seisachtheia</em> ("shaking off of burdens") cancelled existing debts and freed Athenians who had been enslaved for debt. He banned debt slavery permanently — a momentous act that established the principle that a citizen's body could not be seized as collateral.</p>
+        </div>
+        <div class="card accent">
+          <h4>Political Classes</h4>
+          <p>Solon replaced birth-based aristocratic privileges with a system of four wealth classes: <em>pentacosiomedimnoi</em> (500-bushel men), <em>hippeis</em> (cavalry), <em>zeugitai</em> (yoke-men/hoplites), and <em>thetes</em> (laborers). Political office was tied to wealth rather than lineage, and even thetes could attend the Assembly and serve on juries.</p>
+        </div>
+        <div class="card">
+          <h4>Council of 400 (Boule)</h4>
+          <p>A new council of 400 members (100 from each of the four Ionian tribes) was created to prepare business for the Assembly and serve as a check on aristocratic power in the Areopagus.</p>
+        </div>
+        <div class="card accent">
+          <h4>The Heliaia</h4>
+          <p>Solon established or reformed the <em>Heliaia</em>, a people's court where any citizen could serve as a juror and where judicial decisions by magistrates could be appealed — a foundational principle of democratic justice.</p>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="expandable" open>
+    <summary>Cleisthenes' Reforms (508/7 BC) — The Birth of Democracy</summary>
+    <div class="content">
+      <p>After the fall of the Peisistratid tyranny (510 BC), Cleisthenes — himself an aristocrat from the Alcmaeonid family — enacted the reforms that are generally considered the founding of Athenian democracy (<em>demokratia</em>, "rule of the people").</p>
+
+      <div class="card gold">
+        <h4>The Ten Tribes (Phylai)</h4>
+        <p>Cleisthenes' masterstroke was reorganizing the citizen body. He replaced the four old Ionian tribes — which were dominated by aristocratic kinship networks — with ten new tribes. Each tribe was composed of citizens from three different regions: the city (<em>asty</em>), the coast (<em>paralia</em>), and the inland area (<em>mesogeia</em>). This deliberately mixed citizens from different geographic and social backgrounds, breaking the power of regional aristocratic factions and creating a new civic identity based on the deme (local district) rather than on clan.</p>
+      </div>
+
+      <p><strong>Key institutional innovations:</strong></p>
+      <ul style="margin: 10px 0 15px 20px; line-height: 2;">
+        <li><strong>Council of 500 (Boule):</strong> 50 members from each of the 10 tribes, chosen <em>by lot</em>, serving for one year. Prepared the agenda for the Assembly.</li>
+        <li><strong>Prytaneis:</strong> Each tribe's 50 councillors served as the standing committee (<em>prytany</em>) for one-tenth of the year, with a new chairman (<em>epistates</em>) chosen by lot each day.</li>
+        <li><strong>Demes:</strong> 139 local districts became the basic unit of political identity. Citizens were registered in their deme and identified as, e.g., "Socrates of Alopece."</li>
+        <li><strong>Ostracism:</strong> Introduced (though not used until 487 BC) as a mechanism to exile any citizen judged too powerful for ten years, without loss of property.</li>
+        <li><strong>Isonomia:</strong> The principle of equality before the law became the defining ideal of the new system.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details class="expandable">
+    <summary>Ephialtes' Reforms (462/1 BC) — Radical Democracy</summary>
+    <div class="content">
+      <p>Ephialtes completed the democratic revolution by stripping the aristocratic Council of the Areopagus of nearly all its political powers. The Areopagus had retained the authority to "guard the laws" and try serious cases. Ephialtes transferred these powers to three democratic bodies:</p>
+      <ul style="margin: 10px 0 15px 20px; line-height: 2;">
+        <li>The <strong>Ekklesia</strong> (Assembly) — gained full sovereign authority</li>
+        <li>The <strong>Boule</strong> (Council of 500) — took over many administrative functions</li>
+        <li>The <strong>Dikasteria</strong> (People's Courts) — gained jurisdiction over most legal cases</li>
+      </ul>
+      <p>Ephialtes was assassinated shortly after, but his reforms survived and were extended by his associate Pericles, who introduced pay for jurors (enabling poorer citizens to serve) and the citizenship law of 451 BC (limiting citizenship to those with two Athenian parents).</p>
+    </div>
+  </details>
+
+  <details class="expandable">
+    <summary>The Age of Pericles (c. 461–429 BC)</summary>
+    <div class="content">
+      <p>Pericles dominated Athenian politics for over thirty years, elected <em>strategos</em> (general) repeatedly. His era is often called the golden age of Athenian democracy, though it also reveals a paradox: a democratic system dominated by a single charismatic leader.</p>
+      <blockquote>
+        "Our constitution does not copy the laws of neighbouring states; we are rather a pattern to others than imitators ourselves. Its administration favours the many instead of the few; this is why it is called a democracy."
+        <cite>— Thucydides, quoting Pericles' Funeral Oration (431 BC)</cite>
+      </blockquote>
+      <p>Under Pericles, Athens achieved its greatest cultural and political achievements, but also pursued aggressive imperialism through the Delian League, demanding tribute from allied states while denying them any democratic voice — a contradiction that did not escape contemporary critics.</p>
+    </div>
+  </details>
+
+  <details class="expandable">
+    <summary>Crises and Restorations (411–403 BC)</summary>
+    <div class="content">
+      <p>Athenian democracy proved remarkably resilient. It survived two oligarchic coups:</p>
+      <div class="grid">
+        <div class="card">
+          <h4>The Four Hundred (411 BC)</h4>
+          <p>During the crisis of the Peloponnesian War, oligarchs overthrew democracy and installed a council of 400. The regime lasted only four months before being replaced by a moderate oligarchy of 5,000, which soon gave way to full democracy.</p>
+        </div>
+        <div class="card accent">
+          <h4>The Thirty Tyrants (404–403 BC)</h4>
+          <p>After Athens' defeat by Sparta, a Spartan-backed junta of thirty oligarchs terrorized the city, executing 1,500 citizens and exiling 5,000. Democrats led by Thrasybulus returned from exile, defeated the oligarchs at Piraeus, and restored democracy, passing a remarkable amnesty that historians regard as one of the earliest examples of transitional justice.</p>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="expandable">
+    <summary>Fourth-Century Democracy (403–322 BC)</summary>
+    <div class="content">
+      <p>The restored democracy of the fourth century was more institutionally sophisticated than its fifth-century predecessor. Key developments included:</p>
+      <ul style="margin: 10px 0 15px 20px; line-height: 2;">
+        <li><strong>Codification of laws:</strong> A clear distinction was drawn between <em>nomoi</em> (fundamental laws, changeable only through special legislative panels called <em>nomothetai</em>) and <em>psephismata</em> (decrees of the Assembly).</li>
+        <li><strong>Graphe paranomon:</strong> Prosecution for proposing unconstitutional decrees became a central check on Assembly power.</li>
+        <li><strong>Theoric Fund:</strong> State payments enabled poorer citizens to attend festivals and, later, Assembly meetings (Assembly pay was introduced c. 392 BC).</li>
+        <li><strong>Professionalization:</strong> Trained orators and financial officials (like Eubulus and Lycurgus) played larger roles, reflecting a trend toward greater expertise in governance.</li>
+      </ul>
+      <p>Athenian democracy continued to function until 322 BC, when the Macedonian general Antipater imposed a property qualification for citizenship after defeating Athens in the Lamian War, disenfranchising roughly 12,000 of the city's 21,000 citizens.</p>
+    </div>
+  </details>
+</section>
+
+<!-- Syracuse -->
+<section id="syracuse">
+  <h2>Syracuse: Democracy in the West</h2>
+
+  <p>Syracuse, founded by Corinthian colonists around 734 BC on the southeastern coast of Sicily, became one of the largest and most powerful Greek cities. Its political history illustrates a particularly dramatic oscillation between tyranny and democracy.</p>
+
+  <details class="expandable" open>
+    <summary>From Oligarchy to Tyranny (734–466 BC)</summary>
+    <div class="content">
+      <p>For its first two centuries, Syracuse was governed by the <em>Gamoroi</em>, a landed aristocracy descended from the original Corinthian colonists. Around 485 BC, the general Gelon seized power and made Syracuse the most powerful city in the Greek west, defeating the Carthaginians at the Battle of Himera (480 BC). His brother Hieron I succeeded him, but Hieron's son Thrasybulus proved so cruel that the Syracusans overthrew him in 466 BC and established a democracy.</p>
+    </div>
+  </details>
+
+  <details class="expandable" open>
+    <summary>Syracusan Democracy (466–405 BC)</summary>
+    <div class="content">
+      <p>The democracy established in 466 BC drew on Athenian models but had distinctive features:</p>
+      <div class="grid">
+        <div class="card">
+          <h4>The Assembly</h4>
+          <p>A popular assembly of all male citizens held sovereign power, meeting regularly to vote on legislation, war and peace, and major policy decisions.</p>
+        </div>
+        <div class="card accent">
+          <h4>Petalism</h4>
+          <p>Syracuse adopted its own version of ostracism called <em>petalismos</em>, in which citizens wrote the name of the person they wished to exile on olive leaves (<em>petala</em>) rather than pottery shards. The exile lasted five years rather than Athens' ten. However, the practice was quickly abandoned because it drove prominent citizens out of public life, leaving the city without capable leaders.</p>
+        </div>
+        <div class="card">
+          <h4>Generals and Officials</h4>
+          <p>Like Athens, Syracuse elected military commanders (strategoi). However, the democratic institutions appear to have been less developed than Athens', with a smaller bureaucracy and less systematic use of sortition.</p>
+        </div>
+        <div class="card accent">
+          <h4>Dionysius I and the End of Democracy</h4>
+          <p>In 405 BC, amid a Carthaginian invasion, the general Dionysius manipulated the Assembly into granting him extraordinary powers. He used a bodyguard voted to him by the Assembly to seize the fortress on Ortygia and became tyrant — a classic example of how democratic institutions could be subverted from within during a crisis.</p>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <details class="expandable">
+    <summary>Timoleon's Restoration (344–337 BC)</summary>
+    <div class="content">
+      <p>After decades of tyranny under Dionysius I and his son Dionysius II (interrupted by Plato's famous and failed attempts to create a philosopher-king), the Corinthian general Timoleon was invited to liberate Syracuse in 344 BC. He defeated both the tyrants and a Carthaginian army, then established a moderate democratic constitution and remarkably retired from public life. Timoleon's constitution included:</p>
+      <ul style="margin: 10px 0 15px 20px; line-height: 2;">
+        <li>A restored popular assembly</li>
+        <li>An annually elected chief magistrate (the <em>amphipolos</em> of Olympian Zeus)</li>
+        <li>A council of 600 drawn from the citizen body</li>
+        <li>Independent law courts</li>
+      </ul>
+      <p>This settlement lasted until Agathocles seized power in 317 BC, inaugurating another cycle of tyranny.</p>
+    </div>
+  </details>
+</section>
+
+<!-- Other City-States -->
+<section id="others">
+  <h2>Other Experiments in Self-Governance</h2>
+
+  <div class="tabs">
+    <div class="tab-buttons">
+      <button class="tab-btn active" onclick="switchTab(event, 'tab-sparta')">Sparta</button>
+      <button class="tab-btn" onclick="switchTab(event, 'tab-corinth')">Corinth</button>
+      <button class="tab-btn" onclick="switchTab(event, 'tab-argos')">Argos</button>
+      <button class="tab-btn" onclick="switchTab(event, 'tab-chios')">Chios</button>
+      <button class="tab-btn" onclick="switchTab(event, 'tab-more')">Others</button>
+    </div>
+
+    <div class="tab-content active" id="tab-sparta">
+      <h3>Sparta: The "Mixed Constitution"</h3>
+      <p>Sparta's political system, traditionally attributed to the legendary lawgiver Lycurgus, combined monarchic, oligarchic, and democratic elements in a way that later theorists like Polybius admired as a "mixed constitution."</p>
+      <div class="grid">
+        <div class="card">
+          <h4>Two Kings</h4>
+          <p>Sparta uniquely had two hereditary kings from the Agiad and Eurypontid dynasties, who served as military commanders and religious leaders. They could be tried and deposed — King Demaratus was deposed in 491 BC, and Pausanias was recalled and eventually starved to death.</p>
+        </div>
+        <div class="card accent">
+          <h4>Gerousia (Council of Elders)</h4>
+          <p>Twenty-eight men over the age of 60, elected for life, plus the two kings. The Gerousia prepared legislation, served as a supreme court, and could override the Assembly. Election was by acclamation: candidates walked through the Assembly, and judges in a sealed room determined who received the loudest shouting.</p>
+        </div>
+        <div class="card">
+          <h4>Apella (Assembly)</h4>
+          <p>All Spartiates (full citizens) over 30 could attend. Voted by acclamation (shouting), not by individual ballot. Could only approve or reject proposals from the Gerousia — could not amend or initiate legislation. A <em>rhetra</em> (amendment) allowed the Gerousia to dismiss the Assembly if it voted "crookedly."</p>
+        </div>
+        <div class="card accent">
+          <h4>Ephors</h4>
+          <p>Five ephors elected annually by the Assembly held enormous power: they could prosecute and fine even kings, controlled foreign policy and education, and supervised daily life. Two ephors accompanied each king on campaign. The ephorate was the most democratic element of the Spartan system.</p>
+        </div>
+      </div>
+      <div class="callout">
+        <strong>Key difference from Athens:</strong> Sparta's system gave the Assembly a voice but no initiative. Citizens could shout yes or no but could not propose, amend, or debate legislation — making it fundamentally more constrained than Athenian democracy.
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-corinth">
+      <h3>Corinth: Oligarchy, Tyranny, and Back</h3>
+      <p>Corinth was ruled by the Bacchiad clan, an exclusive aristocracy of some 200 families who intermarried only with each other, until Cypselus overthrew them around 657 BC. The Bacchiads had governed through an annual elected <em>prytanis</em> (president) and a council, but restricted all power to their own kin.</p>
+      <p>Cypselus' tyranny, and that of his son Periander (one of the Seven Sages), lasted about 73 years. After the tyranny fell (c. 584 BC), Corinth established a moderate oligarchy with a council of eighty and broader citizen participation than the Bacchiad regime, though never approaching Athenian-style democracy. Corinth remained oligarchic and was consistently hostile to democratic movements in other cities, making it a natural ally of Sparta.</p>
+    </div>
+
+    <div class="tab-content" id="tab-argos">
+      <h3>Argos: Athens' Democratic Ally</h3>
+      <p>Argos, in the northeastern Peloponnese, developed democratic institutions at least partly in deliberate contrast to its rival Sparta. After the catastrophic loss of much of its citizen body at the Battle of Sepeia (c. 494 BC) against Sparta, Argos appears to have enfranchised <em>perioikoi</em> (surrounding peoples) to replenish its citizen body, broadening the political community.</p>
+      <p>By the mid-fifth century, Argos had a functioning democracy with an assembly, council, and elected magistrates. The city maintained a long alliance with democratic Athens. Notably, Argos practiced a form of constitutional review: a board of magistrates called the <em>artynai</em> could bring charges against officials accused of exceeding their authority, functioning similarly to Athens' <em>graphe paranomon</em>.</p>
+    </div>
+
+    <div class="tab-content" id="tab-chios">
+      <h3>Chios: Possibly the Earliest Democracy</h3>
+      <p>The island of Chios in the eastern Aegean has a strong claim to some of the earliest democratic institutions in Greece. An inscription dating to approximately 575–550 BC describes a "people's council" (<em>boule demosie</em>) with the power to hear appeals against magistrates' decisions — a strikingly democratic concept for this early date.</p>
+      <p>The inscription also mentions a system where each tribe elected representatives to the council, and citizens could appeal judicial decisions to the people's council. This is roughly contemporary with Solon's reforms and may represent an independent development of democratic ideas rather than Athenian influence.</p>
+      <div class="callout">
+        <strong>Historical significance:</strong> The Chios inscription challenges the Athenocentric narrative of Greek democracy, suggesting that democratic ideas may have emerged in multiple places roughly simultaneously, perhaps driven by similar social pressures (trade, colonization, hoplite warfare) across the Greek world.
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-more">
+      <h3>Further Cases</h3>
+      <div class="grid">
+        <div class="card">
+          <h4>Megara</h4>
+          <p>Megara experienced a brief but violent democratic revolution in the sixth century BC. The democratic faction confiscated aristocratic property and even forced the wealthy to refund interest on past loans — a radical act of economic redistribution. Aristotle later cited Megara as an example of democratic excess, but the episode illustrates how deep class tensions ran in Greek poleis.</p>
+        </div>
+        <div class="card accent">
+          <h4>Mantinea</h4>
+          <p>This Arcadian city maintained a democratic government allied with Athens and Argos. Sparta destroyed Mantinea's walls in 385 BC and forcibly dispersed the population into villages to eliminate the democracy — a stark reminder that democratic self-governance existed under constant external threat.</p>
+        </div>
+        <div class="card">
+          <h4>Elis</h4>
+          <p>Elis, host of the Olympic Games, had democratic institutions including an elected council and popular assembly. After a democratic revolution around 471 BC, Elis conducted a synoecism (merging of surrounding communities into a single polis), expanding the democratic citizen body.</p>
+        </div>
+        <div class="card accent">
+          <h4>Rhodes</h4>
+          <p>In 408 BC, the three cities of Rhodes (Lindos, Ialysus, and Camirus) merged into a single city with democratic institutions, including an assembly, a council of 500, and a board of <em>prytaneis</em>. Rhodes' democratic constitution was noted for its stability and survived with modifications for centuries.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Voting Rules -->
+<section id="voting">
+  <h2>Voting Rules &amp; Procedures</h2>
+
+  <p>Greek city-states developed a variety of voting methods, each with distinctive implications for political equality and the expression of collective will.</p>
+
+  <h3>Athens</h3>
+  <div class="grid">
+    <div class="card">
+      <h4>Assembly: Show of Hands (Cheirotonia)</h4>
+      <p>In the Athenian Assembly (<em>Ekklesia</em>), most votes were taken by a show of hands (<em>cheirotonia</em>). The presiding officer estimated which side had more hands — there was no exact count. This method was fast and suited to the large gatherings (up to 6,000 or more) on the Pnyx hillside, though it meant that close votes depended on the chairman's judgment. For certain matters requiring a guaranteed quorum — such as grants of citizenship or ostracism — a count was taken.</p>
+    </div>
+    <div class="card accent">
+      <h4>Courts: Secret Ballot (Psephoi)</h4>
+      <p>In the law courts, jurors voted by placing bronze ballots (<em>psephoi</em>) into urns. Each juror received two ballots: one with a solid axle (for acquittal) and one with a hollow axle (for conviction). Jurors held the ballots by their axles so that no observer could see which was which, then deposited the ballot of their choice into a bronze urn (the one that counted) and the other into a wooden urn (discarded). This was a remarkably sophisticated secret ballot system designed to prevent intimidation.</p>
+    </div>
+  </div>
+
+  <h3>Other Methods Across Greece</h3>
+  <div class="grid">
+    <div class="card">
+      <h4>Sparta: Acclamation (Boai)</h4>
+      <p>The Spartan Assembly voted by shouting (<em>boai</em>). Judges sealed in a nearby building determined which side shouted louder. Thucydides records that this method was sometimes uncertain — in one famous case regarding the Peloponnesian War, a division (physical separation of sides) was required because the shout was too close to call.</p>
+    </div>
+    <div class="card accent">
+      <h4>Ostracism: Inscribed Pottery</h4>
+      <p>Each year, the Assembly voted on whether to hold an ostracism. If approved, a special vote was held in which each citizen scratched a name on a potsherd (<em>ostrakon</em>). A minimum of 6,000 votes was required for validity, and the person with the most votes was exiled for ten years.</p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>Who could vote?</strong> In Athens, only adult male citizens (over 18 for the Assembly, over 30 for juries) could participate. Women, enslaved people (perhaps 80,000–100,000 in Attica), and resident foreigners (<em>metics</em>) were excluded. Estimates suggest that of Athens' total population of roughly 250,000–300,000, only about 30,000–40,000 were eligible citizens, and typical Assembly attendance may have been 6,000–8,000.
+  </div>
+
+  <table>
+    <tr><th>City-State</th><th>Voting Method</th><th>Where Used</th><th>Notable Features</th></tr>
+    <tr><td>Athens</td><td>Show of hands</td><td>Assembly (Ekklesia)</td><td>No exact count; chairman estimates majority</td></tr>
+    <tr><td>Athens</td><td>Secret bronze ballots</td><td>Law courts (Dikasteria)</td><td>Hollow vs. solid axle; deposited in urns</td></tr>
+    <tr><td>Athens</td><td>Inscribed potsherds</td><td>Ostracism votes</td><td>6,000 minimum; annual decision to hold one</td></tr>
+    <tr><td>Sparta</td><td>Acclamation (shouting)</td><td>Assembly (Apella)</td><td>Judges assess volume; no individual count</td></tr>
+    <tr><td>Syracuse</td><td>Olive leaves</td><td>Petalism votes</td><td>5-year exile; abandoned as counterproductive</td></tr>
+    <tr><td>Sparta</td><td>Acclamation (shouting)</td><td>Gerousia elections</td><td>Candidates paraded; loudest cheers win</td></tr>
+  </table>
+</section>
+
+<!-- Courts -->
+<section id="courts">
+  <h2>Courts &amp; the Administration of Justice</h2>
+
+  <p>The Athenian court system was one of the most distinctive features of its democracy, placing judicial power directly in the hands of ordinary citizens rather than professional judges.</p>
+
+  <h3>The Athenian Court System</h3>
+
+  <div class="card gold">
+    <h4>The Heliaia and Dikasteria</h4>
+    <p>The Heliaia, traditionally attributed to Solon, was the supreme people's court from which the various <em>dikasteria</em> (jury-courts) were drawn. Each year, 6,000 citizens over age 30 were enrolled as potential jurors (<em>dikastai</em>). On trial days, jurors were assigned to specific courts by an elaborate lottery machine called the <em>kleroterion</em>.</p>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h4>Jury Size</h4>
+      <p>Athenian juries were enormous by modern standards: typically 201, 401, or 501 for private cases, and 501, 1,001, or even 1,501 for public cases. The odd numbers prevented tied verdicts. In exceptional cases, juries of 6,001 were convened. The large numbers served two purposes: they made bribery impractical and ensured that the jury represented a broad cross-section of the citizen body.</p>
+    </div>
+    <div class="card accent">
+      <h4>The Kleroterion (Allotment Machine)</h4>
+      <p>This marble machine, several examples of which survive, was used to randomly assign jurors to courts on the day of trial. Jurors inserted their identification tickets (<em>pinakia</em>) into slots. Black and white balls were then randomly released down a tube; rows aligned with white balls were selected. This prevented advance knowledge of which jurors would hear which case, further discouraging bribery.</p>
+    </div>
+  </div>
+
+  <h3>Trial Procedure</h3>
+  <p>Athenian trials were strikingly different from modern practice:</p>
+  <ul style="margin: 10px 0 15px 20px; line-height: 2;">
+    <li><strong>No professional lawyers:</strong> Litigants were required to speak for themselves, though they could hire speechwriters (<em>logographoi</em>) like Lysias or Demosthenes to compose their arguments.</li>
+    <li><strong>Time limits:</strong> Speeches were timed by a water clock (<em>klepsydra</em>). Each side received equal time.</li>
+    <li><strong>Two-stage verdicts:</strong> In some cases (including Socrates' trial in 399 BC), the jury first voted on guilt. If convicted, each side proposed a penalty, and the jury chose between them — they could not impose an intermediate sentence.</li>
+    <li><strong>No appeal:</strong> The jury's verdict was final, with no mechanism for appeal.</li>
+    <li><strong>Pay:</strong> Jurors received a daily stipend of 2–3 obols (later raised by Cleon to 3 obols), enabling poorer citizens to serve.</li>
+  </ul>
+
+  <h3>Types of Legal Action</h3>
+  <div class="grid-3">
+    <div class="card">
+      <h4>Dike (Private Suit)</h4>
+      <p>Only the injured party (or their guardian) could bring the case. Covered property disputes, assault, breach of contract. The prosecutor risked no penalty for losing.</p>
+    </div>
+    <div class="card accent">
+      <h4>Graphe (Public Prosecution)</h4>
+      <p>Any citizen could prosecute on behalf of the public interest. Used for offenses like impiety, hybris (outrage), and proposing illegal decrees. Prosecutors who failed to win at least one-fifth of the jury's votes were fined 1,000 drachmas and barred from bringing similar cases — a deterrent against frivolous prosecution.</p>
+    </div>
+    <div class="card gold">
+      <h4>Eisangelia (Impeachment)</h4>
+      <p>A procedure for prosecuting treason, corruption, and other serious offenses against the state. Could be brought before either the Assembly or the Council of 500. Many prominent leaders faced eisangelia, including generals who lost battles.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Ostracism -->
+<section id="ostracism">
+  <h2>Ostracism &amp; Petalism</h2>
+
+  <h3>Athenian Ostracism</h3>
+  <p>Ostracism was a unique Athenian institution that allowed the citizen body to exile any individual for ten years without trial or formal charges. It was a preventive measure — not a punishment for past crimes, but a safeguard against the concentration of power.</p>
+
+  <div class="card gold">
+    <h4>How Ostracism Worked</h4>
+    <ol style="margin: 10px 0 0 20px; line-height: 2;">
+      <li>Each year, during the sixth prytany, the Assembly voted on whether to hold an ostracism that year.</li>
+      <li>If approved, the ostracism vote was held approximately two months later, in the eighth prytany.</li>
+      <li>On the appointed day, citizens gathered in the Agora, which was fenced off with ten entrances (one per tribe).</li>
+      <li>Each citizen scratched the name of the person they wished to exile on a potsherd (<em>ostrakon</em>).</li>
+      <li>A minimum of 6,000 votes was required for the vote to be valid (scholars debate whether this was 6,000 total votes or 6,000 against a single person).</li>
+      <li>The person whose name appeared most often had ten days to leave Attica.</li>
+      <li>The exile lasted exactly ten years. The exiled person retained their citizenship and property; their family could remain in Athens.</li>
+    </ol>
+  </div>
+
+  <h3>Famous Ostracisms</h3>
+  <table>
+    <tr><th>Person</th><th>Year (approx.)</th><th>Reason / Context</th></tr>
+    <tr><td>Hipparchus (son of Charmus)</td><td>487 BC</td><td>First person ostracized; relative of the Peisistratid tyrants</td></tr>
+    <tr><td>Megacles</td><td>486 BC</td><td>Alcmaeonid aristocrat; possibly seen as too ambitious</td></tr>
+    <tr><td>Xanthippus</td><td>484 BC</td><td>Political rival of Themistocles; later recalled for Persian War</td></tr>
+    <tr><td>Aristides "the Just"</td><td>482 BC</td><td>Opposed Themistocles' naval policy; famous story of illiterate voter</td></tr>
+    <tr><td>Themistocles</td><td>c. 471 BC</td><td>Victor of Salamis; later suspected of pro-Persian sympathies</td></tr>
+    <tr><td>Cimon</td><td>461 BC</td><td>Pro-Spartan conservative; opposed democratic reforms</td></tr>
+    <tr><td>Thucydides (son of Melesias)</td><td>443 BC</td><td>Led opposition to Pericles' building program</td></tr>
+    <tr><td>Hyperbolus</td><td>c. 416 BC</td><td>Last ostracism; Nicias and Alcibiades colluded to exile him instead of each other</td></tr>
+  </table>
+
+  <div class="callout">
+    <strong>The end of ostracism:</strong> The farcical ostracism of Hyperbolus — who was a minor demagogue rather than a genuinely threatening figure — discredited the institution. When the intended targets (Nicias and Alcibiades) colluded to redirect votes against Hyperbolus, Athenians recognized that the process had been subverted, and ostracism was never used again.
+  </div>
+
+  <blockquote>
+    "An illiterate countryman handed his ostrakon to Aristides, not knowing who he was, and asked him to write the name 'Aristides' on it. When Aristides asked what harm the man had suffered, the voter replied: 'None. I do not even know him. But I am tired of hearing him called "the Just."'"
+    <cite>— Plutarch, Life of Aristides</cite>
+  </blockquote>
+
+  <h3>Syracusan Petalism</h3>
+  <p>Syracuse adopted its own version of ostracism called <em>petalismos</em> around 454 BC. The mechanics were similar to Athenian ostracism, with two key differences:</p>
+  <ul style="margin: 10px 0 15px 20px; line-height: 2;">
+    <li>Names were written on <strong>olive leaves</strong> (<em>petala</em>) rather than pottery shards</li>
+    <li>The exile lasted only <strong>five years</strong> instead of ten</li>
+  </ul>
+  <p>However, petalism was abandoned after only a short period. According to Diodorus Siculus, the practice caused the best and most capable citizens to withdraw from public life entirely, fearing exile. With competent leaders refusing to serve, the city was left in the hands of less capable men. The Syracusans recognized this self-defeating dynamic and abolished petalism — an instructive example of how a democratic safeguard can backfire.</p>
+</section>
+
+<!-- Sortition -->
+<section id="sortition">
+  <h2>Sortition: Selection by Lot</h2>
+
+  <p>For the Athenians, selection by lot (<em>sortition</em>) was the most democratic method of filling offices. They regarded election as an aristocratic principle — it favoured the well-known, wealthy, and eloquent — while the lottery gave every citizen an equal chance of serving, embodying the democratic ideal of <em>isonomia</em> (political equality).</p>
+
+  <div class="card gold">
+    <h4>Aristotle on Sortition</h4>
+    <blockquote style="border:none; background:none; padding:5px 0; margin:0;">
+      "It is thought to be democratic for offices to be assigned by lot, and oligarchic for them to be filled by election."
+      <cite>— Aristotle, Politics IV.9 (1294b)</cite>
+    </blockquote>
+  </div>
+
+  <h3>How Sortition Was Used in Athens</h3>
+
+  <div class="grid">
+    <div class="card">
+      <h4>Council of 500 (Boule)</h4>
+      <p>Fifty members were selected by lot from each of the ten tribes every year. Councillors served for one year and could serve a maximum of twice in their lifetime. Each tribe's fifty councillors served as the presiding committee (<em>prytaneis</em>) for one-tenth of the year.</p>
+    </div>
+    <div class="card accent">
+      <h4>Most Magistrates</h4>
+      <p>The vast majority of Athens' roughly 700 annual magistrates were selected by lot, including the nine archons (after 487 BC), market inspectors (<em>agoranomoi</em>), grain inspectors (<em>sitophylakes</em>), and many others. After selection, candidates underwent <em>dokimasia</em> (scrutiny) to verify their eligibility.</p>
+    </div>
+    <div class="card">
+      <h4>Jurors</h4>
+      <p>The 6,000 annual jurors were selected by lot from volunteers, then further sorted by the <em>kleroterion</em> on each trial day. This double randomization made jury-packing virtually impossible.</p>
+    </div>
+    <div class="card accent">
+      <h4>The Exception: Elected Officers</h4>
+      <p>Positions requiring specialized expertise were filled by election, not sortition. Most importantly, the ten <em>strategoi</em> (generals) were elected — one from each tribe (later changed to at-large election). Financial officers like the <em>tamias</em> (treasurer) of the military fund were also elected. These positions could be held repeatedly; Pericles was elected strategos for over 30 consecutive years.</p>
+    </div>
+  </div>
+
+  <h3>Safeguards on Allotted Officials</h3>
+  <p>The Athenians paired sortition with robust accountability mechanisms:</p>
+  <ul style="margin: 10px 0 15px 20px; line-height: 2;">
+    <li><strong>Dokimasia (scrutiny):</strong> Before taking office, every official underwent examination before a jury. Their citizenship, tax record, family background, and military service were reviewed. Any citizen could challenge their fitness.</li>
+    <li><strong>Euthynai (audit):</strong> At the end of their term, every official submitted their accounts for audit. Ten <em>logistai</em> (auditors), chosen by lot, examined financial records. Any citizen could file a complaint about an official's conduct during the audit period.</li>
+    <li><strong>Epicheirotonia:</strong> At the principal Assembly meeting of each prytany, a vote was taken on whether each category of official was performing satisfactorily. If voted down, the official was suspended and referred to the courts.</li>
+    <li><strong>Term limits:</strong> Most offices could be held only once (or twice for the Boule), preventing entrenchment.</li>
+  </ul>
+
+  <div class="callout">
+    <strong>A radical idea:</strong> The Athenian commitment to sortition was far more radical than any modern democracy has attempted. The premise was that any citizen — farmer, potter, fisherman — was competent to govern. The system of scrutiny, audit, and short terms was designed not to filter out incompetence but to ensure accountability. In practice, this meant that ordinary Athenians gained direct experience of governance at a rate unmatched in any other political system before or since.
+  </div>
+</section>
+
+<!-- Dismissing Leaders -->
+<section id="dismissal">
+  <h2>Dismissing Leaders &amp; Holding Power to Account</h2>
+
+  <p>The Athenians developed a comprehensive toolkit for removing, punishing, or constraining leaders — reflecting a deep institutional suspicion of concentrated power born from their experience with tyranny.</p>
+
+  <div class="grid">
+    <div class="card">
+      <h4>Ostracism</h4>
+      <p>A <strong>preventive</strong> measure: exile for 10 years without formal charges. Used against citizens seen as too powerful, not necessarily guilty of anything. See the <a href="#ostracism">Ostracism section</a> for full details.</p>
+    </div>
+    <div class="card accent">
+      <h4>Eisangelia (Impeachment)</h4>
+      <p>The most serious procedure, used for treason, attempting to overthrow the democracy, corruption, and military incompetence. Could be initiated in the Assembly or the Council. If the Assembly heard the case itself, it acted as both prosecutor and jury. Penalties could include death, exile, confiscation of property, and denial of burial in Attica.</p>
+    </div>
+    <div class="card gold">
+      <h4>Graphe Paranomon</h4>
+      <p>A prosecution for proposing an unconstitutional decree. Any citizen could charge the proposer of a decree — even after it had been passed — with having violated the laws. This was a powerful check on demagogues: speakers who proposed radical measures in the heat of the moment could be prosecuted afterward by cooler heads. The penalty could include a fine or loss of political rights (<em>atimia</em>). After three convictions for graphe paranomon, a citizen was permanently disenfranchised.</p>
+    </div>
+    <div class="card">
+      <h4>Apocheirotonia (Vote of Confidence)</h4>
+      <p>At the principal Assembly meeting of each prytany (roughly every 36 days), a formal vote was taken on whether the current <em>strategoi</em> (generals) and other elected officials were performing adequately. If a majority voted against an official, they were immediately suspended from office and referred to trial. This provided regular, institutionalized accountability — not just a one-time election.</p>
+    </div>
+    <div class="card accent">
+      <h4>Euthynai (End-of-Term Audit)</h4>
+      <p>Every departing official submitted to a financial and general audit of their conduct in office. Auditors chosen by lot examined their accounts. Any citizen could bring complaints during the thirty-day review period. Officials found guilty could face fines, loss of rights, or worse.</p>
+    </div>
+    <div class="card gold">
+      <h4>Dokimasia (Pre-Office Scrutiny)</h4>
+      <p>Before taking office, all officials — whether elected or chosen by lot — appeared before a jury that examined their qualifications. Any citizen could object. This served as a preliminary filter and could bar unfit individuals from taking office.</p>
+    </div>
+  </div>
+
+  <h3>Examples of Leaders Brought Down</h3>
+  <table>
+    <tr><th>Leader</th><th>Mechanism</th><th>Outcome</th></tr>
+    <tr><td>Miltiades (hero of Marathon)</td><td>Eisangelia</td><td>Fined 50 talents for failed expedition to Paros (489 BC); died of wounds before paying</td></tr>
+    <tr><td>Themistocles</td><td>Ostracism, then eisangelia (in absentia)</td><td>Ostracized c. 471 BC; later condemned for alleged treason, fled to Persia</td></tr>
+    <tr><td>Cimon</td><td>Ostracism</td><td>Exiled 461 BC for pro-Spartan policies; recalled early during crisis</td></tr>
+    <tr><td>Pericles</td><td>Removed as strategos, fined</td><td>Deposed and fined 15–50 talents (430 BC) after plague struck; re-elected the next year</td></tr>
+    <tr><td>Alcibiades</td><td>Eisangelia (for profanation of Mysteries)</td><td>Recalled from Sicilian expedition (415 BC); defected to Sparta</td></tr>
+    <tr><td>Generals at Arginusae</td><td>Group trial by Assembly</td><td>Six generals executed (406 BC) for failing to rescue shipwrecked sailors — later regretted</td></tr>
+    <tr><td>Socrates</td><td>Graphe (public prosecution for impiety)</td><td>Convicted and executed (399 BC); jury of 501 voted 280–221 for conviction</td></tr>
+  </table>
+</section>
+
+<!-- Comparison -->
+<section id="comparison">
+  <h2>Athens vs. Syracuse: A Comparison</h2>
+
+  <div class="comparison">
+    <div class="col">
+      <h4 style="color:var(--primary);">Athens</h4>
+      <ul>
+        <li>Democracy evolved gradually over ~200 years</li>
+        <li>Sophisticated institutional checks and balances</li>
+        <li>Extensive use of sortition for magistrates</li>
+        <li>Ostracism: 10-year exile on potsherds; used 487–416 BC</li>
+        <li>Large-scale jury courts (201–6,001 jurors)</li>
+        <li>Assembly met ~40 times per year</li>
+        <li>Pay for jurors, councillors, and (later) Assembly attendance</li>
+        <li>Graphe paranomon as constitutional safeguard</li>
+        <li>Democracy lasted ~185 years (508–322 BC, with interruptions)</li>
+        <li>Overthrown by external force (Macedon)</li>
+      </ul>
+    </div>
+    <div class="col">
+      <h4 style="color:var(--secondary);">Syracuse</h4>
+      <ul>
+        <li>Democracy emerged suddenly after fall of tyranny</li>
+        <li>Simpler institutional framework</li>
+        <li>Less systematic use of sortition</li>
+        <li>Petalism: 5-year exile on olive leaves; quickly abandoned</li>
+        <li>Courts less well-documented</li>
+        <li>Assembly structure similar but less formalized</li>
+        <li>No evidence of state pay for political participation</li>
+        <li>Fewer constitutional safeguards</li>
+        <li>Democracy lasted ~60 years (466–405 BC), with later revival</li>
+        <li>Overthrown by internal subversion (Dionysius I)</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- Quiz -->
+<section id="quiz">
+  <h2>Test Your Knowledge</h2>
+  <p>See how much you've learned about ancient Greek democracy.</p>
+
+  <div class="quiz-card" id="q1">
+    <h4>1. What was the minimum number of votes required for an Athenian ostracism to be valid?</h4>
+    <button class="quiz-option" onclick="checkQuiz('q1', this, true)">6,000</button>
+    <button class="quiz-option" onclick="checkQuiz('q1', this, false)">3,000</button>
+    <button class="quiz-option" onclick="checkQuiz('q1', this, false)">10,000</button>
+    <button class="quiz-option" onclick="checkQuiz('q1', this, false)">500</button>
+    <div class="quiz-feedback" id="q1-fb"></div>
+  </div>
+
+  <div class="quiz-card" id="q2">
+    <h4>2. In Syracusan petalism, names were written on what material?</h4>
+    <button class="quiz-option" onclick="checkQuiz('q2', this, false)">Pottery shards</button>
+    <button class="quiz-option" onclick="checkQuiz('q2', this, true)">Olive leaves</button>
+    <button class="quiz-option" onclick="checkQuiz('q2', this, false)">Wax tablets</button>
+    <button class="quiz-option" onclick="checkQuiz('q2', this, false)">Papyrus strips</button>
+    <div class="quiz-feedback" id="q2-fb"></div>
+  </div>
+
+  <div class="quiz-card" id="q3">
+    <h4>3. Which philosopher famously stated that sortition is democratic and election is oligarchic?</h4>
+    <button class="quiz-option" onclick="checkQuiz('q3', this, false)">Plato</button>
+    <button class="quiz-option" onclick="checkQuiz('q3', this, true)">Aristotle</button>
+    <button class="quiz-option" onclick="checkQuiz('q3', this, false)">Socrates</button>
+    <button class="quiz-option" onclick="checkQuiz('q3', this, false)">Herodotus</button>
+    <div class="quiz-feedback" id="q3-fb"></div>
+  </div>
+
+  <div class="quiz-card" id="q4">
+    <h4>4. How did Spartan citizens vote in the Apella?</h4>
+    <button class="quiz-option" onclick="checkQuiz('q4', this, false)">Secret ballot with pebbles</button>
+    <button class="quiz-option" onclick="checkQuiz('q4', this, false)">Show of hands</button>
+    <button class="quiz-option" onclick="checkQuiz('q4', this, true)">Shouting (acclamation)</button>
+    <button class="quiz-option" onclick="checkQuiz('q4', this, false)">Written ballots</button>
+    <div class="quiz-feedback" id="q4-fb"></div>
+  </div>
+
+  <div class="quiz-card" id="q5">
+    <h4>5. What was the kleroterion used for?</h4>
+    <button class="quiz-option" onclick="checkQuiz('q5', this, false)">Timing speeches in court</button>
+    <button class="quiz-option" onclick="checkQuiz('q5', this, false)">Counting votes in the Assembly</button>
+    <button class="quiz-option" onclick="checkQuiz('q5', this, true)">Randomly assigning jurors to courts</button>
+    <button class="quiz-option" onclick="checkQuiz('q5', this, false)">Recording laws on stone</button>
+    <div class="quiz-feedback" id="q5-fb"></div>
+  </div>
+
+  <div class="quiz-card" id="q6">
+    <h4>6. Who was the last person to be ostracized from Athens?</h4>
+    <button class="quiz-option" onclick="checkQuiz('q6', this, false)">Alcibiades</button>
+    <button class="quiz-option" onclick="checkQuiz('q6', this, false)">Themistocles</button>
+    <button class="quiz-option" onclick="checkQuiz('q6', this, true)">Hyperbolus</button>
+    <button class="quiz-option" onclick="checkQuiz('q6', this, false)">Cimon</button>
+    <div class="quiz-feedback" id="q6-fb"></div>
+  </div>
+
+  <div class="quiz-card" id="q7">
+    <h4>7. What mechanism allowed any Athenian citizen to prosecute someone for proposing an unconstitutional decree?</h4>
+    <button class="quiz-option" onclick="checkQuiz('q7', this, false)">Eisangelia</button>
+    <button class="quiz-option" onclick="checkQuiz('q7', this, true)">Graphe paranomon</button>
+    <button class="quiz-option" onclick="checkQuiz('q7', this, false)">Dokimasia</button>
+    <button class="quiz-option" onclick="checkQuiz('q7', this, false)">Euthynai</button>
+    <div class="quiz-feedback" id="q7-fb"></div>
+  </div>
+
+  <div id="quizScore" style="display:none; text-align:center; padding:20px; margin-top:20px; background:var(--bg-dark); border-radius:10px;">
+    <h3 style="color:var(--primary);"></h3>
+  </div>
+</section>
+
+<!-- Sources -->
+<section id="sources">
+  <h2>Sources &amp; Further Reading</h2>
+  <div class="grid">
+    <div class="card">
+      <h4>Ancient Sources</h4>
+      <ul style="margin: 5px 0 0 15px; line-height: 2; font-size: 0.9rem;">
+        <li>Aristotle, <em>Politics</em> and <em>Constitution of the Athenians</em></li>
+        <li>Herodotus, <em>Histories</em></li>
+        <li>Thucydides, <em>History of the Peloponnesian War</em></li>
+        <li>Plutarch, <em>Parallel Lives</em> (esp. Solon, Themistocles, Pericles, Aristides, Cimon, Timoleon)</li>
+        <li>Diodorus Siculus, <em>Library of History</em></li>
+        <li>Xenophon, <em>Constitution of the Lacedaemonians</em></li>
+      </ul>
+    </div>
+    <div class="card accent">
+      <h4>Modern Scholarship</h4>
+      <ul style="margin: 5px 0 0 15px; line-height: 2; font-size: 0.9rem;">
+        <li>M.H. Hansen, <em>The Athenian Democracy in the Age of Demosthenes</em> (1991)</li>
+        <li>J. Ober, <em>Mass and Elite in Democratic Athens</em> (1989)</li>
+        <li>P.J. Rhodes, <em>A Commentary on the Aristotelian Athenaion Politeia</em> (1993)</li>
+        <li>R. Osborne, <em>Demos: The Discovery of Classical Attika</em> (1985)</li>
+        <li>E. Robinson, <em>Democracy Beyond Athens</em> (2011)</li>
+        <li>V.D. Hanson, <em>The Other Greeks</em> (1995)</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <p>Democracy in Ancient Greece — An Interactive Educational Resource</p>
+  <p style="margin-top:8px; font-size:0.8rem;">Content based on ancient sources and modern scholarship. Created for educational purposes.</p>
+</footer>
+
+</div><!-- end main -->
+
+<script>
+// City info data
+const cityData = {
+  athens: {
+    title: 'Athens',
+    text: 'The birthplace and most developed example of ancient democracy. From Solon\'s reforms (594 BC) through Cleisthenes\' democratic revolution (508/7 BC) to the radical democracy of the fifth century, Athens created the Assembly (Ekklesia), Council of 500 (Boule), people\'s courts (Dikasteria), ostracism, and extensive use of sortition. Population: ~250,000–300,000 (of whom ~30,000–40,000 were citizens). Democracy lasted from 508 to 322 BC with two brief oligarchic interruptions.'
+  },
+  syracuse: {
+    title: 'Syracuse',
+    text: 'The largest Greek city in Sicily and the most important democratic experiment outside mainland Greece. After overthrowing the tyrant Thrasybulus in 466 BC, Syracuse established a democracy with a popular assembly and its own version of ostracism called petalism (using olive leaves instead of pottery). Democracy lasted until 405 BC when Dionysius I seized power. Timoleon briefly restored democracy in 344–337 BC.'
+  },
+  sparta: {
+    title: 'Sparta',
+    text: 'Sparta\'s "mixed constitution" combined two hereditary kings, the Gerousia (council of 28 elders elected for life), the Apella (citizen assembly voting by acclamation), and five annually elected ephors with extensive powers. While not a democracy in the Athenian sense, Sparta included significant popular elements. The Assembly could approve or reject legislation but could not propose or amend it.'
+  },
+  corinth: {
+    title: 'Corinth',
+    text: 'Ruled by the exclusive Bacchiad aristocracy until Cypselus\'s tyranny (c. 657 BC), then by Periander. After the tyranny fell (c. 584 BC), Corinth became a moderate oligarchy with broader participation than before but never a full democracy. Consistently anti-democratic in foreign policy and a key Spartan ally.'
+  },
+  argos: {
+    title: 'Argos',
+    text: 'Developed democratic institutions partly in opposition to rival Sparta. After heavy losses at the Battle of Sepeia (c. 494 BC), Argos expanded its citizen body by enfranchising surrounding peoples. Maintained a long alliance with democratic Athens. Had a board of artynai who could prosecute officials for exceeding their authority.'
+  },
+  thebes: {
+    title: 'Thebes',
+    text: 'The chief city of Boeotia, Thebes oscillated between oligarchy and broader government. Under the Boeotian Confederation, Thebes used a system of four rotating councils. After liberation from Sparta in 379 BC, Thebes established a more democratic government under Epaminondas and Pelopidas, briefly becoming the strongest power in Greece.'
+  },
+  megara: {
+    title: 'Megara',
+    text: 'Experienced a brief but radical democratic revolution in the 6th century BC, during which the democratic faction confiscated aristocratic property and forced the wealthy to refund interest on past loans. Aristotle later cited Megara as a cautionary example of democratic excess. The democracy was short-lived.'
+  },
+  chios: {
+    title: 'Chios',
+    text: 'An inscription from c. 575–550 BC describes a "people\'s council" (boule demosie) with power to hear appeals against magistrates — one of the earliest known democratic institutions in Greece, roughly contemporary with Solon\'s Athens. This suggests democratic ideas may have emerged independently in multiple Greek cities.'
+  },
+  rhodes: {
+    title: 'Rhodes',
+    text: 'In 408 BC, the three cities of Rhodes (Lindos, Ialysus, Camirus) merged into a single polis with a democratic constitution: an assembly, a council of 500, and elected prytaneis. Rhodes\' democracy was noted for its stability and lasted for centuries.'
+  },
+  miletus: {
+    title: 'Miletus',
+    text: 'A major Ionian city on the coast of Asia Minor. Miletus experienced intense political conflict between democratic and oligarchic factions in the 6th century. Herodotus records that Miletus suffered from prolonged civil strife (stasis) that was eventually arbitrated by Paros. The city later participated in the Ionian Revolt against Persia (499 BC).'
+  },
+  mantinea: {
+    title: 'Mantinea',
+    text: 'An Arcadian city that maintained a democratic government allied with Athens and Argos. In 385 BC, Sparta destroyed Mantinea\'s walls and forcibly dispersed the population into villages to eliminate the democracy — demonstrating that democratic self-governance existed under constant external threat from anti-democratic powers.'
+  },
+  elis: {
+    title: 'Elis',
+    text: 'Host of the Olympic Games, Elis established democratic institutions after a revolution around 471 BC. The city conducted a synoecism (merger of surrounding communities), expanding the democratic citizen body. It maintained an elected council and popular assembly.'
+  },
+  pella: {
+    title: 'Pella (Macedonia)',
+    text: 'Capital of the Macedonian kingdom under Philip II and Alexander the Great. Macedonia was a hereditary monarchy, not a democracy. Philip II\'s victory at Chaeronea (338 BC) and Alexander\'s subsequent campaigns effectively ended the era of independent Greek city-state democracy, though democratic forms persisted under Macedonian hegemony.'
+  }
+};
+
+// Leaflet map setup
+function initMap() {
+  const map = L.map('leafletMap', {
+    center: [38.0, 23.5],
+    zoom: 6,
+    minZoom: 5,
+    maxZoom: 10,
+    scrollWheelZoom: true
+  });
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors',
+    maxZoom: 19
+  }).addTo(map);
+
+  function makeIcon(color, size) {
+    return L.divIcon({
+      className: '',
+      html: `<div style="width:${size}px;height:${size}px;border-radius:50%;background:${color};border:3px solid #fff;box-shadow:0 0 0 2px ${color}, 0 2px 6px rgba(0,0,0,0.3);"></div>`,
+      iconSize: [size, size],
+      iconAnchor: [size/2, size/2],
+      popupAnchor: [0, -size/2 - 4]
+    });
+  }
+
+  const cities = [
+    { lat: 37.97, lon: 23.73, key: 'athens', color: '#c62828', size: 22 },
+    { lat: 37.07, lon: 15.29, key: 'syracuse', color: '#8b2e8b', size: 22 },
+    { lat: 37.07, lon: 22.43, key: 'sparta', color: '#2e7d32', size: 16 },
+    { lat: 37.94, lon: 22.88, key: 'corinth', color: '#e65100', size: 14 },
+    { lat: 37.63, lon: 22.72, key: 'argos', color: '#e65100', size: 14 },
+    { lat: 38.32, lon: 23.32, key: 'thebes', color: '#e65100', size: 14 },
+    { lat: 38.00, lon: 23.34, key: 'megara', color: '#e65100', size: 12 },
+    { lat: 38.37, lon: 26.07, key: 'chios', color: '#1565c0', size: 14 },
+    { lat: 36.44, lon: 28.23, key: 'rhodes', color: '#1565c0', size: 14 },
+    { lat: 37.53, lon: 27.28, key: 'miletus', color: '#1565c0', size: 12 },
+    { lat: 37.62, lon: 22.39, key: 'mantinea', color: '#e65100', size: 11 },
+    { lat: 37.88, lon: 21.51, key: 'elis', color: '#e65100', size: 11 },
+    { lat: 40.76, lon: 22.52, key: 'pella', color: '#4a148c', size: 14 }
+  ];
+
+  cities.forEach(c => {
+    const d = cityData[c.key];
+    if (!d) return;
+    const marker = L.marker([c.lat, c.lon], { icon: makeIcon(c.color, c.size) }).addTo(map);
+    marker.bindPopup(`<h4>${d.title}</h4><p>${d.text}</p>`);
+  });
+}
+
+// Tab switching
+function switchTab(e, tabId) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  e.target.classList.add('active');
+  document.getElementById(tabId).classList.add('active');
+}
+
+// Timeline data
+const events = [
+  { year: -800, label: 'Rise of the Greek polis', cat: 'other' },
+  { year: -750, label: 'Hoplite warfare transforms politics', cat: 'other' },
+  { year: -683, label: 'Athens: annual archons replace life archons', cat: 'athens' },
+  { year: -657, label: 'Cypselus becomes tyrant of Corinth', cat: 'other' },
+  { year: -632, label: 'Cylon\'s attempted coup in Athens', cat: 'athens' },
+  { year: -621, label: 'Draco\'s law code in Athens', cat: 'athens' },
+  { year: -594, label: 'Solon\'s reforms: wealth classes, Heliaia, Boule', cat: 'athens' },
+  { year: -575, label: 'Chios: earliest known "people\'s council"', cat: 'other' },
+  { year: -560, label: 'Peisistratus becomes tyrant of Athens', cat: 'athens' },
+  { year: -510, label: 'Fall of Peisistratid tyranny in Athens', cat: 'athens' },
+  { year: -508, label: 'Cleisthenes\' reforms: birth of demokratia', cat: 'athens' },
+  { year: -494, label: 'Argos expands citizenship after Sepeia', cat: 'other' },
+  { year: -487, label: 'First ostracism in Athens; archons chosen by lot', cat: 'athens' },
+  { year: -485, label: 'Gelon becomes tyrant of Syracuse', cat: 'syracuse' },
+  { year: -480, label: 'Battles of Thermopylae and Salamis', cat: 'other' },
+  { year: -471, label: 'Elis: democratic revolution & synoecism', cat: 'other' },
+  { year: -466, label: 'Democracy established in Syracuse', cat: 'syracuse' },
+  { year: -462, label: 'Ephialtes\' reforms: radical democracy', cat: 'athens' },
+  { year: -454, label: 'Syracuse introduces petalism', cat: 'syracuse' },
+  { year: -451, label: 'Pericles\' citizenship law', cat: 'athens' },
+  { year: -443, label: 'Thucydides son of Melesias ostracized', cat: 'athens' },
+  { year: -416, label: 'Last ostracism: Hyperbolus exiled', cat: 'athens' },
+  { year: -415, label: 'Sicilian Expedition launched', cat: 'athens' },
+  { year: -411, label: 'Oligarchic coup of the Four Hundred', cat: 'athens' },
+  { year: -408, label: 'Rhodes: democratic synoecism', cat: 'other' },
+  { year: -405, label: 'Dionysius I seizes power in Syracuse', cat: 'syracuse' },
+  { year: -404, label: 'Thirty Tyrants seize power in Athens', cat: 'athens' },
+  { year: -403, label: 'Democracy restored in Athens', cat: 'athens' },
+  { year: -399, label: 'Trial and execution of Socrates', cat: 'athens' },
+  { year: -385, label: 'Sparta destroys democratic Mantinea', cat: 'other' },
+  { year: -344, label: 'Timoleon restores democracy in Syracuse', cat: 'syracuse' },
+  { year: -338, label: 'Philip II defeats Greeks at Chaeronea', cat: 'other' },
+  { year: -323, label: 'Death of Alexander the Great', cat: 'other' },
+  { year: -322, label: 'Macedon ends Athenian democracy', cat: 'athens' }
+];
+
+// Build vertical timeline
+function buildTimeline() {
+  const container = document.getElementById('vtlContainer');
+  container.innerHTML = '';
+
+  // Group events into eras for section headers
+  const eras = [
+    { start: -810, end: -600, label: 'Archaic Period (800\u2013600 BC)' },
+    { start: -600, end: -480, label: 'Late Archaic / Rise of Democracy (600\u2013480 BC)' },
+    { start: -480, end: -400, label: 'Classical Period (480\u2013400 BC)' },
+    { start: -400, end: -310, label: 'Fourth Century & Macedonian Era (400\u2013322 BC)' }
+  ];
+
+  let side = 'left';
+  let eraIdx = 0;
+
+  events.forEach((ev) => {
+    // Check if we need an era header
+    while (eraIdx < eras.length && ev.year >= eras[eraIdx].end) eraIdx++;
+    if (eraIdx < eras.length && ev.year >= eras[eraIdx].start) {
+      // Insert era header before first event in this era
+      if (!container.querySelector(`[data-era="${eraIdx}"]`)) {
+        const eraDiv = document.createElement('div');
+        eraDiv.className = 'vtl-era';
+        eraDiv.setAttribute('data-era', eraIdx);
+        eraDiv.innerHTML = `<span>${eras[eraIdx].label}</span>`;
+        container.appendChild(eraDiv);
+      }
+    }
+
+    const div = document.createElement('div');
+    div.className = `vtl-event ${side} cat-${ev.cat}`;
+    div.setAttribute('data-cat', ev.cat);
+    div.innerHTML = `
+      <div class="vtl-dot ${ev.cat}"></div>
+      <div class="vtl-year">${Math.abs(ev.year)} BC</div>
+      <div class="vtl-text">${ev.label}</div>`;
+    container.appendChild(div);
+    side = (side === 'left') ? 'right' : 'left';
+  });
+}
+
+// Filter timeline
+function filterTimeline(cat, btn) {
+  document.querySelectorAll('.tl-filter-btn').forEach(b => {
+    b.classList.remove('active', 'active-syr', 'active-other');
+  });
+  if (cat === 'all') btn.classList.add('active');
+  else if (cat === 'syracuse') btn.classList.add('active-syr');
+  else if (cat === 'other') btn.classList.add('active-other');
+  else btn.classList.add('active');
+
+  document.querySelectorAll('.vtl-event').forEach(el => {
+    if (cat === 'all' || el.dataset.cat === cat) {
+      el.style.display = '';
+    } else {
+      el.style.display = 'none';
+    }
+  });
+}
+
+// Quiz
+let quizAnswered = 0;
+let quizCorrect = 0;
+const totalQuestions = 7;
+const quizFeedback = {
+  q1: { correct: 'Correct! A minimum of 6,000 votes (ostraka) was required for an ostracism to be valid.', wrong: 'Not quite. The required minimum was 6,000 votes — a significant fraction of the citizen body.' },
+  q2: { correct: 'Correct! Petalism used olive leaves (petala), giving the practice its name.', wrong: 'Not quite. Syracuse used olive leaves (petala), unlike Athens\' pottery shards (ostraka).' },
+  q3: { correct: 'Correct! Aristotle made this famous observation in the Politics (IV.9).', wrong: 'It was Aristotle who wrote in the Politics that "offices assigned by lot are democratic, those filled by election are oligarchic."' },
+  q4: { correct: 'Correct! Spartans voted by shouting (boai), with judges determining which side was louder.', wrong: 'Spartans voted by acclamation — shouting — with judges sealed in a nearby building deciding which side was louder.' },
+  q5: { correct: 'Correct! The kleroterion was a marble allotment machine used to randomly assign jurors to courts on trial days.', wrong: 'The kleroterion was an allotment machine for randomly assigning jurors to courts, preventing advance knowledge of jury composition.' },
+  q6: { correct: 'Correct! Hyperbolus was ostracized c. 416 BC after Nicias and Alcibiades colluded against him, discrediting the institution.', wrong: 'The last person ostracized was Hyperbolus (c. 416 BC). The farcical circumstances led Athenians to abandon the practice.' },
+  q7: { correct: 'Correct! The graphe paranomon allowed any citizen to prosecute someone for proposing a decree that violated existing laws.', wrong: 'The graphe paranomon ("prosecution for illegal proposals") was the mechanism for challenging unconstitutional decrees.' }
+};
+
+function checkQuiz(qId, btn, isCorrect) {
+  const card = document.getElementById(qId);
+  if (card.dataset.answered) return;
+  card.dataset.answered = 'true';
+  quizAnswered++;
+
+  const buttons = card.querySelectorAll('.quiz-option');
+  buttons.forEach(b => {
+    b.style.pointerEvents = 'none';
+    b.style.opacity = '0.7';
+  });
+
+  if (isCorrect) {
+    btn.classList.add('correct');
+    btn.style.opacity = '1';
+    quizCorrect++;
+  } else {
+    btn.classList.add('wrong');
+    btn.style.opacity = '1';
+    // highlight correct
+    buttons.forEach(b => {
+      if (!b.classList.contains('wrong')) {
+        // find the correct one by checking all - we use a small hack
+      }
+    });
+  }
+
+  const fb = document.getElementById(qId + '-fb');
+  fb.style.display = 'block';
+  fb.style.background = isCorrect ? '#e8f5e9' : '#fff3e0';
+  fb.style.color = isCorrect ? '#2e7d32' : '#e65100';
+  fb.textContent = isCorrect ? quizFeedback[qId].correct : quizFeedback[qId].wrong;
+
+  if (quizAnswered === totalQuestions) {
+    const scoreDiv = document.getElementById('quizScore');
+    scoreDiv.style.display = 'block';
+    scoreDiv.querySelector('h3').textContent = `You scored ${quizCorrect} out of ${totalQuestions}! ${quizCorrect === totalQuestions ? 'Perfect — you are a true scholar of Greek democracy!' : quizCorrect >= 5 ? 'Excellent knowledge of ancient Greek political institutions!' : quizCorrect >= 3 ? 'Good effort! Review the sections above to strengthen your knowledge.' : 'Keep reading — the history of Greek democracy is fascinating!'}`;
+  }
+}
+
+// Sidebar active state on scroll
+function updateSidebar() {
+  const sections = document.querySelectorAll('section[id], header[id]');
+  let current = '';
+  sections.forEach(s => {
+    if (window.scrollY >= s.offsetTop - 100) current = s.id;
+  });
+  document.querySelectorAll('.sidebar a').forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+  });
+}
+
+window.addEventListener('scroll', updateSidebar);
+document.addEventListener('DOMContentLoaded', () => {
+  initMap();
+  buildTimeline();
+  updateSidebar();
+});
+</script>
+
+</body>
+</html>

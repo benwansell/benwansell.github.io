@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>House of Cards - Westminster Deck-Builder</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Screen Wipe Overlay -->
+    <div id="screen-wipe"></div>
+
+    <!-- Title Screen -->
+    <div id="title-screen" class="screen active">
+        <div class="title-content">
+            <div class="title-portcullis">&#9784;</div>
+            <h1>House of Cards</h1>
+            <p class="subtitle">A Westminster Deck-Builder</p>
+            <button id="new-game-btn" class="btn btn-primary">New Game</button>
+            <button id="continue-btn" class="btn" style="display:none">Continue</button>
+        </div>
+    </div>
+
+    <!-- Level Briefing Screen -->
+    <div id="briefing-screen" class="screen">
+        <div class="briefing-content">
+            <h2 id="briefing-level">Level 1: Candidate Selection</h2>
+            <div class="briefing-enemy-portrait" id="briefing-enemy-initials">BC</div>
+            <div class="briefing-enemy-name" id="briefing-enemy-name">Cllr. Brenda Cartwright</div>
+            <div class="briefing-enemy-title" id="briefing-enemy-title">Seasoned Local Councillor</div>
+            <div class="briefing-enemy-hp" id="briefing-enemy-hp">HP: 45</div>
+            <div class="briefing-special" id="briefing-special"></div>
+            <button id="start-combat-btn" class="btn btn-primary">Begin Battle</button>
+        </div>
+    </div>
+
+    <!-- Combat Screen -->
+    <div id="combat-screen" class="screen">
+        <div class="combat-layout">
+            <!-- Top bar -->
+            <div class="combat-top-bar">
+                <div class="top-left">
+                    <span id="combat-gold">0g</span>
+                    <div id="relics-bar"></div>
+                </div>
+                <button id="view-deck-btn" class="btn btn-secondary" style="padding:6px 16px;font-size:11px">View Deck</button>
+            </div>
+
+            <!-- Battlefield -->
+            <div class="battlefield">
+                <!-- Player -->
+                <div id="player-area">
+                    <div class="player-portrait">
+                        &#9824;
+                        <div class="block-badge" id="player-block" style="display:none">0</div>
+                    </div>
+                    <div class="hp-bar">
+                        <div class="hp-bar-fill" id="player-hp-fill" style="width:100%"></div>
+                        <div class="hp-bar-text" id="player-hp-text">60/60</div>
+                    </div>
+                    <div class="status-container" id="player-status"></div>
+                    <div class="energy-display">
+                        <div class="energy-orb" id="player-energy">3</div>
+                        <span class="energy-max">/<span id="energy-max">3</span></span>
+                    </div>
+                </div>
+
+                <!-- Enemy -->
+                <div class="enemy-area">
+                    <div class="enemy-portrait" id="enemy-portrait">
+                        <span id="enemy-initials">BC</span>
+                        <div class="block-badge" id="enemy-block" style="display:none">0</div>
+                    </div>
+                    <div id="enemy-minion"></div>
+                    <div class="enemy-name" id="enemy-name">Cllr. Brenda Cartwright</div>
+                    <div class="hp-bar">
+                        <div class="hp-bar-fill" id="enemy-hp-fill" style="width:100%"></div>
+                        <div class="hp-bar-text" id="enemy-hp-text">45/45</div>
+                    </div>
+                    <div class="status-container" id="enemy-status"></div>
+                    <div class="enemy-intent" id="enemy-intent">???</div>
+                </div>
+
+                <!-- Combat Log -->
+                <div class="combat-log" id="combat-log"></div>
+
+                <!-- Discard Prompt -->
+                <div id="discard-prompt"></div>
+            </div>
+
+            <!-- Hand -->
+            <div class="hand-area">
+                <div id="hand-container"></div>
+            </div>
+
+            <!-- Bottom bar -->
+            <div class="combat-bottom-bar">
+                <div class="pile-info">
+                    <span>Draw: <strong id="draw-count">0</strong></span>
+                    <span>Discard: <strong id="discard-count">0</strong></span>
+                    <span>Exhaust: <strong id="exhaust-count">0</strong></span>
+                </div>
+                <button id="end-turn-btn" class="btn btn-primary" style="padding:8px 24px;font-size:12px">End Turn</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reward Screen -->
+    <div id="reward-screen" class="screen">
+        <div class="reward-content">
+            <h2>Victory!</h2>
+            <div id="reward-content"></div>
+        </div>
+    </div>
+
+    <!-- Shop Screen -->
+    <div id="shop-screen" class="screen">
+        <div class="shop-content">
+            <h2>The Olde Westminster Shoppe</h2>
+            <div id="shop-content"></div>
+            <button id="shop-continue-btn" class="btn btn-primary" style="margin-top:24px">Continue</button>
+        </div>
+    </div>
+
+    <!-- Victory Screen -->
+    <div id="victory-screen" class="screen">
+        <div class="victory-content">
+            <h1>Prime Minister!</h1>
+            <p class="victory-sub">You have risen to the highest office in the land.</p>
+            <div class="victory-stats">
+                <div id="victory-turns">Turns: 0</div>
+                <div id="victory-gold">Gold Earned: 0</div>
+                <div id="victory-deck-size">Final Deck Size: 10</div>
+                <div id="victory-relics">Relics: 0</div>
+            </div>
+            <button id="victory-restart-btn" class="btn btn-primary">Play Again</button>
+        </div>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="gameover-screen" class="screen">
+        <div class="gameover-content">
+            <h1>Deselected</h1>
+            <p id="gameover-level">Defeated at Level 1</p>
+            <button id="gameover-restart-btn" class="btn btn-primary">Try Again</button>
+        </div>
+    </div>
+
+    <!-- Deck View Modal -->
+    <div class="deck-modal" id="deck-modal">
+        <div class="deck-modal-header">
+            <span class="deck-modal-title" id="deck-modal-title">Your Deck</span>
+            <button class="btn btn-secondary" id="deck-modal-close" style="padding:6px 16px;font-size:11px">Close</button>
+        </div>
+        <div class="deck-modal-cards" id="deck-modal-cards"></div>
+    </div>
+
+    <!-- Scripts in load order -->
+    <script src="js/cards.js"></script>
+    <script src="js/enemies.js"></script>
+    <script src="js/combat.js"></script>
+    <script src="js/shop.js"></script>
+    <script src="js/animations.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>
