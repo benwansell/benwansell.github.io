@@ -3,121 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ben W. Ansell | Oxford Professor</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Ben W. Ansell</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #32373c;
+            background-color: #f8f8f8;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        a { color: #32373c; text-decoration: none; }
+        header {
+            text-align: center;
+            padding: 3rem 2rem 1.5rem;
+        }
+        header h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+        header p {
+            color: #666;
+            font-size: 1.05rem;
+        }
+        .projects {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 1rem 2rem 3rem;
+            flex: 1;
+        }
+        .project-card {
+            background: #fff;
+            border-radius: 8px;
+            padding: 1.5rem 1.8rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: box-shadow 0.2s, transform 0.15s;
+            border: 1px solid #e8e8e8;
+        }
+        .project-card:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            transform: translateY(-2px);
+        }
+        .project-info h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        .project-info p {
+            color: #666;
+            font-size: 0.95rem;
+        }
+        .project-arrow {
+            font-size: 1.4rem;
+            color: #999;
+            margin-left: 1.5rem;
+            flex-shrink: 0;
+        }
+        .project-card:hover .project-arrow { color: #32373c; }
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            color: #999;
+            font-size: 0.85rem;
+        }
+        @media (max-width: 600px) {
+            header { padding: 2rem 1.5rem 1rem; }
+            header h1 { font-size: 1.7rem; }
+            .projects { padding: 1rem 1.2rem 2rem; }
+            .project-card { padding: 1.2rem 1.4rem; }
+        }
+    </style>
 </head>
 <body>
     <header>
-        <nav>
-            <ul>
-                <li><a href="index.html" class="active">Home</a></li>
-                <li><a href="bio.html">Bio</a></li>
-                <li><a href="cv.html">CV</a></li>
-                <li><a href="books.html">Books</a></li>
-                <li><a href="papers.html">Papers</a></li>
-                <li><a href="media.html">Media</a></li>
-                <li><a href="teaching.html">Teaching</a></li>
-            </ul>
-        </nav>
+        <h1>Ben W. Ansell</h1>
+        <p>Projects and pages</p>
     </header>
 
-    <main>
-        <section class="hero">
-            <div class="hero-with-image">
-                <img src="headshot.jpg" alt="Ben W. Ansell" class="headshot">
-                <div class="hero-content">
-                    <h1>Ben W. Ansell</h1>
-                    <p class="title">Professor of Comparative Democratic Institutions at Nuffield College and the University of Oxford and Fellow of the British Academy.</p>
-                    <p class="highlight">Host of BBC Radio 4's <em>Rethink</em>, 2023 BBC Reith Lecturer, and author of <em>Why Politics Fails</em>.</p>
-                </div>
+    <div class="projects">
+        <a href="personal/" class="project-card">
+            <div class="project-info">
+                <h2>Personal Website</h2>
+                <p>Academic profile, publications, media, and teaching at Oxford.</p>
             </div>
-        </section>
+            <span class="project-arrow">&rarr;</span>
+        </a>
 
-        <section class="about">
-            <h2>Current Roles</h2>
-            <ul class="roles-list">
-                <li>Inaugural Director, Centre for Advanced Social Science Methods (CASSM), University of Oxford, 2025-30</li>
-                <li>Host, BBC Radio 4 <em>Rethink</em>, 2024-</li>
-                <li>UK Politics Columnist, <em>Prospect</em>, 2025-</li>
-                <li>Editor (with David Samuels and Dawn Teele), <em>Comparative Political Studies</em></li>
-                <li>Fellow of the British Academy, 2018-</li>
-            </ul>
-        </section>
-
-        <section class="recent-work">
-            <h2>Recent Work</h2>
-            <div class="work-grid">
-                <div class="work-item">
-                    <h3>Why Politics Fails</h3>
-                    <p>Published by Penguin Random House (2023), translated into German, Spanish, Portuguese, Greek, Korean, Chinese, and Japanese.</p>
-                    <a href="books.html" class="btn">Learn More</a>
-                </div>
-                <div class="work-item">
-                    <h3>BBC Reith Lectures 2023</h3>
-                    <p>Delivered the prestigious annual BBC Reith Lectures exploring democracy and political institutions.</p>
-                    <a href="https://www.bbc.co.uk/programmes/m001t2r7" target="_blank" class="btn">Listen on BBC</a>
-                </div>
-                <div class="work-item">
-                    <h3>Political Calculus</h3>
-                    <p>Substack newsletter analysing politics through data and political economy.</p>
-                    <a href="https://benansell.substack.com" target="_blank" class="btn">Read on Substack</a>
-                </div>
+        <a href="house-of-cards/" class="project-card">
+            <div class="project-info">
+                <h2>House of Cards</h2>
+                <p>A Westminster-themed deck-building card game.</p>
             </div>
-        </section>
+            <span class="project-arrow">&rarr;</span>
+        </a>
 
-        <section class="recent-work">
-            <h2>Interactive Projects</h2>
-            <div class="work-grid">
-                <div class="work-item">
-                    <h3>House of Cards</h3>
-                    <p>A Westminster-themed deck-building card game. Battle your way from local council to Downing Street.</p>
-                    <a href="house-of-cards/" class="btn">Play</a>
-                </div>
-                <div class="work-item">
-                    <h3>Democracy in Ancient Greece</h3>
-                    <p>Interactive guide to democratic institutions in the ancient Greek world, with maps, timelines, and a quiz.</p>
-                    <a href="ancient-greek-democracy/" class="btn">Explore</a>
-                </div>
-                <div class="work-item">
-                    <h3>Conway's Game of Life</h3>
-                    <p>Interactive cellular automaton with preset patterns, adjustable speed, and multiple colour schemes.</p>
-                    <a href="game-of-life/" class="btn">Play</a>
-                </div>
-                <div class="work-item">
-                    <h3>Farage BES Report</h3>
-                    <p>Like/dislike ratings of Nigel Farage across 30 waves of the British Election Study Internet Panel.</p>
-                    <a href="farage-bes-report/" class="btn">View Report</a>
-                </div>
-                <div class="work-item">
-                    <h3>Presentations</h3>
-                    <p>Slides from selected talks and lectures, including tax exposure research.</p>
-                    <a href="presentations/" class="btn">View Slides</a>
-                </div>
+        <a href="ancient-greek-democracy/" class="project-card">
+            <div class="project-info">
+                <h2>Democracy in Ancient Greece</h2>
+                <p>Interactive guide with maps, timelines, and a quiz.</p>
             </div>
-        </section>
+            <span class="project-arrow">&rarr;</span>
+        </a>
 
-        <section class="contact">
-            <h2>Contact</h2>
-            <p>Nuffield College<br>
-            University of Oxford<br>
-            New Road, OX1 1NF<br>
-            Oxford, England</p>
-            <p>Email: <a href="mailto:ben.ansell@politics.ox.ac.uk">ben.ansell@politics.ox.ac.uk</a></p>
-            <p>Phone: +44 1865 278610</p>
-
-            <div class="social-links">
-                <a href="https://bsky.app/profile/benansell.bsky.social" target="_blank">Bluesky</a>
-                <a href="https://twitter.com/bikiagb" target="_blank">X (Twitter)</a>
-                <a href="https://github.com/benwansell" target="_blank">GitHub</a>
+        <a href="game-of-life/" class="project-card">
+            <div class="project-info">
+                <h2>Conway's Game of Life</h2>
+                <p>Interactive cellular automaton with patterns and colour schemes.</p>
             </div>
-        </section>
-    </main>
+            <span class="project-arrow">&rarr;</span>
+        </a>
+
+        <a href="farage-bes-report/" class="project-card">
+            <div class="project-info">
+                <h2>Farage BES Report</h2>
+                <p>Like/dislike ratings across 30 waves of the British Election Study.</p>
+            </div>
+            <span class="project-arrow">&rarr;</span>
+        </a>
+
+        <a href="presentations/" class="project-card">
+            <div class="project-info">
+                <h2>Presentations</h2>
+                <p>Slides from selected talks and lectures.</p>
+            </div>
+            <span class="project-arrow">&rarr;</span>
+        </a>
+    </div>
 
     <footer>
-        <p>&copy; 2025 Ben W. Ansell. All rights reserved.</p>
+        <p>&copy; 2025 Ben W. Ansell</p>
     </footer>
 </body>
 </html>
