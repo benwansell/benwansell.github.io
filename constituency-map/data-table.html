@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Data Table – UK Constituency Explorer</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-4377db9d4c22054dc8340ad0cecc5d1e.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script type="module" src="site_libs/quarto-ojs/quarto-ojs-runtime.js"></script>
+<link href="site_libs/quarto-ojs/quarto-ojs.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">UK Constituency Explorer</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="./index.html"> 
+<span class="menu-text">Hex Map</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./geo-map.html"> 
+<span class="menu-text">Geographic Map</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./scatterplot.html"> 
+<span class="menu-text">Scatterplot</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./histogram.html"> 
+<span class="menu-text">Histogram</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./boxplot.html"> 
+<span class="menu-text">Box Plot</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./heatmap.html"> 
+<span class="menu-text">Heatmap</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./profile.html"> 
+<span class="menu-text">Constituency Profile</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="./data-table.html" aria-current="page"> 
+<span class="menu-text">Data Table</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content column-page" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Data Table</h1>
+</div>
+
+
+
+<div class="quarto-title-meta column-page">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="cell">
+<div class="sourceCode cell-code hidden" id="cb1" data-startfrom="7" data-source-offset="-0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 6;"><span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>rawData <span class="op">=</span> <span class="fu">FileAttachment</span>(<span class="st">"data/constituencies.json"</span>)<span class="op">.</span><span class="fu">json</span>()</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>partyColors <span class="op">=</span> ({</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Con"</span><span class="op">:</span> <span class="st">"#0087DC"</span><span class="op">,</span> <span class="st">"Lab"</span><span class="op">:</span> <span class="st">"#DC241f"</span><span class="op">,</span> <span class="st">"LD"</span><span class="op">:</span> <span class="st">"#FAA61A"</span><span class="op">,</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">"Green"</span><span class="op">:</span> <span class="st">"#6AB023"</span><span class="op">,</span> <span class="st">"RUK"</span><span class="op">:</span> <span class="st">"#12B6CF"</span><span class="op">,</span> <span class="st">"SNP"</span><span class="op">:</span> <span class="st">"#FDF38E"</span><span class="op">,</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="st">"PC"</span><span class="op">:</span> <span class="st">"#005B54"</span><span class="op">,</span> <span class="st">"Ind"</span><span class="op">:</span> <span class="st">"#999999"</span><span class="op">,</span> <span class="st">"Other"</span><span class="op">:</span> <span class="st">"#AAAAAA"</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>allVarsMap <span class="op">=</span> [</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Conservative 2024"</span><span class="op">,</span>       <span class="dt">value</span><span class="op">:</span> <span class="st">"Con24"</span>}<span class="op">,</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Labour 2024"</span><span class="op">,</span>             <span class="dt">value</span><span class="op">:</span> <span class="st">"Lab24"</span>}<span class="op">,</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Lib Dem 2024"</span><span class="op">,</span>            <span class="dt">value</span><span class="op">:</span> <span class="st">"LD24"</span>}<span class="op">,</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Reform 2024"</span><span class="op">,</span>             <span class="dt">value</span><span class="op">:</span> <span class="st">"RUK24"</span>}<span class="op">,</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Green 2024"</span><span class="op">,</span>              <span class="dt">value</span><span class="op">:</span> <span class="st">"Green24"</span>}<span class="op">,</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"SNP 2024"</span><span class="op">,</span>                <span class="dt">value</span><span class="op">:</span> <span class="st">"SNP24"</span>}<span class="op">,</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Plaid Cymru 2024"</span><span class="op">,</span>        <span class="dt">value</span><span class="op">:</span> <span class="st">"PC24"</span>}<span class="op">,</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Other 2024"</span><span class="op">,</span>              <span class="dt">value</span><span class="op">:</span> <span class="st">"Other24"</span>}<span class="op">,</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Conservative 2019"</span><span class="op">,</span>       <span class="dt">value</span><span class="op">:</span> <span class="st">"Con19"</span>}<span class="op">,</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Labour 2019"</span><span class="op">,</span>             <span class="dt">value</span><span class="op">:</span> <span class="st">"Lab19"</span>}<span class="op">,</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Lib Dem 2019"</span><span class="op">,</span>            <span class="dt">value</span><span class="op">:</span> <span class="st">"LD19"</span>}<span class="op">,</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Reform/Brexit 2019"</span><span class="op">,</span>      <span class="dt">value</span><span class="op">:</span> <span class="st">"Brexit19"</span>}<span class="op">,</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Green 2019"</span><span class="op">,</span>              <span class="dt">value</span><span class="op">:</span> <span class="st">"Green19"</span>}<span class="op">,</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"SNP 2019"</span><span class="op">,</span>                <span class="dt">value</span><span class="op">:</span> <span class="st">"SNP19"</span>}<span class="op">,</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Plaid Cymru 2019"</span><span class="op">,</span>        <span class="dt">value</span><span class="op">:</span> <span class="st">"PC19"</span>}<span class="op">,</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Turnout 2024"</span><span class="op">,</span>            <span class="dt">value</span><span class="op">:</span> <span class="st">"Turnout24"</span>}<span class="op">,</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Turnout 2019"</span><span class="op">,</span>            <span class="dt">value</span><span class="op">:</span> <span class="st">"Turnout19"</span>}<span class="op">,</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Majority 2024"</span><span class="op">,</span>           <span class="dt">value</span><span class="op">:</span> <span class="st">"Majority24"</span>}<span class="op">,</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Brexit Leave (Hanretty)"</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> <span class="st">"HanrettyLeave"</span>}<span class="op">,</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Population Density"</span><span class="op">,</span>      <span class="dt">value</span><span class="op">:</span> <span class="st">"c21PopulationDensity"</span>}<span class="op">,</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Age: Under 15"</span><span class="op">,</span>           <span class="dt">value</span><span class="op">:</span> <span class="st">"AgeUnder15"</span>}<span class="op">,</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Age: 16-24"</span><span class="op">,</span>              <span class="dt">value</span><span class="op">:</span> <span class="st">"Age16to24"</span>}<span class="op">,</span></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Age: 25-34"</span><span class="op">,</span>              <span class="dt">value</span><span class="op">:</span> <span class="st">"Age25to34"</span>}<span class="op">,</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Age: 35-44"</span><span class="op">,</span>              <span class="dt">value</span><span class="op">:</span> <span class="st">"Age35to44"</span>}<span class="op">,</span></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Age: 45-54"</span><span class="op">,</span>              <span class="dt">value</span><span class="op">:</span> <span class="st">"Age45to54"</span>}<span class="op">,</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Age: 55-64"</span><span class="op">,</span>              <span class="dt">value</span><span class="op">:</span> <span class="st">"Age55to64"</span>}<span class="op">,</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Age: Over 65"</span><span class="op">,</span>            <span class="dt">value</span><span class="op">:</span> <span class="st">"AgeOver65"</span>}<span class="op">,</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Ethnicity: White"</span><span class="op">,</span>        <span class="dt">value</span><span class="op">:</span> <span class="st">"c21EthnicityWhite"</span>}<span class="op">,</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Ethnicity: Asian"</span><span class="op">,</span>        <span class="dt">value</span><span class="op">:</span> <span class="st">"c21EthnicityAsian"</span>}<span class="op">,</span></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Ethnicity: Black"</span><span class="op">,</span>        <span class="dt">value</span><span class="op">:</span> <span class="st">"c21EthnicityBlack"</span>}<span class="op">,</span></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Ethnicity: Mixed"</span><span class="op">,</span>        <span class="dt">value</span><span class="op">:</span> <span class="st">"c21EthnicityMixed"</span>}<span class="op">,</span></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Born in UK"</span><span class="op">,</span>              <span class="dt">value</span><span class="op">:</span> <span class="st">"born_uk"</span>}<span class="op">,</span></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Religion: Christian"</span><span class="op">,</span>     <span class="dt">value</span><span class="op">:</span> <span class="st">"c21Christian"</span>}<span class="op">,</span></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Religion: Muslim"</span><span class="op">,</span>        <span class="dt">value</span><span class="op">:</span> <span class="st">"c21Muslim"</span>}<span class="op">,</span></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Religion: No Religion"</span><span class="op">,</span>   <span class="dt">value</span><span class="op">:</span> <span class="st">"c21NoReligion"</span>}<span class="op">,</span></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Qualification: None"</span><span class="op">,</span>     <span class="dt">value</span><span class="op">:</span> <span class="st">"c21QualNone"</span>}<span class="op">,</span></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Qualification: Level 4+"</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> <span class="st">"c21QualLevel4"</span>}<span class="op">,</span></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Housing: Owned Outright"</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> <span class="st">"c21HouseOutright"</span>}<span class="op">,</span></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Housing: Mortgage"</span><span class="op">,</span>       <span class="dt">value</span><span class="op">:</span> <span class="st">"c21HouseMortgage"</span>}<span class="op">,</span></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Housing: Social Rent"</span><span class="op">,</span>    <span class="dt">value</span><span class="op">:</span> <span class="st">"c21HouseSocialLA"</span>}<span class="op">,</span></span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Housing: Private Rent"</span><span class="op">,</span>   <span class="dt">value</span><span class="op">:</span> <span class="st">"c21HousePrivateLandlord"</span>}<span class="op">,</span></span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"No Car"</span><span class="op">,</span>                  <span class="dt">value</span><span class="op">:</span> <span class="st">"c21CarsNone"</span>}<span class="op">,</span></span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Health: Very Good"</span><span class="op">,</span>       <span class="dt">value</span><span class="op">:</span> <span class="st">"c21HealthVeryGood"</span>}<span class="op">,</span></span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Health: Bad/Very Bad"</span><span class="op">,</span>    <span class="dt">value</span><span class="op">:</span> <span class="st">"c21HealthBad"</span>}<span class="op">,</span></span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Employment: Unemployed"</span><span class="op">,</span>  <span class="dt">value</span><span class="op">:</span> <span class="st">"c21Unemployed"</span>}<span class="op">,</span></span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Deprivation: None"</span><span class="op">,</span>       <span class="dt">value</span><span class="op">:</span> <span class="st">"c21DeprivedNone"</span>}<span class="op">,</span></span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"Deprivation: 3+ dims"</span><span class="op">,</span>    <span class="dt">value</span><span class="op">:</span> <span class="st">"c21Deprived3"</span>}</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>mapVarsMap <span class="op">=</span> [</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"2024 Winner"</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> <span class="st">"Winner24"</span>}<span class="op">,</span></span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>  {<span class="dt">label</span><span class="op">:</span> <span class="st">"2019 Winner"</span><span class="op">,</span> <span class="dt">value</span><span class="op">:</span> <span class="st">"Winner19"</span>}<span class="op">,</span></span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>  <span class="op">...</span>allVarsMap</span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a>allVarLabels <span class="op">=</span> <span class="bu">Object</span><span class="op">.</span><span class="fu">fromEntries</span>(allVarsMap<span class="op">.</span><span class="fu">map</span>(v <span class="kw">=&gt;</span> [v<span class="op">.</span><span class="at">value</span><span class="op">,</span> v<span class="op">.</span><span class="at">label</span>]))</span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>mapVarLabels <span class="op">=</span> <span class="bu">Object</span><span class="op">.</span><span class="fu">fromEntries</span>(mapVarsMap<span class="op">.</span><span class="fu">map</span>(v <span class="kw">=&gt;</span> [v<span class="op">.</span><span class="at">value</span><span class="op">,</span> v<span class="op">.</span><span class="at">label</span>]))</span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a>allRegions   <span class="op">=</span> [<span class="op">...</span><span class="kw">new</span> <span class="bu">Set</span>(rawData<span class="op">.</span><span class="fu">map</span>(d <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">Region</span>))]<span class="op">.</span><span class="fu">filter</span>(<span class="bu">Boolean</span>)<span class="op">.</span><span class="fu">sort</span>()</span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a>allWinners   <span class="op">=</span> [<span class="op">...</span><span class="kw">new</span> <span class="bu">Set</span>(rawData<span class="op">.</span><span class="fu">map</span>(d <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">Winner24</span>))]<span class="op">.</span><span class="fu">filter</span>(<span class="bu">Boolean</span>)<span class="op">.</span><span class="fu">sort</span>()</span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a>allConsts    <span class="op">=</span> rawData<span class="op">.</span><span class="fu">map</span>(d <span class="kw">=&gt;</span> d<span class="op">.</span><span class="at">ConstituencyName</span>)<span class="op">.</span><span class="fu">filter</span>(<span class="bu">Boolean</span>)<span class="op">.</span><span class="fu">sort</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-1-1" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-1-2" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-1-3" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-1-4" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-1-5" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-1-6" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-1-7" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-1-8" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-1-9" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+</div>
+<div class="mt-2">
+<div class="cell">
+<div class="sourceCode cell-code hidden" id="cb2" data-startfrom="82" data-source-offset="-0"><pre class="sourceCode js code-with-copy"><code class="sourceCode javascript" style="counter-reset: source-line 81;"><span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a>viewof tableSearch <span class="op">=</span> Inputs<span class="op">.</span><span class="fu">text</span>({<span class="dt">label</span><span class="op">:</span> <span class="st">"Search:"</span><span class="op">,</span> <span class="dt">placeholder</span><span class="op">:</span> <span class="st">"Constituency, region or winner..."</span><span class="op">,</span> <span class="dt">width</span><span class="op">:</span> <span class="dv">400</span>})</span>
+<span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a>tableCols <span class="op">=</span> [<span class="st">"ConstituencyName"</span><span class="op">,</span><span class="st">"Region"</span><span class="op">,</span><span class="st">"Country"</span><span class="op">,</span><span class="st">"Winner24"</span><span class="op">,</span><span class="st">"Winner19"</span><span class="op">,</span><span class="st">"Majority24"</span><span class="op">,</span><span class="st">"Con24"</span><span class="op">,</span><span class="st">"Lab24"</span><span class="op">,</span><span class="st">"LD24"</span><span class="op">,</span><span class="st">"RUK24"</span><span class="op">,</span><span class="st">"Green24"</span><span class="op">,</span><span class="st">"SNP24"</span><span class="op">,</span><span class="st">"PC24"</span><span class="op">,</span><span class="st">"Turnout24"</span><span class="op">,</span><span class="st">"HanrettyLeave"</span><span class="op">,</span><span class="st">"c21QualLevel4"</span><span class="op">,</span><span class="st">"c21EthnicityWhite"</span><span class="op">,</span><span class="st">"AgeOver65"</span><span class="op">,</span><span class="st">"c21PopulationDensity"</span>]</span>
+<span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-86"><a href="#cb2-86" aria-hidden="true" tabindex="-1"></a>tableHeaders <span class="op">=</span> ({<span class="st">"ConstituencyName"</span><span class="op">:</span><span class="st">"Constituency"</span><span class="op">,</span><span class="st">"Region"</span><span class="op">:</span><span class="st">"Region"</span><span class="op">,</span><span class="st">"Country"</span><span class="op">:</span><span class="st">"Country"</span><span class="op">,</span><span class="st">"Winner24"</span><span class="op">:</span><span class="st">"Winner 24"</span><span class="op">,</span><span class="st">"Winner19"</span><span class="op">:</span><span class="st">"Winner 19"</span><span class="op">,</span><span class="st">"Majority24"</span><span class="op">:</span><span class="st">"Majority%"</span><span class="op">,</span><span class="st">"Con24"</span><span class="op">:</span><span class="st">"Con%"</span><span class="op">,</span><span class="st">"Lab24"</span><span class="op">:</span><span class="st">"Lab%"</span><span class="op">,</span><span class="st">"LD24"</span><span class="op">:</span><span class="st">"LD%"</span><span class="op">,</span><span class="st">"RUK24"</span><span class="op">:</span><span class="st">"Ref%"</span><span class="op">,</span><span class="st">"Green24"</span><span class="op">:</span><span class="st">"Grn%"</span><span class="op">,</span><span class="st">"SNP24"</span><span class="op">:</span><span class="st">"SNP%"</span><span class="op">,</span><span class="st">"PC24"</span><span class="op">:</span><span class="st">"PC%"</span><span class="op">,</span><span class="st">"Turnout24"</span><span class="op">:</span><span class="st">"Turnout%"</span><span class="op">,</span><span class="st">"HanrettyLeave"</span><span class="op">:</span><span class="st">"Leave%"</span><span class="op">,</span><span class="st">"c21QualLevel4"</span><span class="op">:</span><span class="st">"Degree%"</span><span class="op">,</span><span class="st">"c21EthnicityWhite"</span><span class="op">:</span><span class="st">"White%"</span><span class="op">,</span><span class="st">"AgeOver65"</span><span class="op">:</span><span class="st">"Over65%"</span><span class="op">,</span><span class="st">"c21PopulationDensity"</span><span class="op">:</span><span class="st">"PopDensity"</span>})</span>
+<span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a>filteredTable <span class="op">=</span> {</span>
+<span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a>  <span class="kw">const</span> q <span class="op">=</span> tableSearch<span class="op">.</span><span class="fu">toLowerCase</span>()<span class="op">;</span></span>
+<span id="cb2-90"><a href="#cb2-90" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> rawData</span>
+<span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">filter</span>(d <span class="kw">=&gt;</span> <span class="op">!</span>q <span class="op">||</span> (d<span class="op">.</span><span class="at">ConstituencyName</span><span class="op">||</span><span class="st">""</span>)<span class="op">.</span><span class="fu">toLowerCase</span>()<span class="op">.</span><span class="fu">includes</span>(q) <span class="op">||</span> (d<span class="op">.</span><span class="at">Region</span><span class="op">||</span><span class="st">""</span>)<span class="op">.</span><span class="fu">toLowerCase</span>()<span class="op">.</span><span class="fu">includes</span>(q) <span class="op">||</span> (d<span class="op">.</span><span class="at">Winner24</span><span class="op">||</span><span class="st">""</span>)<span class="op">.</span><span class="fu">toLowerCase</span>()<span class="op">.</span><span class="fu">includes</span>(q))</span>
+<span id="cb2-92"><a href="#cb2-92" aria-hidden="true" tabindex="-1"></a>    <span class="op">.</span><span class="fu">map</span>(d <span class="kw">=&gt;</span> <span class="bu">Object</span><span class="op">.</span><span class="fu">fromEntries</span>(tableCols<span class="op">.</span><span class="fu">map</span>(c <span class="kw">=&gt;</span> [tableHeaders[c]<span class="op">||</span>c<span class="op">,</span> <span class="kw">typeof</span> d[c]<span class="op">===</span><span class="st">"number"</span> <span class="op">?</span> <span class="op">+</span>d[c]<span class="op">.</span><span class="fu">toFixed</span>(<span class="dv">1</span>) <span class="op">:</span> d[c]])))<span class="op">;</span></span>
+<span id="cb2-93"><a href="#cb2-93" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-94"><a href="#cb2-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-95"><a href="#cb2-95" aria-hidden="true" tabindex="-1"></a>Inputs<span class="op">.</span><span class="fu">table</span>(filteredTable<span class="op">,</span> {<span class="dt">rows</span><span class="op">:</span> <span class="dv">30</span><span class="op">,</span> <span class="dt">sort</span><span class="op">:</span> <span class="st">"Constituency"</span>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-2-1" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-2-2" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-2-3" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-2-4" data-nodetype="declaration">
+
+</div>
+</div>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<div id="ojs-cell-2-5" data-nodetype="expression">
+
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+
+</main> <!-- /main -->
+<script type="ojs-module-contents">
+eyJjb250ZW50cyI6W3sibWV0aG9kTmFtZSI6ImludGVycHJldCIsImNlbGxOYW1lIjoib2pzLWNlbGwtMSIsImlubGluZSI6ZmFsc2UsInNvdXJjZSI6InJhd0RhdGEgPSBGaWxlQXR0YWNobWVudChcImRhdGEvY29uc3RpdHVlbmNpZXMuanNvblwiKS5qc29uKClcblxucGFydHlDb2xvcnMgPSAoe1xuICBcIkNvblwiOiBcIiMwMDg3RENcIiwgXCJMYWJcIjogXCIjREMyNDFmXCIsIFwiTERcIjogXCIjRkFBNjFBXCIsXG4gIFwiR3JlZW5cIjogXCIjNkFCMDIzXCIsIFwiUlVLXCI6IFwiIzEyQjZDRlwiLCBcIlNOUFwiOiBcIiNGREYzOEVcIixcbiAgXCJQQ1wiOiBcIiMwMDVCNTRcIiwgXCJJbmRcIjogXCIjOTk5OTk5XCIsIFwiT3RoZXJcIjogXCIjQUFBQUFBXCJcbn0pXG5cbmFsbFZhcnNNYXAgPSBbXG4gIHtsYWJlbDogXCJDb25zZXJ2YXRpdmUgMjAyNFwiLCAgICAgICB2YWx1ZTogXCJDb24yNFwifSxcbiAge2xhYmVsOiBcIkxhYm91ciAyMDI0XCIsICAgICAgICAgICAgIHZhbHVlOiBcIkxhYjI0XCJ9LFxuICB7bGFiZWw6IFwiTGliIERlbSAyMDI0XCIsICAgICAgICAgICAgdmFsdWU6IFwiTEQyNFwifSxcbiAge2xhYmVsOiBcIlJlZm9ybSAyMDI0XCIsICAgICAgICAgICAgIHZhbHVlOiBcIlJVSzI0XCJ9LFxuICB7bGFiZWw6IFwiR3JlZW4gMjAyNFwiLCAgICAgICAgICAgICAgdmFsdWU6IFwiR3JlZW4yNFwifSxcbiAge2xhYmVsOiBcIlNOUCAyMDI0XCIsICAgICAgICAgICAgICAgIHZhbHVlOiBcIlNOUDI0XCJ9LFxuICB7bGFiZWw6IFwiUGxhaWQgQ3ltcnUgMjAyNFwiLCAgICAgICAgdmFsdWU6IFwiUEMyNFwifSxcbiAge2xhYmVsOiBcIk90aGVyIDIwMjRcIiwgICAgICAgICAgICAgIHZhbHVlOiBcIk90aGVyMjRcIn0sXG4gIHtsYWJlbDogXCJDb25zZXJ2YXRpdmUgMjAxOVwiLCAgICAgICB2YWx1ZTogXCJDb24xOVwifSxcbiAge2xhYmVsOiBcIkxhYm91ciAyMDE5XCIsICAgICAgICAgICAgIHZhbHVlOiBcIkxhYjE5XCJ9LFxuICB7bGFiZWw6IFwiTGliIERlbSAyMDE5XCIsICAgICAgICAgICAgdmFsdWU6IFwiTEQxOVwifSxcbiAge2xhYmVsOiBcIlJlZm9ybS9CcmV4aXQgMjAxOVwiLCAgICAgIHZhbHVlOiBcIkJyZXhpdDE5XCJ9LFxuICB7bGFiZWw6IFwiR3JlZW4gMjAxOVwiLCAgICAgICAgICAgICAgdmFsdWU6IFwiR3JlZW4xOVwifSxcbiAge2xhYmVsOiBcIlNOUCAyMDE5XCIsICAgICAgICAgICAgICAgIHZhbHVlOiBcIlNOUDE5XCJ9LFxuICB7bGFiZWw6IFwiUGxhaWQgQ3ltcnUgMjAxOVwiLCAgICAgICAgdmFsdWU6IFwiUEMxOVwifSxcbiAge2xhYmVsOiBcIlR1cm5vdXQgMjAyNFwiLCAgICAgICAgICAgIHZhbHVlOiBcIlR1cm5vdXQyNFwifSxcbiAge2xhYmVsOiBcIlR1cm5vdXQgMjAxOVwiLCAgICAgICAgICAgIHZhbHVlOiBcIlR1cm5vdXQxOVwifSxcbiAge2xhYmVsOiBcIk1ham9yaXR5IDIwMjRcIiwgICAgICAgICAgIHZhbHVlOiBcIk1ham9yaXR5MjRcIn0sXG4gIHtsYWJlbDogXCJCcmV4aXQgTGVhdmUgKEhhbnJldHR5KVwiLCB2YWx1ZTogXCJIYW5yZXR0eUxlYXZlXCJ9LFxuICB7bGFiZWw6IFwiUG9wdWxhdGlvbiBEZW5zaXR5XCIsICAgICAgdmFsdWU6IFwiYzIxUG9wdWxhdGlvbkRlbnNpdHlcIn0sXG4gIHtsYWJlbDogXCJBZ2U6IFVuZGVyIDE1XCIsICAgICAgICAgICB2YWx1ZTogXCJBZ2VVbmRlcjE1XCJ9LFxuICB7bGFiZWw6IFwiQWdlOiAxNi0yNFwiLCAgICAgICAgICAgICAgdmFsdWU6IFwiQWdlMTZ0bzI0XCJ9LFxuICB7bGFiZWw6IFwiQWdlOiAyNS0zNFwiLCAgICAgICAgICAgICAgdmFsdWU6IFwiQWdlMjV0bzM0XCJ9LFxuICB7bGFiZWw6IFwiQWdlOiAzNS00NFwiLCAgICAgICAgICAgICAgdmFsdWU6IFwiQWdlMzV0bzQ0XCJ9LFxuICB7bGFiZWw6IFwiQWdlOiA0NS01NFwiLCAgICAgICAgICAgICAgdmFsdWU6IFwiQWdlNDV0bzU0XCJ9LFxuICB7bGFiZWw6IFwiQWdlOiA1NS02NFwiLCAgICAgICAgICAgICAgdmFsdWU6IFwiQWdlNTV0bzY0XCJ9LFxuICB7bGFiZWw6IFwiQWdlOiBPdmVyIDY1XCIsICAgICAgICAgICAgdmFsdWU6IFwiQWdlT3ZlcjY1XCJ9LFxuICB7bGFiZWw6IFwiRXRobmljaXR5OiBXaGl0ZVwiLCAgICAgICAgdmFsdWU6IFwiYzIxRXRobmljaXR5V2hpdGVcIn0sXG4gIHtsYWJlbDogXCJFdGhuaWNpdHk6IEFzaWFuXCIsICAgICAgICB2YWx1ZTogXCJjMjFFdGhuaWNpdHlBc2lhblwifSxcbiAge2xhYmVsOiBcIkV0aG5pY2l0eTogQmxhY2tcIiwgICAgICAgIHZhbHVlOiBcImMyMUV0aG5pY2l0eUJsYWNrXCJ9LFxuICB7bGFiZWw6IFwiRXRobmljaXR5OiBNaXhlZFwiLCAgICAgICAgdmFsdWU6IFwiYzIxRXRobmljaXR5TWl4ZWRcIn0sXG4gIHtsYWJlbDogXCJCb3JuIGluIFVLXCIsICAgICAgICAgICAgICB2YWx1ZTogXCJib3JuX3VrXCJ9LFxuICB7bGFiZWw6IFwiUmVsaWdpb246IENocmlzdGlhblwiLCAgICAgdmFsdWU6IFwiYzIxQ2hyaXN0aWFuXCJ9LFxuICB7bGFiZWw6IFwiUmVsaWdpb246IE11c2xpbVwiLCAgICAgICAgdmFsdWU6IFwiYzIxTXVzbGltXCJ9LFxuICB7bGFiZWw6IFwiUmVsaWdpb246IE5vIFJlbGlnaW9uXCIsICAgdmFsdWU6IFwiYzIxTm9SZWxpZ2lvblwifSxcbiAge2xhYmVsOiBcIlF1YWxpZmljYXRpb246IE5vbmVcIiwgICAgIHZhbHVlOiBcImMyMVF1YWxOb25lXCJ9LFxuICB7bGFiZWw6IFwiUXVhbGlmaWNhdGlvbjogTGV2ZWwgNCtcIiwgdmFsdWU6IFwiYzIxUXVhbExldmVsNFwifSxcbiAge2xhYmVsOiBcIkhvdXNpbmc6IE93bmVkIE91dHJpZ2h0XCIsIHZhbHVlOiBcImMyMUhvdXNlT3V0cmlnaHRcIn0sXG4gIHtsYWJlbDogXCJIb3VzaW5nOiBNb3J0Z2FnZVwiLCAgICAgICB2YWx1ZTogXCJjMjFIb3VzZU1vcnRnYWdlXCJ9LFxuICB7bGFiZWw6IFwiSG91c2luZzogU29jaWFsIFJlbnRcIiwgICAgdmFsdWU6IFwiYzIxSG91c2VTb2NpYWxMQVwifSxcbiAge2xhYmVsOiBcIkhvdXNpbmc6IFByaXZhdGUgUmVudFwiLCAgIHZhbHVlOiBcImMyMUhvdXNlUHJpdmF0ZUxhbmRsb3JkXCJ9LFxuICB7bGFiZWw6IFwiTm8gQ2FyXCIsICAgICAgICAgICAgICAgICAgdmFsdWU6IFwiYzIxQ2Fyc05vbmVcIn0sXG4gIHtsYWJlbDogXCJIZWFsdGg6IFZlcnkgR29vZFwiLCAgICAgICB2YWx1ZTogXCJjMjFIZWFsdGhWZXJ5R29vZFwifSxcbiAge2xhYmVsOiBcIkhlYWx0aDogQmFkL1ZlcnkgQmFkXCIsICAgIHZhbHVlOiBcImMyMUhlYWx0aEJhZFwifSxcbiAge2xhYmVsOiBcIkVtcGxveW1lbnQ6IFVuZW1wbG95ZWRcIiwgIHZhbHVlOiBcImMyMVVuZW1wbG95ZWRcIn0sXG4gIHtsYWJlbDogXCJEZXByaXZhdGlvbjogTm9uZVwiLCAgICAgICB2YWx1ZTogXCJjMjFEZXByaXZlZE5vbmVcIn0sXG4gIHtsYWJlbDogXCJEZXByaXZhdGlvbjogMysgZGltc1wiLCAgICB2YWx1ZTogXCJjMjFEZXByaXZlZDNcIn1cbl1cblxubWFwVmFyc01hcCA9IFtcbiAge2xhYmVsOiBcIjIwMjQgV2lubmVyXCIsIHZhbHVlOiBcIldpbm5lcjI0XCJ9LFxuICB7bGFiZWw6IFwiMjAxOSBXaW5uZXJcIiwgdmFsdWU6IFwiV2lubmVyMTlcIn0sXG4gIC4uLmFsbFZhcnNNYXBcbl1cblxuYWxsVmFyTGFiZWxzID0gT2JqZWN0LmZyb21FbnRyaWVzKGFsbFZhcnNNYXAubWFwKHYgPT4gW3YudmFsdWUsIHYubGFiZWxdKSlcbm1hcFZhckxhYmVscyA9IE9iamVjdC5mcm9tRW50cmllcyhtYXBWYXJzTWFwLm1hcCh2ID0+IFt2LnZhbHVlLCB2LmxhYmVsXSkpXG5hbGxSZWdpb25zICAgPSBbLi4ubmV3IFNldChyYXdEYXRhLm1hcChkID0+IGQuUmVnaW9uKSldLmZpbHRlcihCb29sZWFuKS5zb3J0KClcbmFsbFdpbm5lcnMgICA9IFsuLi5uZXcgU2V0KHJhd0RhdGEubWFwKGQgPT4gZC5XaW5uZXIyNCkpXS5maWx0ZXIoQm9vbGVhbikuc29ydCgpXG5hbGxDb25zdHMgICAgPSByYXdEYXRhLm1hcChkID0+IGQuQ29uc3RpdHVlbmN5TmFtZSkuZmlsdGVyKEJvb2xlYW4pLnNvcnQoKVxuIn0seyJtZXRob2ROYW1lIjoiaW50ZXJwcmV0IiwiY2VsbE5hbWUiOiJvanMtY2VsbC0yIiwiaW5saW5lIjpmYWxzZSwic291cmNlIjoidmlld29mIHRhYmxlU2VhcmNoID0gSW5wdXRzLnRleHQoe2xhYmVsOiBcIlNlYXJjaDpcIiwgcGxhY2Vob2xkZXI6IFwiQ29uc3RpdHVlbmN5LCByZWdpb24gb3Igd2lubmVyLi4uXCIsIHdpZHRoOiA0MDB9KVxuXG50YWJsZUNvbHMgPSBbXCJDb25zdGl0dWVuY3lOYW1lXCIsXCJSZWdpb25cIixcIkNvdW50cnlcIixcIldpbm5lcjI0XCIsXCJXaW5uZXIxOVwiLFwiTWFqb3JpdHkyNFwiLFwiQ29uMjRcIixcIkxhYjI0XCIsXCJMRDI0XCIsXCJSVUsyNFwiLFwiR3JlZW4yNFwiLFwiU05QMjRcIixcIlBDMjRcIixcIlR1cm5vdXQyNFwiLFwiSGFucmV0dHlMZWF2ZVwiLFwiYzIxUXVhbExldmVsNFwiLFwiYzIxRXRobmljaXR5V2hpdGVcIixcIkFnZU92ZXI2NVwiLFwiYzIxUG9wdWxhdGlvbkRlbnNpdHlcIl1cblxudGFibGVIZWFkZXJzID0gKHtcIkNvbnN0aXR1ZW5jeU5hbWVcIjpcIkNvbnN0aXR1ZW5jeVwiLFwiUmVnaW9uXCI6XCJSZWdpb25cIixcIkNvdW50cnlcIjpcIkNvdW50cnlcIixcIldpbm5lcjI0XCI6XCJXaW5uZXIgMjRcIixcIldpbm5lcjE5XCI6XCJXaW5uZXIgMTlcIixcIk1ham9yaXR5MjRcIjpcIk1ham9yaXR5JVwiLFwiQ29uMjRcIjpcIkNvbiVcIixcIkxhYjI0XCI6XCJMYWIlXCIsXCJMRDI0XCI6XCJMRCVcIixcIlJVSzI0XCI6XCJSZWYlXCIsXCJHcmVlbjI0XCI6XCJHcm4lXCIsXCJTTlAyNFwiOlwiU05QJVwiLFwiUEMyNFwiOlwiUEMlXCIsXCJUdXJub3V0MjRcIjpcIlR1cm5vdXQlXCIsXCJIYW5yZXR0eUxlYXZlXCI6XCJMZWF2ZSVcIixcImMyMVF1YWxMZXZlbDRcIjpcIkRlZ3JlZSVcIixcImMyMUV0aG5pY2l0eVdoaXRlXCI6XCJXaGl0ZSVcIixcIkFnZU92ZXI2NVwiOlwiT3ZlcjY1JVwiLFwiYzIxUG9wdWxhdGlvbkRlbnNpdHlcIjpcIlBvcERlbnNpdHlcIn0pXG5cbmZpbHRlcmVkVGFibGUgPSB7XG4gIGNvbnN0IHEgPSB0YWJsZVNlYXJjaC50b0xvd2VyQ2FzZSgpO1xuICByZXR1cm4gcmF3RGF0YVxuICAgIC5maWx0ZXIoZCA9PiAhcSB8fCAoZC5Db25zdGl0dWVuY3lOYW1lfHxcIlwiKS50b0xvd2VyQ2FzZSgpLmluY2x1ZGVzKHEpIHx8IChkLlJlZ2lvbnx8XCJcIikudG9Mb3dlckNhc2UoKS5pbmNsdWRlcyhxKSB8fCAoZC5XaW5uZXIyNHx8XCJcIikudG9Mb3dlckNhc2UoKS5pbmNsdWRlcyhxKSlcbiAgICAubWFwKGQgPT4gT2JqZWN0LmZyb21FbnRyaWVzKHRhYmxlQ29scy5tYXAoYyA9PiBbdGFibGVIZWFkZXJzW2NdfHxjLCB0eXBlb2YgZFtjXT09PVwibnVtYmVyXCIgPyArZFtjXS50b0ZpeGVkKDEpIDogZFtjXV0pKSk7XG59XG5cbklucHV0cy50YWJsZShmaWx0ZXJlZFRhYmxlLCB7cm93czogMzAsIHNvcnQ6IFwiQ29uc3RpdHVlbmN5XCJ9KVxuIn0seyJtZXRob2ROYW1lIjoiaW50ZXJwcmV0UXVpZXQiLCJzb3VyY2UiOiJzaGlueUlucHV0KCd0YWJsZVNlYXJjaCcpIn1dfQ==
+</script>
+<script type="module">
+if (window.location.protocol === "file:") { alert("The OJS runtime does not work with file:// URLs. Please use a web server to view this document."); }
+window._ojs.paths.runtimeToDoc = "../..";
+window._ojs.paths.runtimeToRoot = "../..";
+window._ojs.paths.docToRoot = "";
+window._ojs.selfContained = false;
+window._ojs.runtime.interpretFromScriptTags();
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
