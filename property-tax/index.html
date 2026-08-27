@@ -110,6 +110,12 @@
     color: var(--ink-2);
   }
 
+  .byline {
+    margin-top: 14px;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
   .callout {
     margin-top: 32px;
     max-width: 72ch;
@@ -268,6 +274,7 @@
   <div class="wrap">
     <div class="eyebrow">Comparative property taxation</div>
     <h1>What a proportional property tax actually costs, around the world and across the UK</h1>
+    <p class="byline">By Ben Ansell, with the aid of Claude Sonnet 5</p>
     <p class="lede">
       Most countries tax homes as a straight percentage of value. England, Scotland and Wales instead charge
       a fixed amount per council tax band, set decades ago against out-of-date valuations. This page lines up
@@ -277,17 +284,15 @@
     </p>
     <div class="callout">
       <strong>On the numbers:</strong> the international and US/Canada figures below are modelled estimates for
-      illustrative comparison, not official statistics — this session's network access blocks direct downloads
-      from ONS and GOV.UK, so those are drawn from published tax-agency and OECD-style sources found via search.
-      England's council tax, however, is now built entirely from three real datasets supplied directly by this
-      report's requester: Band D (GOV.UK's official 2025–26 levels, Table 9), the "likely bill" band-mix
-      adjustment (the MHCLG Council Taxbase collection, October 2025), and median house price (ONS/HM Land
-      Registry, year ending September 2025) — see "Is Band D the right figure?" below. <strong>England is
-      complete: all 296 billing authorities</strong>, not a sample. Wales's median house prices are also real
-      (same ONS source); its Band D and band-mix adjustment remain estimates, since Wales isn't in either GOV.UK
-      or MHCLG workbook. Scotland (32 councils, fully estimated) and Northern Ireland (11 councils, its own
-      capital-value rates system) are unchanged. Treat every non-England rate as
-      order-of-magnitude, not a return you can file.
+      illustrative comparison, drawn from published tax-agency and OECD-style sources, not official statistics.
+      England's council tax is built entirely from three real datasets: Band D (GOV.UK's official 2025–26
+      levels, Table 9), the "likely bill" band-mix adjustment (the MHCLG Council Taxbase collection, October
+      2025), and median house price (ONS/HM Land Registry, year ending September 2025) — see "Is Band D the
+      right figure?" below. <strong>England is complete: all 296 billing authorities</strong>, not a sample.
+      Wales's median house prices are also real (same ONS source); its Band D and band-mix adjustment remain
+      estimates, since Wales isn't covered by the GOV.UK or MHCLG releases used here. Scotland (32 councils)
+      and Northern Ireland (11 councils, its own capital-value rates system) are estimated throughout. Treat
+      every non-England rate as order-of-magnitude, not a return you can file.
     </div>
     <nav class="toc">
       <a href="#international">1. International rates</a>
@@ -378,11 +383,11 @@
 
     <div class="section-head" style="margin-top:0;">
       <div class="section-num">03a — Is Band D the right figure?</div>
-      <h2 style="font-size:1.4rem;">No — and for England this is now real data, not a model</h2>
+      <h2 style="font-size:1.4rem;">No — and for England the table below uses real data, not a model</h2>
       <p class="section-dek">
         Council tax bands are fixed points on the 1991 (2003 in Wales) valuation scale, not a live median —
         Band D is simply the reference band councils use to set rates. For England, every figure in this table
-        is now real, official data rather than an estimate. Band D comes from <strong>GOV.UK's "Council Tax
+        is real, official data rather than an estimate. Band D comes from <strong>GOV.UK's "Council Tax
         levels set by local authorities in England 2025 to 2026," Table 9</strong> — the exact combined
         district/unitary + county + police + fire charge for all 296 English billing authorities. The "likely
         bill" adjustment comes from the <strong>MHCLG Council Taxbase statistical collection (October
@@ -408,7 +413,7 @@
       <div class="stat"><div class="num tabular">1.23</div><div class="lab">Westminster, ratio to Band D</div></div>
     </div>
     <p style="font-size:0.8rem;color:var(--muted);max-width:70ch;margin-top:-8px;">
-      Sources (all three supplied by the report's requester): Band D from GOV.UK "Council Tax levels set by
+      Sources: Band D from GOV.UK "Council Tax levels set by
       local authorities in England 2025 to 2026," Table 9. Likely-bill ratio from the MHCLG Council Taxbase
       statistical collection, October 2025 — Table 1.35 (Band D tax-base equivalents after discounts, premiums
       and council tax support) ÷ Table 1.01 (total dwellings on the valuation list). Median house price from
@@ -461,8 +466,8 @@
         that band are decades out of date. That band's statutory multiplier (e.g. Band G is 15/9 of Band D)
         is applied to the real Band D figure at full rate, with no discount — a 90th-percentile household is
         not a plausible council tax support claimant, unlike the authority-wide average used elsewhere on this
-        page. The accompanying 90th-percentile <em>price</em> has no equivalent real per-authority data this
-        session, so it's modelled: median price × 2.0 nationally (English price-paid percentile data has
+        page. The accompanying 90th-percentile <em>price</em> has no equivalent real per-authority data
+        available, so it's modelled: median price × 2.0 nationally (English price-paid percentile data has
         historically put the 90th percentile at roughly double the median), scaled up or down for each English
         authority by its real Table 1.01 band dispersion — authorities whose actual housing stock spans a wider
         band range get a wider assumed price spread too. Wales, Scotland and Northern Ireland use the flat 2.0×
@@ -569,13 +574,13 @@
     <footer style="padding:0;">
       <h3>Methodology &amp; sources</h3>
       <ul>
-        <li><strong>International rates:</strong> approximate effective annual rates on market value, compiled from tax-authority and industry summaries (Tax Foundation, JETRO, Revenue.ie, Belastingdienst/municipal OZB guidance, French-Property.com, IBI municipal surveys, Danish Statistics/DST, and comparable sources) found via web search during this session. Several taxes are levied on an assessed or cadastral value below market value (Japan, Spain, South Korea, Belgium); the average shown approximates the effective rate against market value, not the nominal statutory rate.</li>
+        <li><strong>International rates:</strong> approximate effective annual rates on market value, compiled from tax-authority and industry summaries (Tax Foundation, JETRO, Revenue.ie, Belastingdienst/municipal OZB guidance, French-Property.com, IBI municipal surveys, Danish Statistics/DST, and comparable sources). Several taxes are levied on an assessed or cadastral value below market value (Japan, Spain, South Korea, Belgium); the average shown approximates the effective rate against market value, not the nominal statutory rate.</li>
         <li><strong>US &amp; Canada cities:</strong> illustrative effective rates drawn from published multi-city property-tax-rate comparisons (e.g. ATTOM/SmartAsset-style US metro surveys; Zoocasa's annual Canadian property-tax-rate report). Local mill rates and assessment ratios change yearly — treat as indicative, not current-year fact.</li>
-        <li><strong>UK council tax — Band D reference, England:</strong> exact 2025–26 figures for all 296 English billing authorities, from GOV.UK "Council Tax levels set by local authorities in England 2025 to 2026," Table 9 (workbook supplied by the report's requester) — the combined district/unitary + county + police + fire total, not just the billing authority's own share. England is complete, not a sample.</li>
-        <li><strong>UK council tax — Band D reference, Wales &amp; Scotland:</strong> not in that workbook, so these remain estimates anchored to published national averages (Wales £2,170, Scotland £1,543) and known outliers (Cardiff £1,926 and Merthyr Tydfil £2,464 — the lowest and highest in Wales), with other authorities estimated from typical regional patterns.</li>
-        <li><strong>UK council tax — likely bill, England:</strong> calculated directly from the MHCLG Council Taxbase statistical collection (October 2025), a workbook supplied by the report's requester covering all 296 English billing authorities. For each authority, "likely bill" = Band D × (Table 1.35 Band D tax-base equivalents, after disabled relief, discounts, second-home/empty-home premiums and local council tax support ÷ Table 1.01 total dwellings on the valuation list). England's national ratio from this data is 0.768, matching the published £1,770-vs-£2,280 average-per-dwelling figure closely. A handful of local authority names were aliased across the three workbooks to match each other (e.g. "County Durham" → "Durham"; "Bournemouth, Christchurch and Poole" → "Bournemouth Christchurch and Poole"; "Bristol" → "Bristol, City of"; "Kings Lynn and West Norfolk" → "King's Lynn and West Norfolk").</li>
-        <li><strong>UK council tax — likely bill, Wales &amp; Scotland:</strong> these nations use different valuation/band systems and weren't in the supplied workbook, so their "likely bill" still scales Band D by a modelled ratio (0.60 at the cheapest end of the nation's price range, ~0.80 at the middle, up to 1.35 at the priciest end) rather than real band-count data — a modelled approximation, not sourced per-authority figures.</li>
-        <li><strong>UK median house prices — England &amp; Wales:</strong> real medians for the year ending September 2025, from ONS/HM Land Registry "Median price paid by local authority" (workbook supplied by the report's requester, sheet 2a) — all property types, 12-month rolling median, for all 296 English and all 22 Welsh local authorities.</li>
+        <li><strong>UK council tax — Band D reference, England:</strong> exact 2025–26 figures for all 296 English billing authorities, from GOV.UK "Council Tax levels set by local authorities in England 2025 to 2026," Table 9 — the combined district/unitary + county + police + fire total, not just the billing authority's own share. England is complete, not a sample.</li>
+        <li><strong>UK council tax — Band D reference, Wales &amp; Scotland:</strong> not in that release, so these remain estimates anchored to published national averages (Wales £2,170, Scotland £1,543) and known outliers (Cardiff £1,926 and Merthyr Tydfil £2,464 — the lowest and highest in Wales), with other authorities estimated from typical regional patterns.</li>
+        <li><strong>UK council tax — likely bill, England:</strong> calculated directly from the MHCLG Council Taxbase statistical collection (October 2025), which covers all 296 English billing authorities. For each authority, "likely bill" = Band D × (Table 1.35 Band D tax-base equivalents, after disabled relief, discounts, second-home/empty-home premiums and local council tax support ÷ Table 1.01 total dwellings on the valuation list). England's national ratio from this data is 0.768, matching the published £1,770-vs-£2,280 average-per-dwelling figure closely. A handful of local authority names were aliased across the three releases to match each other (e.g. "County Durham" → "Durham"; "Bournemouth, Christchurch and Poole" → "Bournemouth Christchurch and Poole"; "Bristol" → "Bristol, City of"; "Kings Lynn and West Norfolk" → "King's Lynn and West Norfolk").</li>
+        <li><strong>UK council tax — likely bill, Wales &amp; Scotland:</strong> these nations use different valuation/band systems and aren't covered by that release, so their "likely bill" instead scales Band D by a modelled ratio (0.60 at the cheapest end of the nation's price range, ~0.80 at the middle, up to 1.35 at the priciest end) rather than real band-count data — a modelled approximation, not sourced per-authority figures.</li>
+        <li><strong>UK median house prices — England &amp; Wales:</strong> real medians for the year ending September 2025, from ONS/HM Land Registry "Median price paid by local authority" (sheet 2a) — all property types, 12-month rolling median, for all 296 English and all 22 Welsh local authorities.</li>
         <li><strong>UK median house prices — Scotland &amp; Northern Ireland:</strong> not in that release (Land Registry covers England and Wales only), so these remain approximate, calibrated to published regional patterns.</li>
         <li><strong>UK reference rates:</strong> 0.50% and 0.65% are illustrative proportional property-tax rates in the range discussed in UK policy proposals to replace council tax and stamp duty (e.g. the Fairer Share campaign's ~0.48% proposal), not adopted government policy.</li>
         <li><strong>Stamp duty / all-in rate:</strong> SDLT, LBTT and LTT standard residential rates for 2025–26 (non-first-time-buyer, no additional-property surcharge), applied to each authority's estimated median house price and amortised over an assumed ten-year hold, then added to the annual council tax bill. This is illustrative of a buyer's cost today, not a bill existing owners actually pay each year.</li>
