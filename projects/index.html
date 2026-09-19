@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ben W. Ansell</title>
-    <meta name="description" content="Ben W. Ansell, Professor of Comparative Democratic Institutions at Nuffield College, University of Oxford.">
+    <title>Projects – Ben W. Ansell</title>
+    <meta name="description" content="Interactive data explorers, simulations and other projects by Ben W. Ansell.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
@@ -18,7 +18,7 @@
             <button class="nav-toggle" aria-expanded="false" aria-controls="site-nav">Menu</button>
             <nav class="main-nav" id="site-nav" aria-label="Main">
                 <ul>
-                <li><a href="/" aria-current="page">Home</a></li>
+                <li><a href="/">Home</a></li>
                 <li><a href="/bio/">Bio</a></li>
                 <li><a href="/books/">Books</a></li>
                 <li><a href="/papers/">Papers</a></li>
@@ -26,7 +26,7 @@
                 <li><a href="/policy/">Policy</a></li>
                 <li><a href="/media/">Media</a></li>
                 <li><a href="/teaching/">Teaching</a></li>
-                <li><a href="/projects/">Projects</a></li>
+                <li><a href="/projects/" aria-current="page">Projects</a></li>
                 </ul>
             </nav>
         </div>
@@ -34,44 +34,51 @@
 
     <main class="site-main" id="main">
         <div class="wrap">
-            <div class="slideshow" aria-label="Photos of Oxford">
-                <img src="/assets/img/nuffield-college.jpg" alt="The quad at Nuffield College, Oxford" class="is-active">
-                <img src="/assets/img/oxford-castle.jpg" alt="Oxford Castle" loading="lazy">
-                <button class="slide-btn prev" aria-label="Previous slide">&#8249;</button>
-                <button class="slide-btn next" aria-label="Next slide">&#8250;</button>
-            </div>
-            <div class="slide-dots">
-                <button aria-label="Slide 1" aria-current="true"></button>
-                <button aria-label="Slide 2"></button>
-            </div>
-
-            <div class="content content-wide">
-                <div class="intro">
-                    <figure class="intro-photo">
-                        <img src="/assets/img/ben-ansell-portrait.jpg" alt="Ben W. Ansell" width="800" height="1200">
-                    </figure>
-                    <div class="intro-text">
-                        <p>I am Professor of Comparative Democratic Institutions at Nuffield College and the University of Oxford and Fellow of the British Academy. Here&rsquo;s my <a href="/wp-content/uploads/2026/09/ben-ansell-cv-sep-2026.pdf">CV</a>.</p>
-                        <p>I am the Director of the <a href="https://cassm.ox.ac.uk">Centre for Advanced Social Science Methods</a>.</p>
-                        <p>I am Course Director of the <a href="https://www.law.ox.ac.uk/content/course/msc-law-governance-and-ai">MSc in Law, Governance and AI</a>.</p>
-                        <p>I am the host of BBC Radio 4&rsquo;s <a href="https://www.bbc.co.uk/programmes/p08gt1ry">Rethink</a>, and I was the BBC&rsquo;s 2023 Reith Lecturer, giving a series of lectures titled &lsquo;<a href="https://www.bbc.co.uk/programmes/m001sty4">Our Democratic Future</a>&rsquo;.</p>
-                        <p>I was the host of &lsquo;<a href="https://www.tortoisemedia.com/listen/whats-wrong-with-democracy/">What&rsquo;s Wrong with Democracy?</a>&rsquo; produced by Tortoise Media.</p>
-                        <p>I&rsquo;m the author of <em>Why Politics Fails</em> (<a href="https://www.penguin.co.uk/books/444113/why-politics-fails-by-ansell-ben/9780241992760">Viking</a> / <a href="https://www.hachettebookgroup.com/titles/ben-ansell/why-politics-fails/9781541702073/?lens=publicaffairs">PublicAffairs</a>).</p>
-                        <p>I am UK Politics Columnist for <a href="https://www.prospectmagazine.co.uk/author/5582/ben-ansell"><em>Prospect</em></a>.</p>
-                        <p>I write the Substack <a href="https://benansell.substack.com">Political Calculus</a>.</p>
-                        <p>I&rsquo;m co-editor (with David Samuels and Dawn Teele) of <em>Comparative Political Studies</em>.</p>
-                        <p>I was Principal Investigator of the ERC funded WEALTHPOL project on the politics of wealth inequality.</p>
-                    </div>
+            <div class="content">
+            <h1 class="page-title">Projects</h1>
+                <p class="projects-intro">Interactive data explorers, simulations, and other projects, mostly built with Claude Code.</p>
+                <div class="project-grid">
+                    <a class="project-card" href="/le2026/">
+                        <h2>2026 Local Election Explorer</h2>
+                        <p>Ward-level results for the 2026 English local elections mapped against 2021 Census demographics, with an interactive scatterplot and regression analysis.</p>
+                        <span class="project-link">Open project &rarr;</span>
+                    </a>
+                    <a class="project-card" href="/constituency-map/">
+                        <h2>Constituency Map</h2>
+                        <p>Interactive explorer of UK constituency data, demographics, and election results.</p>
+                        <span class="project-link">Open project &rarr;</span>
+                    </a>
+                    <a class="project-card" href="/farage-bes-report/">
+                        <h2>Farage BES Report</h2>
+                        <p>Like/dislike ratings across 30 waves of the British Election Study.</p>
+                        <span class="project-link">Open project &rarr;</span>
+                    </a>
+                    <a class="project-card" href="/schelling-segregation/">
+                        <h2>Schelling Segregation Model</h2>
+                        <p>Interactive simulation of how individual preferences drive neighbourhood segregation.</p>
+                        <span class="project-link">Open project &rarr;</span>
+                    </a>
+                    <a class="project-card" href="/ancient-greek-democracy/">
+                        <h2>Democracy in Ancient Greece</h2>
+                        <p>Interactive guide with maps, timelines, and a quiz.</p>
+                        <span class="project-link">Open project &rarr;</span>
+                    </a>
+                    <a class="project-card" href="/game-of-life/">
+                        <h2>Conway&rsquo;s Game of Life</h2>
+                        <p>Interactive cellular automaton with patterns and colour schemes.</p>
+                        <span class="project-link">Open project &rarr;</span>
+                    </a>
+                    <a class="project-card" href="/house-of-cards/">
+                        <h2>House of Cards</h2>
+                        <p>A Westminster-themed deck-building card game.</p>
+                        <span class="project-link">Open project &rarr;</span>
+                    </a>
+                    <a class="project-card" href="/presentations/">
+                        <h2>Presentations</h2>
+                        <p>Slides from selected talks and lectures.</p>
+                        <span class="project-link">Open project &rarr;</span>
+                    </a>
                 </div>
-
-                <hr>
-
-                <section class="contact">
-                    <h2>Contact</h2>
-                    <p><span><a href="tel:+441865278610">+44 1865 278610</a></span> <span>ben.ansellATpolitics.ox.ac.uk</span></p>
-                </section>
-
-                <hr>
             </div>
         </div>
     </main>

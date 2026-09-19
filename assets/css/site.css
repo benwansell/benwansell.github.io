@@ -1,0 +1,433 @@
+/* Ben W. Ansell — main site styles.
+   Modelled on the WordPress.com "Creative" theme used at benwansell.com. */
+
+:root {
+    --accent: #df3062;
+    --accent-hover: #b81f4b;
+    --text: #555;
+    --heading: #444;
+    --muted: #aaa;
+    --nav: #b4b4b4;
+    --page-bg: #f9f9f9;
+    --header-bg: #fff;
+    --rule: #808080;
+    --card-border: #e6e6e6;
+    --footer-bg: #2d3339;
+    --footer-bottom-bg: #22262b;
+    --footer-text: #717f8f;
+    --footer-text-hover: #9ba6b0;
+    --serif: Merriweather, Georgia, serif;
+    --sans: Lato, "Helvetica Neue", Arial, sans-serif;
+    --wrap: 1140px;
+    --content: 850px;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 16px;
+    line-height: 1.75;
+    color: var(--text);
+    background: var(--page-bg);
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+a { color: var(--accent); text-decoration: none; transition: color 0.2s linear; }
+a:hover, a:focus { color: var(--accent-hover); }
+
+img { max-width: 100%; height: auto; display: block; }
+
+h1, h2, h3, h4 {
+    font-family: var(--sans);
+    color: var(--heading);
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+p { margin: 0 0 1.5em; }
+
+hr {
+    border: 0;
+    border-top: 2px solid var(--rule);
+    margin: 1.5rem 0;
+    opacity: 0.8;
+}
+
+.wrap {
+    max-width: var(--wrap);
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.skip-link {
+    position: absolute;
+    left: -9999px;
+}
+.skip-link:focus {
+    left: 1rem;
+    top: 1rem;
+    z-index: 100;
+    background: #fff;
+    padding: 0.5rem 1rem;
+}
+
+/* ---------- Header ---------- */
+
+.site-header { background: var(--header-bg); }
+
+.site-header .wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 84px;
+}
+
+.site-title {
+    margin: 0;
+    font-family: var(--sans);
+    font-size: 1.125rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+.site-title a { color: var(--muted); }
+.site-title a:hover { color: var(--heading); }
+
+.main-nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+.main-nav a {
+    display: block;
+    padding: 0.5rem 0 0.5rem 2.2rem;
+    font-family: var(--sans);
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: var(--nav);
+}
+.main-nav a:hover,
+.main-nav a[aria-current="page"] { color: var(--accent); }
+
+.nav-toggle {
+    display: none;
+    background: none;
+    border: 0;
+    padding: 0.5rem;
+    cursor: pointer;
+    color: var(--heading);
+    font-family: var(--sans);
+    font-size: 0.8125rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+/* ---------- Main ---------- */
+
+.site-main {
+    flex: 1;
+    padding: 3rem 0 5rem;
+}
+
+.content { max-width: var(--content); }
+.content-wide { max-width: none; }
+
+.page-title {
+    font-size: 3rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin: 0 0 3rem;
+}
+
+.section-label {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 1.125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    margin: 2.5rem 0 1.5rem;
+}
+.section-label:first-child { margin-top: 0; }
+
+.sub-label {
+    font-family: var(--serif);
+    font-size: 1rem;
+    margin: 1.5rem 0 0.75rem;
+}
+
+.lead-large { font-size: 1.125rem; }
+
+/* Papers / publication lists */
+.pub-list p { font-size: 1.0625rem; }
+
+/* File / download lists */
+.file-list {
+    list-style: none;
+    margin: 0 0 1.75rem;
+    padding: 0;
+}
+.file-list li { margin-bottom: 0.6rem; }
+
+/* ---------- Home ---------- */
+
+.slideshow {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 2400 / 1042;
+    background: #ddd;
+    margin-bottom: 1rem;
+}
+.slideshow img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+}
+.slideshow img.is-active { opacity: 1; }
+.slide-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    border: 0;
+    background: rgba(0, 0, 0, 0.35);
+    color: #fff;
+    font-size: 1rem;
+    line-height: 28px;
+    cursor: pointer;
+    padding: 0;
+}
+.slide-btn:hover { background: rgba(0, 0, 0, 0.6); }
+.slide-btn.prev { left: 4px; }
+.slide-btn.next { right: 4px; }
+.slide-dots {
+    display: flex;
+    gap: 6px;
+    margin: 0 0 2.25rem;
+}
+.slide-dots button {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    border: 0;
+    padding: 0;
+    background: #bbb;
+    cursor: pointer;
+}
+.slide-dots button[aria-current="true"] { background: #444; }
+
+.intro {
+    display: grid;
+    grid-template-columns: 40% 1fr;
+    gap: 0;
+    margin-bottom: 1.25rem;
+}
+/* The photo grows to match the text height, but only up to 8% taller than
+   its natural 2:3 shape, so the sides are never cropped by much. */
+.intro-photo {
+    margin: 0;
+    container-type: inline-size;
+    display: flex;
+    align-items: center;
+}
+.intro-photo img {
+    width: 100%;
+    height: 100%;
+    min-height: 150cqi;
+    max-height: 162cqi;
+    object-fit: cover;
+    object-position: 50% 20%;
+}
+.intro-text {
+    align-self: center;
+    padding: 0 4% 0 9%;
+    font-size: 1.0625rem;
+}
+.intro-text p { margin-bottom: 1.4em; }
+.intro-text p:last-child { margin-bottom: 0; }
+
+.contact h2 {
+    font-size: 1rem;
+    text-transform: uppercase;
+    margin: 0 0 0.75rem;
+}
+.contact p {
+    font-size: 1.0625rem;
+    margin: 0;
+}
+.contact p span + span { margin-left: 0.6rem; }
+
+/* ---------- Books ---------- */
+
+.book {
+    display: grid;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 2.5rem;
+}
+.book figure { margin: 0; }
+.book .book-text { padding: 0 8%; }
+.book .book-text p:last-child { margin-bottom: 0; }
+.book.wide { grid-template-columns: 64% 1fr; }
+.book.left { grid-template-columns: 37% 1fr; }
+.book.right { grid-template-columns: 1fr 36%; }
+.book.right figure { order: 2; }
+
+/* ---------- Projects ---------- */
+
+.projects-intro { margin-bottom: 2.5rem; }
+
+.project-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+}
+.project-card {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border: 1px solid var(--card-border);
+    border-top: 3px solid var(--accent);
+    padding: 1.4rem 1.5rem 1.25rem;
+    color: var(--text);
+    transition: box-shadow 0.2s, transform 0.15s;
+}
+.project-card:hover,
+.project-card:focus {
+    color: var(--text);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.07);
+    transform: translateY(-2px);
+}
+.project-card h2 {
+    font-size: 1.125rem;
+    margin: 0 0 0.4rem;
+}
+.project-card p {
+    font-size: 0.9375rem;
+    line-height: 1.65;
+    margin: 0 0 1rem;
+    flex: 1;
+}
+.project-card .project-link {
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+}
+
+/* ---------- Footer ---------- */
+
+.site-footer {
+    background: var(--footer-bg);
+    color: var(--footer-text);
+}
+.site-footer .footer-widgets { padding: 4rem 0 3.5rem; }
+.site-footer h2 {
+    margin: 0 0 1rem;
+    font-size: 0.8125rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--footer-text);
+}
+.social-links {
+    display: flex;
+    gap: 0.75rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.social-links a {
+    display: block;
+    color: var(--footer-text);
+}
+.social-links a:hover { color: var(--footer-text-hover); }
+.social-links svg {
+    width: 26px;
+    height: 26px;
+    fill: currentColor;
+    display: block;
+}
+.social-links svg.stroke {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+}
+.social-links svg.stroke .dot {
+    fill: currentColor;
+    stroke: none;
+}
+.site-info {
+    background: var(--footer-bottom-bg);
+    color: #657380;
+    padding: 1.5rem 0;
+    font-size: 0.8125rem;
+}
+.site-info p { margin: 0; }
+.site-info a { color: var(--footer-text); text-decoration: underline; }
+
+.visually-hidden {
+    position: absolute !important;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+}
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 1000px) {
+    .main-nav a { padding-left: 1.4rem; }
+}
+
+@media (max-width: 860px) {
+    .site-header .wrap { flex-wrap: wrap; min-height: 64px; }
+    .nav-toggle { display: block; }
+    .main-nav {
+        display: none;
+        width: 100%;
+        padding-bottom: 1rem;
+    }
+    .main-nav.is-open { display: block; }
+    .main-nav ul { flex-direction: column; }
+    .main-nav a {
+        padding: 0.6rem 0;
+        border-top: 1px solid #eee;
+    }
+}
+
+@media (max-width: 700px) {
+    body { font-size: 15px; }
+    .wrap { padding: 0 16px; }
+    .site-main { padding: 2rem 0 3rem; }
+    .page-title { font-size: 2.25rem; margin-bottom: 2rem; }
+    .intro,
+    .book.wide,
+    .book.left,
+    .book.right { grid-template-columns: 1fr; }
+    .intro-photo { margin-bottom: 1.75rem; }
+    .intro-photo img { min-height: 0; max-height: 520px; }
+    .intro-text { padding: 0; }
+    .book figure { margin-bottom: 1.25rem; }
+    .book.right figure { order: 0; }
+    .book.left figure,
+    .book.right figure { max-width: 260px; }
+    .book .book-text { padding: 0; }
+    .project-grid { grid-template-columns: 1fr; }
+}
