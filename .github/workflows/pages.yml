@@ -2,6 +2,8 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
+  schedule:
+    - cron: '30 6 * * *'   # every day at 06:30 UTC, to refresh the "Latest" cards
   workflow_dispatch:
 
 permissions:
@@ -21,6 +23,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # Refresh the front page's "Latest" cards from Prospect, Substack and Rethink.
+      # If a source is unreachable the previous card is kept, and the site still deploys.
+      - name: Update Latest cards
+        run: python3 scripts/update_now.py
+        continue-on-error: true
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

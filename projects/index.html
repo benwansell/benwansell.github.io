@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projects – Ben W. Ansell</title>
+    <title>Lab – Ben W. Ansell</title>
     <meta name="description" content="Interactive data explorers, simulations and other projects by Ben W. Ansell.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/assets/css/site.css?v=2">
+    <link rel="stylesheet" href="/assets/css/site.css?v=15">
 </head>
 <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -26,7 +26,7 @@
                 <li><a href="/policy/">Policy</a></li>
                 <li><a href="/media/">Media</a></li>
                 <li><a href="/teaching/">Teaching</a></li>
-                <li><a href="/projects/" aria-current="page">Projects</a></li>
+                <li><a href="/projects/" aria-current="page">Lab</a></li>
                 </ul>
             </nav>
         </div>
@@ -35,55 +35,102 @@
     <main class="site-main" id="main">
         <div class="wrap">
             <div class="content">
-            <h1 class="page-title">Projects</h1>
-                <p class="projects-intro">Interactive data explorers, simulations, and other projects, mostly built with Claude Code.</p>
-                <div class="project-grid">
-                    <a class="project-card" href="/property-tax/">
-                        <h2>Proportional Property Tax</h2>
-                        <p>International, US/Canada and UK local-authority property tax rates compared against illustrative proportional-tax scenarios for Britain, down to every English billing authority.</p>
-                        <span class="project-link">Open project &rarr;</span>
-                    </a>
-                    <a class="project-card" href="/le2026/">
-                        <h2>2026 Local Election Explorer</h2>
-                        <p>Ward-level results for the 2026 English local elections mapped against 2021 Census demographics, with an interactive scatterplot and regression analysis.</p>
-                        <span class="project-link">Open project &rarr;</span>
-                    </a>
-                    <a class="project-card" href="/constituency-map/">
-                        <h2>Constituency Map</h2>
-                        <p>Interactive explorer of UK constituency data, demographics, and election results.</p>
-                        <span class="project-link">Open project &rarr;</span>
-                    </a>
-                    <a class="project-card" href="/farage-bes-report/">
-                        <h2>Farage BES Report</h2>
-                        <p>Like/dislike ratings across 30 waves of the British Election Study.</p>
-                        <span class="project-link">Open project &rarr;</span>
-                    </a>
-                    <a class="project-card" href="/schelling-segregation/">
-                        <h2>Schelling Segregation Model</h2>
-                        <p>Interactive simulation of how individual preferences drive neighbourhood segregation.</p>
-                        <span class="project-link">Open project &rarr;</span>
-                    </a>
-                    <a class="project-card" href="/ancient-greek-democracy/">
-                        <h2>Democracy in Ancient Greece</h2>
-                        <p>Interactive guide with maps, timelines, and a quiz.</p>
-                        <span class="project-link">Open project &rarr;</span>
-                    </a>
-                    <a class="project-card" href="/game-of-life/">
-                        <h2>Conway&rsquo;s Game of Life</h2>
-                        <p>Interactive cellular automaton with patterns and colour schemes.</p>
-                        <span class="project-link">Open project &rarr;</span>
-                    </a>
-                    <a class="project-card" href="/house-of-cards/">
-                        <h2>House of Cards</h2>
-                        <p>A Westminster-themed deck-building card game.</p>
-                        <span class="project-link">Open project &rarr;</span>
-                    </a>
-                    <a class="project-card" href="/presentations/">
-                        <h2>Presentations</h2>
-                        <p>Slides from selected talks and lectures.</p>
-                        <span class="project-link">Open project &rarr;</span>
-                    </a>
-                </div>
+            <h1 class="page-title">Lab</h1>
+                <p class="projects-intro">Interactive data explorers, simulations and other projects, mostly built with Claude Code.</p>
+                <section class="lab-shelf">
+                    <h2 class="band-title">Research tools</h2>
+                    <p class="lab-shelf-intro">Interactive explorers built on real data: elections, the census, public opinion and taxes.</p>
+                    <div class="project-grid">
+                        <a class="project-card" href="/le2026/">
+                            <img class="project-thumb" src="/assets/img/lab/le2026.jpg?v=2" alt="" loading="lazy" width="640" height="400">
+                            <span class="project-body">
+                                <h3>2026 Local Election Explorer</h3>
+                                <p>Ward-level results for the 2026 English local elections mapped against 2021 Census demographics, with an interactive scatterplot and regression analysis.</p>
+                                <span class="project-link">Open explorer &rarr;</span>
+                            </span>
+                        </a>
+                        <a class="project-card" href="/constituency-map/">
+                            <img class="project-thumb" src="/assets/img/lab/constituency-map.jpg?v=2" alt="" loading="lazy" width="640" height="400">
+                            <span class="project-body">
+                                <h3>Constituency Map</h3>
+                                <p>A hex map and explorer of UK constituency data, demographics and election results.</p>
+                                <span class="project-link">Open map &rarr;</span>
+                            </span>
+                        </a>
+                        <a class="project-card" href="/property-tax/">
+                            <img class="project-thumb" src="/assets/img/lab/property-tax.jpg" alt="" loading="lazy" width="640" height="400">
+                            <span class="project-body">
+                                <h3>Proportional Property Tax</h3>
+                                <p>International, US/Canada and UK local-authority property tax rates compared against illustrative proportional-tax scenarios for Britain.</p>
+                                <span class="project-link">Open calculator &rarr;</span>
+                            </span>
+                        </a>
+                        <a class="project-card" href="/farage-bes-report/">
+                            <img class="project-thumb" src="/assets/img/lab/farage-bes-report.jpg" alt="" loading="lazy" width="640" height="400">
+                            <span class="project-body">
+                                <h3>Farage BES Report</h3>
+                                <p>How Nigel Farage&rsquo;s like/dislike ratings have moved across 30 waves of the British Election Study.</p>
+                                <span class="project-link">Read report &rarr;</span>
+                            </span>
+                        </a>
+                    </div>
+                </section>
+                <section class="lab-shelf">
+                    <h2 class="band-title">Models of society</h2>
+                    <p class="lab-shelf-intro">Simulations and guides that show how simple rules and institutions produce collective outcomes.</p>
+                    <div class="project-grid">
+                        <a class="project-card" href="/schelling-segregation/">
+                            <img class="project-thumb" src="/assets/img/lab/schelling-segregation.jpg" alt="" loading="lazy" width="640" height="400">
+                            <span class="project-body">
+                                <h3>Schelling Segregation Model</h3>
+                                <p>How mild individual preferences can add up to stark neighbourhood segregation.</p>
+                                <span class="project-link">Run the model &rarr;</span>
+                            </span>
+                        </a>
+                        <a class="project-card" href="/ancient-greek-democracy/">
+                            <img class="project-thumb" src="/assets/img/lab/ancient-greek-democracy.jpg" alt="" loading="lazy" width="640" height="400">
+                            <span class="project-body">
+                                <h3>Democracy in Ancient Greece</h3>
+                                <p>An interactive guide to the world&rsquo;s first democracies, with maps, timelines and a quiz.</p>
+                                <span class="project-link">Explore &rarr;</span>
+                            </span>
+                        </a>
+                        <a class="project-card" href="/game-of-life/">
+                            <img class="project-thumb" src="/assets/img/lab/game-of-life.jpg" alt="" loading="lazy" width="640" height="400">
+                            <span class="project-body">
+                                <h3>Conway&rsquo;s Game of Life</h3>
+                                <p>The classic cellular automaton: complex patterns from four simple rules.</p>
+                                <span class="project-link">Play &rarr;</span>
+                            </span>
+                        </a>
+                    </div>
+                </section>
+                <section class="lab-shelf">
+                    <h2 class="band-title">Just for fun</h2>
+                    <div class="project-grid">
+                        <a class="project-card" href="/house-of-cards/">
+                            <img class="project-thumb" src="/assets/img/lab/house-of-cards.jpg" alt="" loading="lazy" width="640" height="400">
+                            <span class="project-body">
+                                <h3>House of Cards</h3>
+                                <p>A Westminster-themed deck-building card game.</p>
+                                <span class="project-link">Play the game &rarr;</span>
+                            </span>
+                        </a>
+                    </div>
+                </section>
+                <section class="lab-shelf">
+                    <h2 class="band-title">Talks</h2>
+                    <div class="project-grid">
+                        <a class="project-card" href="/presentations/">
+                            <img class="project-thumb" src="/assets/img/lab/presentations.jpg" alt="" loading="lazy" width="640" height="400">
+                            <span class="project-body">
+                                <h3>Presentations</h3>
+                                <p>Slides from selected talks and lectures.</p>
+                                <span class="project-link">View slides &rarr;</span>
+                            </span>
+                        </a>
+                    </div>
+                </section>
             </div>
         </div>
     </main>
@@ -110,6 +157,6 @@
         </div>
     </footer>
 
-    <script src="/assets/js/site.js?v=2"></script>
+    <script src="/assets/js/site.js?v=4"></script>
 </body>
 </html>

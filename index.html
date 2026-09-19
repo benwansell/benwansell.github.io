@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/assets/css/site.css?v=2">
+    <link rel="stylesheet" href="/assets/css/site.css?v=15">
 </head>
 <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -26,26 +26,111 @@
                 <li><a href="/policy/">Policy</a></li>
                 <li><a href="/media/">Media</a></li>
                 <li><a href="/teaching/">Teaching</a></li>
-                <li><a href="/projects/">Projects</a></li>
+                <li><a href="/projects/">Lab</a></li>
                 </ul>
             </nav>
         </div>
     </header>
 
-    <main class="site-main" id="main">
+    <main class="site-main home" id="main">
         <div class="wrap">
-            <div class="slideshow" aria-label="Photos of Oxford">
-                <img src="/assets/img/nuffield-college.jpg" alt="The quad at Nuffield College, Oxford" class="is-active">
-                <img src="/assets/img/oxford-castle.jpg" alt="Oxford Castle" loading="lazy">
-                <button class="slide-btn prev" aria-label="Previous slide">&#8249;</button>
-                <button class="slide-btn next" aria-label="Next slide">&#8250;</button>
-            </div>
-            <div class="slide-dots">
-                <button aria-label="Slide 1" aria-current="true"></button>
-                <button aria-label="Slide 2"></button>
-            </div>
+            <figure class="top-banner">
+                <img src="/assets/img/nuffield-college.jpg" alt="The quad at Nuffield College, Oxford">
+                <figcaption>Nuffield College, Oxford</figcaption>
+            </figure>
 
-            <div class="content content-wide">
+            <section class="hero">
+                <div class="hero-text">
+                    <h1>Why Politics Fails &ndash; and What We Can Do About It</h1>
+                    <p class="hero-roles">I&rsquo;m Professor of Comparative Democratic Institutions at Nuffield College, Oxford, and Director of the <a href="https://cassm.ox.ac.uk">Centre for Advanced Social Science Methods</a>. I gave the BBC&rsquo;s 2023 Reith Lectures, I host <em>Rethink</em> on Radio 4, and I wrote <a href="https://www.penguin.co.uk/books/444113/why-politics-fails-by-ansell-ben/9780241992753"><em>Why Politics Fails</em></a>.</p>
+                    <aside class="listen-box" aria-labelledby="listen-title">
+                        <svg class="listen-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 0 0-9 9v6a3 3 0 0 0 3 3h1a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1H5v-1a7 7 0 0 1 14 0v1h-2a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h1a3 3 0 0 0 3-3v-6a9 9 0 0 0-9-9z"/></svg>
+                        <div>
+                            <p class="listen-kicker">Listen</p>
+                            <h2 class="listen-title" id="listen-title">The 2023 BBC Reith Lectures: <em>Our Democratic Future</em></h2>
+                            <ol class="listen-list">
+                                <li><a href="https://www.bbc.co.uk/programmes/m001sty4">The Future of Democracy</a></li>
+                                <li><a href="https://www.bbc.co.uk/programmes/m001t3cf">The Future of Security</a></li>
+                                <li><a href="https://www.bbc.co.uk/programmes/m001t9f9">The Future of Solidarity</a></li>
+                                <li><a href="https://www.bbc.co.uk/programmes/m001thz1">The Future of Prosperity</a></li>
+                            </ol>
+                        </div>
+                    </aside>
+                </div>
+                <figure class="hero-chart" id="chart-carousel" tabindex="-1">
+                    <a class="chart-kicker" href="/projects/">Data from the Lab &rarr;</a>
+                    <figcaption>
+                        <span class="chart-title">The education divide</span>
+                        <span class="chart-sub"></span>
+                    </figcaption>
+                    <div class="chart-frame">
+                        <div class="chart-tip" hidden></div>
+                    </div>
+                    <div class="chart-controls">
+                        <button type="button" class="chart-prev" aria-label="Previous chart">&#8249;</button>
+                        <span class="chart-dotsnav"></span>
+                        <span class="chart-count" aria-live="polite">1 / 3</span>
+                        <button type="button" class="chart-next" aria-label="Next chart">&#8250;</button>
+                    </div>
+                    <p class="chart-note"></p>
+                </figure>
+            </section>
+
+            <section class="now" aria-labelledby="now-heading">
+                <h2 class="band-title" id="now-heading">Latest Columns and Podcasts</h2>
+                <div class="now-grid">
+                    <!-- NOW:START -->
+                    <a class="now-card now-prospect" href="https://www.prospectmagazine.co.uk/politics/74573/andy-burnham-phone-alert-prime-minister">
+                        <span class="now-label">Latest in Prospect</span>
+                        <h3>Andy Burnham, phone alert prime minister</h3>
+                        <p>It might feel like he has been in power forever, but I promise you, it really has only been a few weeks</p>
+                        <span class="now-foot"><span class="now-cta">Read the column &rarr;</span></span>
+                    </a>
+                    <a class="now-card now-substack" href="https://benansell.substack.com/p/pardogatto-progressivism">
+                        <span class="now-label">Latest on Political Calculus</span>
+                        <h3>Pardogatto Progressivism</h3>
+                        <p>The switch in radicalism from left to right is the key challenge of our age</p>
+                        <span class="now-foot"><span class="now-date">27 May 2026</span><span class="now-cta">Read the post &rarr;</span></span>
+                    </a>
+                    <a class="now-card now-rethink" href="https://www.bbc.co.uk/programmes/m0031k00">
+                        <span class="now-label">Latest on Rethink, BBC Radio 4</span>
+                        <h3>Rethink... warfare</h3>
+                        <p>21st Century wars aren&#x27;t turning out quite as planned. Russia expected to defeat Ukraine within days of the start of its &quot;special military operation&quot; in February 2022…</p>
+                        <span class="now-foot"><span class="now-date">17 September 2026</span><span class="now-cta">Listen &rarr;</span></span>
+                    </a>
+                    <!-- NOW:END -->
+                </div>
+            </section>
+
+            <section class="doors" aria-label="Explore the site">
+                <a class="door" href="/papers/">
+                    <span class="door-kicker">Research</span>
+                    <h3>Papers, books and data</h3>
+                    <p>Work on democracy, inequality, housing and education, with replication data from the WEALTHPOL project.</p>
+                    <span class="door-links">Papers &middot; Books &middot; Data &middot; Policy</span>
+                </a>
+                <a class="door" href="/projects/">
+                    <span class="door-kicker">The Lab</span>
+                    <h3>Explorers, maps and models</h3>
+                    <p>Interactive tools to play with: the 2026 local elections, a constituency hex map, a property-tax calculator and more.</p>
+                    <span class="door-links">Open the Lab &rarr;</span>
+                </a>
+                <a class="door" href="/media/">
+                    <span class="door-kicker">Writing &amp; Media</span>
+                    <h3>Columns, radio and podcasts</h3>
+                    <p>My <em>Prospect</em> column, the Political Calculus newsletter, <em>Rethink</em> on Radio 4 and the Reith Lectures.</p>
+                    <span class="door-links">Media &middot; Substack &middot; <em>Prospect</em></span>
+                </a>
+            </section>
+
+            <div class="content content-wide about">
+                <h2 class="band-title">About</h2>
+                <div class="photo-strip single">
+                    <figure>
+                        <img src="/assets/img/oxford-castle.jpg" alt="Oxford Castle" loading="lazy">
+                        <figcaption>Oxford Castle</figcaption>
+                    </figure>
+                </div>
                 <div class="intro">
                     <figure class="intro-photo">
                         <img src="/assets/img/ben-ansell-portrait.jpg" alt="Ben W. Ansell" width="800" height="1200">
@@ -98,6 +183,7 @@
         </div>
     </footer>
 
-    <script src="/assets/js/site.js?v=2"></script>
+    <script src="/assets/js/site.js?v=4"></script>
+    <script src="/assets/js/home-chart.js?v=5"></script>
 </body>
 </html>
