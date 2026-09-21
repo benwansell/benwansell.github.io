@@ -1,5 +1,7 @@
-// Front-page chart carousel: three interactive scatter plots drawn from the Lab projects.
-// Each slide loads its data from assets/data/ the first time it is shown.
+// Front-page charts. One list of slides feeds two views:
+//   1. the carousel below the fold: interactive scatter plots (from the Lab) and figures from published papers;
+//   2. the splash: the same slides, redrawn quiet (one series, no axes, no tooltips) behind the name, cycling slowly.
+// Each data slide loads its JSON from assets/data/ the first time it is needed.
 (function () {
     var fig = document.getElementById('chart-carousel');
     if (!fig) return;
@@ -12,6 +14,7 @@
     var money = function (v) { return v >= 1e6 ? '£' + (v / 1e6) + 'm' : '£' + (v / 1e3) + 'k'; };
     var NATION = { England: '#df3062', Wales: '#d98a1c', Scotland: '#2f6fb3' };
 
+    var IMG = '/assets/img/figures/';
     var SLIDES = [
         {
             src: 'education-reform.json',
@@ -21,11 +24,29 @@
             link: [MAIN + '/constituency-map/', 'Explore the constituency map'],
             x: [15, 70], xTicks: [20, 30, 40, 50, 60, 70], xFmt: pct, xLabel: 'Residents with a degree (2021)',
             y: [0, 50], yTicks: [0, 10, 20, 30, 40, 50], yFmt: pct, yLabel: 'Reform UK vote, 2024',
-            color: function () { return '#df3062'; },
+            color: function () { return '#15487e'; },
             trend: [18, 66],
             callout: function (f) { return ['Each 10 points more graduates:', 'about ' + Math.abs(f.slope * 10).toFixed(1) + ' points less Reform']; },
             calloutAt: [46.5, 36],
             tip: function (d) { return '<b>' + d[0] + '</b>' + d[1] + '% graduates &middot; Reform ' + d[2] + '%'; }
+        },
+        {
+            img: IMG + 'social-distancing-workplace.jpg',
+            wash: IMG + 'social-distancing-wash.webp',
+            alt: 'Scatter plot of change in workplace activity from baseline, March to August 2020, with the lockdown and reopening dates marked, for Remain-voting (yellow) and Leave-voting (blue) local authorities. Activity collapses at full lockdown and recovers only partly through the summer, more so in Leave-voting areas.',
+            title: 'Workplace activity through lockdown',
+            sub: 'Change in workplace activity from baseline, March to August 2020, with the lockdown and reopening dates marked. Yellow dots are Remain-voting local authorities, blue are Leave-voting.',
+            note: 'From \u2018Social Distancing, Politics, and Wealth\u2019, with Asl\u0131 Cansunar and Mads Elkj\u00e6r, West European Politics (2021).',
+            link: ['https://doi.org/10.1080/01402382.2021.1917154', 'Read the paper']
+        },
+        {
+            img: IMG + 'inheritance-tax-rates.jpg',
+            wash: IMG + 'inheritance-tax-wash.webp',
+            alt: 'Line chart of marginal inheritance tax rates from 1945 to 2019 in 18 advanced democracies, for estates worth 1, 5, 10, 50, 100 and 1000 times GDP per capita. Rates on the largest estates peak near 38 per cent around 1970 and fall to about 20 per cent by 2019.',
+            title: 'The fall of inheritance taxes',
+            sub: 'Marginal inheritance tax rates by size of estate, as a multiple of GDP per capita, averaged across 18 advanced democracies, 1945\u20132019.',
+            note: 'From \u2018Why is it so Hard to Counteract Wealth Inequality? Evidence from the United Kingdom\u2019, with Laure Bokobza, Asl\u0131 Cansunar, Mads Elkj\u00e6r, Matthias Haslberger and Jacob Nyrup, World Politics (2025).',
+            link: ['https://ora.ox.ac.uk/objects/uuid:f3aea392-6325-486e-b4cd-31e9579654e7', 'Read the paper']
         },
         {
             src: 'green-renters.json',
@@ -69,11 +90,21 @@
     var current = 0;
 
     SLIDES.forEach(function (s, i) {
-        var svg = document.createElementNS(NS, 'svg');
-        svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
-        svg.setAttribute('class', 'chart-svg');
-        svg.setAttribute('role', 'img');
-        svg.setAttribute('aria-label', s.title + '. ' + s.sub);
+        var svg;
+        if (s.img) {
+            svg = document.createElement('img');
+            svg.src = s.img;
+            svg.alt = s.alt;
+            svg.className = 'chart-img';
+            svg.loading = i === 0 ? 'eager' : 'lazy';
+            s.drawn = true;
+        } else {
+            svg = document.createElementNS(NS, 'svg');
+            svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+            svg.setAttribute('class', 'chart-svg');
+            svg.setAttribute('role', 'img');
+            svg.setAttribute('aria-label', s.title + '. ' + s.sub);
+        }
         svg.style.display = i === 0 ? '' : 'none';
         frame.insertBefore(svg, tip);
         s.svg = svg;
@@ -98,10 +129,15 @@
         tip.hidden = true;
         if (!s.drawn) {
             s.drawn = true;
-            fetch(DATA + s.src).then(function (r) { return r.json(); })
-                .then(function (data) { draw(s, data); })
+            load(s).then(function (data) { draw(s, data); })
                 .catch(function () { s.drawn = false; });
         }
+    }
+
+    // JSON is fetched once per slide and shared by the carousel and the splash.
+    function load(s) {
+        if (!s.data) s.data = fetch(DATA + s.src).then(function (r) { return r.json(); });
+        return s.data;
     }
 
     fig.querySelector('.chart-prev').addEventListener('click', function () { go(current - 1); });
@@ -193,6 +229,108 @@
             hot = null;
         });
     }
+
+    // ---------- Splash: the same slides, quiet ----------
+    var bg = document.getElementById('splash-bg');
+    if (bg) (function () {
+        var QW = 960, QH = 720, PAD = { l: 36, r: 24, t: 90, b: 90 };
+        var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var cap = document.querySelector('.splash-cap');
+        var capTitle = cap.querySelector('.splash-cap-title');
+        var capLink = cap.querySelector('.splash-cap-link');
+        var pauseBtn = cap.querySelector('.splash-pause');
+        var dotsEl = cap.querySelector('.splash-dots');
+        var layers = [], now = -1, timer = null, paused = still;
+
+        function drawQuiet(s, data, svg) {
+            var lx = function (v) { return s.xLog ? Math.log10(v) : v; };
+            var x = function (v) { return PAD.l + (lx(v) - lx(s.x[0])) / (lx(s.x[1]) - lx(s.x[0])) * (QW - PAD.l - PAD.r); };
+            var y = function (v) { return QH - PAD.b - (v - s.y[0]) / (s.y[1] - s.y[0]) * (QH - PAD.t - PAD.b); };
+            var g = document.createElementNS(NS, 'g');
+            g.setAttribute('class', 'q-dots');
+            data.rows.forEach(function (d) {
+                var c = document.createElementNS(NS, 'circle');
+                c.setAttribute('cx', x(d[1]).toFixed(1));
+                c.setAttribute('cy', y(d[2]).toFixed(1));
+                c.setAttribute('r', s.quietR || 5);
+                g.appendChild(c);
+            });
+            svg.appendChild(g);
+            if (s.trend) {
+                var f = data.fit, t0 = s.trend[0], t1 = s.trend[1];
+                var x1 = x(t0), y1 = y(f.intercept + f.slope * lx(t0)), x2 = x(t1), y2 = y(f.intercept + f.slope * lx(t1));
+                var ln = document.createElementNS(NS, 'line');
+                ln.setAttribute('class', 'q-trend');
+                ln.setAttribute('x1', x1); ln.setAttribute('y1', y1); ln.setAttribute('x2', x2); ln.setAttribute('y2', y2);
+                ln.style.setProperty('--len', Math.ceil(Math.hypot(x2 - x1, y2 - y1)));
+                svg.appendChild(ln);
+            }
+        }
+
+        SLIDES.forEach(function (s, i) {
+            var layer = document.createElement('div');
+            layer.className = 'splash-slide';
+            if (s.wash) {
+                var im = document.createElement('img');
+                im.alt = '';
+                im.decoding = 'async';
+                im.src = s.wash;
+                layer.appendChild(im);
+            } else {
+                s.quiet = document.createElementNS(NS, 'svg');
+                s.quiet.setAttribute('viewBox', '0 0 ' + QW + ' ' + QH);
+                s.quiet.setAttribute('preserveAspectRatio', 'xMaxYMid meet');
+                layer.appendChild(s.quiet);
+            }
+            bg.appendChild(layer);
+            layers.push(layer);
+            var b = document.createElement('button');
+            b.type = 'button';
+            b.setAttribute('aria-label', 'Background figure ' + (i + 1) + ': ' + s.title);
+            b.addEventListener('click', function () { show(i); if (!paused) start(); });
+            dotsEl.appendChild(b);
+        });
+
+        function ready(i) {
+            var s = SLIDES[i];
+            if (s.quietDrawn || s.wash) return;
+            s.quietDrawn = true;
+            load(s).then(function (data) { drawQuiet(s, data, s.quiet); }).catch(function () { s.quietDrawn = false; });
+        }
+
+        function show(i) {
+            i = (i + SLIDES.length) % SLIDES.length;
+            ready(i);
+            ready((i + 1) % SLIDES.length);
+            if (now >= 0) layers[now].classList.remove('is-active');
+            layers[i].classList.add('is-active');
+            now = i;
+            capTitle.textContent = SLIDES[i].title;
+            [].forEach.call(dotsEl.children, function (b, j) {
+                if (j === i) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current');
+            });
+        }
+
+        function start() {
+            clearInterval(timer);
+            timer = paused ? null : setInterval(function () { show(now + 1); }, 8000);
+        }
+
+        pauseBtn.addEventListener('click', function () {
+            paused = !paused;
+            pauseBtn.setAttribute('aria-label', (paused ? 'Play' : 'Pause') + ' the background figures');
+            pauseBtn.setAttribute('aria-pressed', paused ? 'true' : 'false');
+            start();
+        });
+        // "See the figure" jumps to the same slide in the carousel below.
+        capLink.addEventListener('click', function () { go(now); });
+
+        pauseBtn.setAttribute('aria-label', (paused ? 'Play' : 'Pause') + ' the background figures');
+        pauseBtn.setAttribute('aria-pressed', paused ? 'true' : 'false');
+        cap.hidden = false;
+        show(0);
+        start();
+    })();
 
     go(0);
 })();

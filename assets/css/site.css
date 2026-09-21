@@ -2,8 +2,9 @@
    Modelled on the WordPress.com "Creative" theme used at benwansell.com. */
 
 :root {
-    --accent: #df3062;
-    --accent-hover: #b81f4b;
+    --accent: #15487e;
+    --accent-hover: #0e3459;
+    --accent-on-dark: #8fb4de;
     --text: #555;
     --heading: #444;
     --muted: #aaa;
@@ -451,7 +452,7 @@ hr {
     align-items: start;
     padding: 1rem 0 3.5rem;
 }
-.hero h1 {
+.hero .hero-title {
     margin: 0 0 1.25rem;
     font-family: var(--serif);
     font-weight: 700;
@@ -573,7 +574,7 @@ hr {
     font-weight: 700;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: var(--muted);
+    color: var(--accent);
     margin: 0 0 1rem;
     padding-top: 1.1rem;
     border-top: 2px solid var(--heading);
@@ -632,7 +633,7 @@ hr {
     font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: #ff7aa0;
+    color: var(--accent-on-dark);
 }
 .door h3 { color: #fff; font-family: var(--serif); font-size: 1.2rem; margin: 0.5rem 0 0.6rem; }
 .door p { font-size: 0.88rem; line-height: 1.6; margin: 0 0 1rem; flex: 1; }
@@ -642,12 +643,12 @@ hr {
 
 @media (max-width: 960px) {
     .hero { grid-template-columns: 1fr; gap: 2rem; }
-    .hero h1 { font-size: 2rem; }
+    .hero .hero-title { font-size: 2rem; }
     .now-grid, .doors { grid-template-columns: 1fr; }
 }
 @media (max-width: 700px) {
     .hero { padding-top: 0; }
-    .hero h1 { font-size: 1.65rem; }
+    .hero .hero-title { font-size: 1.65rem; }
     .hero-chart { padding: 0.9rem 0.6rem 0.6rem; }
 }
 
@@ -747,36 +748,41 @@ hr {
 .project-card h3 { font-family: var(--sans); font-size: 1.125rem; margin: 0 0 0.4rem; }
 .project-card .project-body p { font-size: 0.9375rem; line-height: 1.65; margin: 0 0 1rem; flex: 1; }
 
-/* Slim photo banner at the top of the home page */
-.top-banner { position: relative; margin: 0 0 2.5rem; }
-.top-banner img { width: 100%; height: 190px; object-fit: cover; object-position: 50% 50%; filter: brightness(1.12) contrast(1.03); }
-.top-banner figcaption {
-    position: absolute;
-    right: 0.6rem;
-    bottom: 0.5rem;
-    padding: 0.15rem 0.5rem;
-    font-family: var(--sans);
-    font-size: 0.7rem;
-    color: #fff;
-    background: rgba(0, 0, 0, 0.35);
-    border-radius: 2px;
-}
 .home .site-main, .site-main.home { padding-top: 2rem; }
-/* Hero text column: Reith box sits at the bottom, level with the chart */
-.hero { align-items: stretch; }
+/* Hero text column: the intro, then the Reith box directly under it */
+.hero { align-items: start; }
 .hero-text { display: flex; flex-direction: column; }
-.hero-text .listen-box { margin-top: auto; }
+.hero-text .listen-box { margin-top: 0.5rem; }
 .hero-roles { margin-bottom: 1.5rem; }
 .photo-strip.single { grid-template-columns: 1fr; }
 .photo-strip.single img { aspect-ratio: 16 / 4.5; }
 @media (max-width: 960px) {
     .hero-text .listen-box { margin-top: 0.5rem; }
-    .top-banner img { height: 140px; }
 }
-.hero h1 { font-size: 2.8rem; line-height: 1.18; margin-bottom: 1.5rem; }
+.hero .hero-title { font-size: 2.8rem; line-height: 1.18; margin-bottom: 1.5rem; }
 .hero-roles { font-size: 1.02rem; line-height: 1.75; }
-@media (max-width: 960px) { .hero h1 { font-size: 2.1rem; } }
-@media (max-width: 700px) { .hero h1 { font-size: 1.7rem; } }
+@media (max-width: 960px) { .hero .hero-title { font-size: 2.1rem; } }
+@media (max-width: 700px) { .hero .hero-title { font-size: 1.7rem; } }
+/* Two quieter companions under the Reith box: the book and the Substack */
+.read-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 0.75rem; }
+.read-card {
+    display: block;
+    padding: 0.7rem 0.9rem;
+    background: #fff;
+    border: 1px solid var(--card-border);
+    border-left: 4px solid var(--accent);
+    color: var(--text);
+}
+.read-card:hover, .read-card:focus-visible { border-color: var(--accent); color: var(--text); }
+.read-kicker {
+    display: block; margin-bottom: 0.15rem;
+    font-family: var(--sans); font-size: 0.6875rem; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);
+}
+.read-title { display: block; font-family: var(--sans); font-weight: 700; color: var(--heading); line-height: 1.3; }
+.read-note { display: block; margin-top: 0.1rem; font-size: 0.8125rem; color: var(--muted); }
+@media (max-width: 520px) { .read-row { grid-template-columns: 1fr; } }
+
 .chart-kicker {
     display: inline-block;
     margin-bottom: 0.35rem;
@@ -788,3 +794,119 @@ hr {
     color: var(--accent);
 }
 .chart-kicker:hover, .chart-kicker:focus { color: var(--accent-hover); text-decoration: underline; }
+
+/* ---------- Splash (Option B: the chart as the image) ---------- */
+
+/* Paper figures sit in the same box as the drawn charts (560 x 360), centred,
+   so a squarer figure letterboxes instead of making the carousel jump. */
+.chart-img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 560 / 360;
+    object-fit: contain;
+    object-position: center;
+}
+
+.splash { position: relative; overflow: hidden; background: var(--page-bg); }
+.splash-bg {
+    /* Right edge lines up with the content gutter, i.e. with LAB in the menu. */
+    position: absolute; top: 0; bottom: 0;
+    right: max(20px, (100% - var(--wrap)) / 2 + 20px);
+    width: min(92vw, 1440px);
+    pointer-events: none;
+}
+.splash-slide { position: absolute; inset: 0; opacity: 0; transition: opacity 1.6s ease; }
+.splash-slide.is-active { opacity: 1; }
+.splash-slide svg, .splash-slide img { width: 100%; height: 100%; display: block; }
+.splash-slide img { object-fit: contain; object-position: right center; opacity: 0.2; }
+.q-dots circle { fill: var(--accent); fill-opacity: 0.17; }
+.q-trend { stroke: var(--accent); stroke-opacity: 0.55; stroke-width: 3; stroke-linecap: round; fill: none; }
+@media (prefers-reduced-motion: no-preference) {
+    .splash-slide.is-active .q-trend { animation: q-draw 2.6s 0.4s ease-out both; }
+    @keyframes q-draw { from { stroke-dashoffset: var(--len); } to { stroke-dashoffset: 0; } }
+    .splash-slide .q-trend { stroke-dasharray: var(--len); }
+}
+
+.splash::after {   /* keeps the text legible where the chart runs underneath it */
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(90deg, var(--page-bg) 0%, rgba(249,249,249,0.78) 18%, rgba(249,249,249,0) 52%);
+}
+.splash-inner {
+    position: relative; z-index: 2;
+    display: flex; align-items: center;
+    min-height: clamp(480px, 84svh, 700px);
+    padding-top: 84px; padding-bottom: 4.5rem;
+}
+.splash-text { max-width: 640px; }
+.splash-name {
+    margin: 0 0 1.1rem;
+    font-family: var(--sans); font-weight: 900;
+    font-size: clamp(3.2rem, 8.4vw, 6.4rem);
+    line-height: 1; letter-spacing: -0.02em;
+    color: var(--heading);
+}
+.splash-id { margin: 0 0 2.2rem; max-width: 30em; font-size: 1.15rem; line-height: 1.6; color: #666; }
+.splash-links { display: flex; flex-wrap: wrap; gap: 0.35rem 1.7rem; }
+.splash-links a {
+    font-family: var(--sans); font-weight: 700; font-size: 0.875rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--heading); padding: 0.45rem 0;
+    border-bottom: 2px solid var(--accent);
+}
+.splash-links a:hover, .splash-links a:focus-visible { color: var(--accent); border-bottom-color: var(--heading); }
+
+.splash-cap {
+    position: absolute; left: 20px; right: 20px; bottom: 1.1rem;
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem 1.5rem;
+    font-family: var(--sans); font-size: 0.75rem; line-height: 1.4; color: #777;
+}
+.splash-cap[hidden] { display: none; }
+.splash-cap-text { margin: 0; flex: 1 1 auto; min-width: 0; }
+.splash-cap-kicker { font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-right: 0.6rem; }
+.splash-cap-title { color: var(--heading); font-weight: 700; margin-right: 0.6rem; }
+.splash-cap-ctl { display: flex; align-items: center; gap: 1rem; flex: 0 0 auto; margin-left: auto; }
+.splash-dots { display: flex; gap: 7px; }
+.splash-dots button { width: 9px; height: 9px; padding: 0; border: 0; border-radius: 50%; background: #d3d3d3; cursor: pointer; }
+.splash-dots button[aria-current="true"] { background: var(--accent); }
+.splash-pause {
+    display: flex; align-items: center; justify-content: center;
+    width: 28px; height: 28px; padding: 0;
+    background: none; border: 1px solid #ccc; border-radius: 3px;
+    color: #666; cursor: pointer;
+}
+.splash-pause svg { width: 13px; height: 13px; fill: currentColor; display: block; }
+.splash-pause .icon-play { display: none; }
+.splash-pause[aria-pressed="true"] .icon-pause { display: none; }
+.splash-pause[aria-pressed="true"] .icon-play { display: block; }
+.splash-pause:hover, .splash-pause:focus-visible { border-color: var(--accent); color: var(--accent); }
+
+/* Header: transparent over the splash, white once scrolled past. Only when JS is running;
+   without it the normal header sits above the splash as before. */
+.js .splash-page .site-header {
+    position: sticky; top: 0; z-index: 50; margin-bottom: -84px;
+    background: transparent; transition: background 0.25s, box-shadow 0.25s;
+}
+.js .splash-page .site-header.is-solid { background: var(--header-bg); box-shadow: 0 1px 0 var(--card-border); }
+.js .splash-page .site-title a { color: var(--heading); }
+.js .splash-page .site-header:not(.is-solid) .main-nav a { color: #666; }
+.js .splash-page .site-header:not(.is-solid) .main-nav a:hover,
+.js .splash-page .site-header:not(.is-solid) .main-nav a[aria-current="page"] { color: var(--accent); }
+.js .splash-page .site-header.has-menu { background: var(--header-bg); }
+
+@media (max-width: 860px) {
+    .js .splash-page .site-header { margin-bottom: -64px; }
+    .splash-inner { align-items: flex-start; padding-top: 104px; }
+}
+@media (max-width: 700px) {
+    /* The figure fills the splash and sits behind the name, rather than
+       being parked below it; the scrim is lightest where the text is. */
+    .splash-bg { width: 100%; right: 0; top: 18%; bottom: auto; height: 62%; }
+    .splash-slide img { object-position: center; opacity: 0.16; }
+    .splash::after { background: linear-gradient(180deg, rgba(249,249,249,0.72) 0%, rgba(249,249,249,0.45) 45%, rgba(249,249,249,0.8) 100%); }
+    .splash-inner { min-height: max(370px, 54svh); padding-bottom: 3.75rem; }
+    /* The hamburger already carries the nav on small screens. */
+    .splash-links { display: none; }
+    .splash-id { font-size: 1.02rem; margin-bottom: 1.5rem; }
+    .splash-cap { left: 16px; right: 16px; }
+    .splash-cap-title { display: block; }
+}

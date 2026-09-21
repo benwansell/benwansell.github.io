@@ -8,9 +8,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/assets/css/site.css?v=15">
+    <script>document.documentElement.className+=" js"</script>
+    <link rel="stylesheet" href="/assets/css/site.css?v=28">
 </head>
-<body>
+<body class="splash-page">
     <a class="skip-link" href="#main">Skip to content</a>
     <header class="site-header">
         <div class="wrap">
@@ -32,17 +33,41 @@
         </div>
     </header>
 
+    <section class="splash" aria-labelledby="splash-name">
+        <div class="splash-bg" id="splash-bg" aria-hidden="true"></div>
+        <div class="wrap splash-inner">
+            <div class="splash-text">
+                <h1 class="splash-name" id="splash-name">Ben W. Ansell</h1>
+                <p class="splash-id">Professor of Comparative Democratic Institutions, Nuffield&nbsp;College, University&nbsp;of&nbsp;Oxford</p>
+                <nav class="splash-links" aria-label="Sections">
+                    <a href="/bio/">Bio</a>
+                    <a href="/books/">Books</a>
+                    <a href="/papers/">Papers</a>
+                    <a href="/data/">Data</a>
+                    <a href="/policy/">Policy</a>
+                    <a href="/media/">Media</a>
+                    <a href="/projects/">Lab</a>
+                </nav>
+            </div>
+            <div class="splash-cap" hidden>
+                <p class="splash-cap-text"><span class="splash-cap-kicker">In the background</span> <span class="splash-cap-title"></span> <a class="splash-cap-link" href="#chart-carousel">See the figure &darr;</a></p>
+                <div class="splash-cap-ctl">
+                    <span class="splash-dots"></span>
+                    <button type="button" class="splash-pause" aria-pressed="false" aria-label="Pause the background figures">
+                        <svg class="icon-pause" viewBox="0 0 16 16" aria-hidden="true"><rect x="3.5" y="2.5" width="3.5" height="11" rx="1"/><rect x="9" y="2.5" width="3.5" height="11" rx="1"/></svg>
+                        <svg class="icon-play" viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 2.4 13.5 8l-9 5.6z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <main class="site-main home" id="main">
         <div class="wrap">
-            <figure class="top-banner">
-                <img src="/assets/img/nuffield-college.jpg" alt="The quad at Nuffield College, Oxford">
-                <figcaption>Nuffield College, Oxford</figcaption>
-            </figure>
 
-            <section class="hero">
+            <section class="hero" aria-label="Introduction">
                 <div class="hero-text">
-                    <h1>Why Politics Fails &ndash; and What We Can Do About It</h1>
-                    <p class="hero-roles">I&rsquo;m Professor of Comparative Democratic Institutions at Nuffield College, Oxford, and Director of the <a href="https://cassm.ox.ac.uk">Centre for Advanced Social Science Methods</a>. I gave the BBC&rsquo;s 2023 Reith Lectures, I host <em>Rethink</em> on Radio 4, and I wrote <a href="https://www.penguin.co.uk/books/444113/why-politics-fails-by-ansell-ben/9780241992753"><em>Why Politics Fails</em></a>.</p>
+                    <p class="hero-roles">I work on why democracies struggle with the things that matter most to them &ndash; housing, inequality, education and the shape of democracy itself. My book <a href="https://www.penguin.co.uk/books/444113/why-politics-fails-by-ansell-ben/9780241992753"><em>Why Politics Fails</em></a> argues that our political ideals keep colliding with one another, and I made the same case in the BBC&rsquo;s 2023 <a href="https://www.bbc.co.uk/programmes/m001sty4">Reith Lectures</a>. I write about it regularly on <a href="https://benansell.substack.com">Political Calculus</a>.</p>
                     <aside class="listen-box" aria-labelledby="listen-title">
                         <svg class="listen-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 0 0-9 9v6a3 3 0 0 0 3 3h1a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1H5v-1a7 7 0 0 1 14 0v1h-2a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h1a3 3 0 0 0 3-3v-6a9 9 0 0 0-9-9z"/></svg>
                         <div>
@@ -56,9 +81,21 @@
                             </ol>
                         </div>
                     </aside>
+                    <div class="read-row">
+                        <a class="read-card" href="https://www.penguin.co.uk/books/444113/why-politics-fails-by-ansell-ben/9780241992753">
+                            <span class="read-kicker">Read</span>
+                            <span class="read-title"><em>Why Politics Fails</em></span>
+                            <span class="read-note">Viking / PublicAffairs</span>
+                        </a>
+                        <a class="read-card" href="https://benansell.substack.com">
+                            <span class="read-kicker">Subscribe</span>
+                            <span class="read-title">Political Calculus</span>
+                            <span class="read-note">My Substack</span>
+                        </a>
+                    </div>
                 </div>
                 <figure class="hero-chart" id="chart-carousel" tabindex="-1">
-                    <a class="chart-kicker" href="/projects/">Data from the Lab &rarr;</a>
+                    <a class="chart-kicker" href="/projects/">Figures and Data &rarr;</a>
                     <figcaption>
                         <span class="chart-title">The education divide</span>
                         <span class="chart-sub"></span>
@@ -69,12 +106,34 @@
                     <div class="chart-controls">
                         <button type="button" class="chart-prev" aria-label="Previous chart">&#8249;</button>
                         <span class="chart-dotsnav"></span>
-                        <span class="chart-count" aria-live="polite">1 / 3</span>
+                        <span class="chart-count" aria-live="polite">1 / 5</span>
                         <button type="button" class="chart-next" aria-label="Next chart">&#8250;</button>
                     </div>
                     <p class="chart-note"></p>
                 </figure>
             </section>
+
+            <div class="content content-wide about">
+                <h2 class="band-title">About</h2>
+                <div class="intro">
+                    <figure class="intro-photo">
+                        <img src="/assets/img/ben-ansell-portrait.jpg" alt="Ben W. Ansell" width="800" height="1200">
+                    </figure>
+                    <div class="intro-text">
+                        <p>I am Professor of Comparative Democratic Institutions at Nuffield College and the University of Oxford and Fellow of the British Academy. Here&rsquo;s my <a href="/wp-content/uploads/2026/09/ben-ansell-cv-sep-2026.pdf">CV</a>.</p>
+                        <p>I am the Director of the <a href="https://cassm.ox.ac.uk">Centre for Advanced Social Science Methods</a>.</p>
+                        <p>I am Course Director of the <a href="https://www.law.ox.ac.uk/content/course/msc-law-governance-and-ai">MSc in Law, Governance and AI</a>.</p>
+                        <p>I am the host of BBC Radio 4&rsquo;s <a href="https://www.bbc.co.uk/programmes/p08gt1ry">Rethink</a>, and I was the BBC&rsquo;s 2023 Reith Lecturer, giving a series of lectures titled &lsquo;<a href="https://www.bbc.co.uk/programmes/m001sty4">Our Democratic Future</a>&rsquo;.</p>
+                        <p>I was the host of &lsquo;<a href="https://www.tortoisemedia.com/listen/whats-wrong-with-democracy/">What&rsquo;s Wrong with Democracy?</a>&rsquo; produced by Tortoise Media.</p>
+                        <p>I&rsquo;m the author of <em>Why Politics Fails</em> (<a href="https://www.penguin.co.uk/books/444113/why-politics-fails-by-ansell-ben/9780241992760">Viking</a> / <a href="https://www.hachettebookgroup.com/titles/ben-ansell/why-politics-fails/9781541702073/?lens=publicaffairs">PublicAffairs</a>).</p>
+                        <p>I am UK Politics Columnist for <a href="https://www.prospectmagazine.co.uk/author/5582/ben-ansell"><em>Prospect</em></a>.</p>
+                        <p>I write the Substack <a href="https://benansell.substack.com">Political Calculus</a>.</p>
+                        <p>I&rsquo;m co-editor (with David Samuels and Dawn Teele) of <a href="https://journals.sagepub.com/home/cps"><em>Comparative Political Studies</em></a>.</p>
+                        <p>I was Principal Investigator of the ERC funded <a href="https://wealthpol.site.ox.ac.uk/home">WEALTHPOL</a> project on the politics of wealth inequality.</p>
+                    </div>
+                </div>
+
+            </div>
 
             <section class="now" aria-labelledby="now-heading">
                 <h2 class="band-title" id="now-heading">Latest Columns and Podcasts</h2>
@@ -123,32 +182,7 @@
                 </a>
             </section>
 
-            <div class="content content-wide about">
-                <h2 class="band-title">About</h2>
-                <div class="photo-strip single">
-                    <figure>
-                        <img src="/assets/img/oxford-castle.jpg" alt="Oxford Castle" loading="lazy">
-                        <figcaption>Oxford Castle</figcaption>
-                    </figure>
-                </div>
-                <div class="intro">
-                    <figure class="intro-photo">
-                        <img src="/assets/img/ben-ansell-portrait.jpg" alt="Ben W. Ansell" width="800" height="1200">
-                    </figure>
-                    <div class="intro-text">
-                        <p>I am Professor of Comparative Democratic Institutions at Nuffield College and the University of Oxford and Fellow of the British Academy. Here&rsquo;s my <a href="/wp-content/uploads/2026/09/ben-ansell-cv-sep-2026.pdf">CV</a>.</p>
-                        <p>I am the Director of the <a href="https://cassm.ox.ac.uk">Centre for Advanced Social Science Methods</a>.</p>
-                        <p>I am Course Director of the <a href="https://www.law.ox.ac.uk/content/course/msc-law-governance-and-ai">MSc in Law, Governance and AI</a>.</p>
-                        <p>I am the host of BBC Radio 4&rsquo;s <a href="https://www.bbc.co.uk/programmes/p08gt1ry">Rethink</a>, and I was the BBC&rsquo;s 2023 Reith Lecturer, giving a series of lectures titled &lsquo;<a href="https://www.bbc.co.uk/programmes/m001sty4">Our Democratic Future</a>&rsquo;.</p>
-                        <p>I was the host of &lsquo;<a href="https://www.tortoisemedia.com/listen/whats-wrong-with-democracy/">What&rsquo;s Wrong with Democracy?</a>&rsquo; produced by Tortoise Media.</p>
-                        <p>I&rsquo;m the author of <em>Why Politics Fails</em> (<a href="https://www.penguin.co.uk/books/444113/why-politics-fails-by-ansell-ben/9780241992760">Viking</a> / <a href="https://www.hachettebookgroup.com/titles/ben-ansell/why-politics-fails/9781541702073/?lens=publicaffairs">PublicAffairs</a>).</p>
-                        <p>I am UK Politics Columnist for <a href="https://www.prospectmagazine.co.uk/author/5582/ben-ansell"><em>Prospect</em></a>.</p>
-                        <p>I write the Substack <a href="https://benansell.substack.com">Political Calculus</a>.</p>
-                        <p>I&rsquo;m co-editor (with David Samuels and Dawn Teele) of <em>Comparative Political Studies</em>.</p>
-                        <p>I was Principal Investigator of the ERC funded WEALTHPOL project on the politics of wealth inequality.</p>
-                    </div>
-                </div>
-
+            <div class="content content-wide">
                 <hr>
 
                 <section class="contact">
@@ -183,7 +217,7 @@
         </div>
     </footer>
 
-    <script src="/assets/js/site.js?v=4"></script>
-    <script src="/assets/js/home-chart.js?v=5"></script>
+    <script src="/assets/js/site.js?v=5"></script>
+    <script src="/assets/js/home-chart.js?v=8"></script>
 </body>
 </html>

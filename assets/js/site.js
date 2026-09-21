@@ -6,7 +6,23 @@
     toggle.addEventListener('click', function () {
         var open = nav.classList.toggle('is-open');
         toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        var header = document.querySelector('.site-header');
+        if (header) header.classList.toggle('has-menu', open);
     });
+})();
+
+// Splash page: the header starts transparent over the splash and turns solid once it scrolls away
+(function () {
+    var splash = document.querySelector('.splash');
+    var header = document.querySelector('.site-header');
+    if (!splash || !header || !('IntersectionObserver' in window)) {
+        if (header) header.classList.add('is-solid');
+        return;
+    }
+    var offset = header.offsetHeight || 84;
+    new IntersectionObserver(function (entries) {
+        header.classList.toggle('is-solid', !entries[0].isIntersecting);
+    }, { rootMargin: '-' + offset + 'px 0px 0px 0px', threshold: 0 }).observe(splash);
 })();
 
 // Home page slideshow
