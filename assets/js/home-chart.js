@@ -17,6 +17,21 @@
     var IMG = '/assets/img/figures/';
     var SLIDES = [
         {
+            src: 'green-renters.json',
+            title: 'Renters and the Greens',
+            sub: 'Green vote share in the 2026 English local elections, by share of households renting privately. Each dot is a ward where the Greens stood.',
+            note: 'Sources: 2026 local election results; 2021 Census. 2,379 wards with a Green candidate.',
+            link: [MAIN + '/le2026/', 'Explore the 2026 local elections'],
+            x: [0, 80], xTicks: [0, 20, 40, 60, 80], xFmt: pct, xLabel: 'Households renting privately (2021)',
+            y: [0, 75], yTicks: [0, 25, 50, 75], yFmt: pct, yLabel: 'Green vote, 2026',
+            color: function () { return '#02a95b'; },
+            radius: 2.4,
+            trend: [6, 78],
+            callout: function (f) { return ['Each 10 points more private renters:', 'about ' + (f.slope * 10).toFixed(1) + ' points more Green']; },
+            calloutAt: [2, 70],
+            tip: function (d) { return '<b>' + d[0] + '</b>' + d[1] + '% private renters &middot; Green ' + d[2] + '%'; }
+        },
+        {
             src: 'education-reform.json',
             title: 'The education divide',
             sub: 'Reform UK vote share at the 2024 general election, by share of residents with a degree. Each dot is a constituency in England and Wales.',
@@ -47,21 +62,6 @@
             sub: 'Marginal inheritance tax rates by size of estate, as a multiple of GDP per capita, averaged across 18 advanced democracies, 1945\u20132019.',
             note: 'From \u2018Why is it so Hard to Counteract Wealth Inequality? Evidence from the United Kingdom\u2019, with Laure Bokobza, Asl\u0131 Cansunar, Mads Elkj\u00e6r, Matthias Haslberger and Jacob Nyrup, World Politics (2025).',
             link: ['https://ora.ox.ac.uk/objects/uuid:f3aea392-6325-486e-b4cd-31e9579654e7', 'Read the paper']
-        },
-        {
-            src: 'green-renters.json',
-            title: 'Renters and the Greens',
-            sub: 'Green vote share in the 2026 English local elections, by share of households renting privately. Each dot is a ward where the Greens stood.',
-            note: 'Sources: 2026 local election results; 2021 Census. 2,379 wards with a Green candidate.',
-            link: [MAIN + '/le2026/', 'Explore the 2026 local elections'],
-            x: [0, 80], xTicks: [0, 20, 40, 60, 80], xFmt: pct, xLabel: 'Households renting privately (2021)',
-            y: [0, 75], yTicks: [0, 25, 50, 75], yFmt: pct, yLabel: 'Green vote, 2026',
-            color: function () { return '#02a95b'; },
-            radius: 2.4,
-            trend: [6, 78],
-            callout: function (f) { return ['Each 10 points more private renters:', 'about ' + (f.slope * 10).toFixed(1) + ' points more Green']; },
-            calloutAt: [2, 70],
-            tip: function (d) { return '<b>' + d[0] + '</b>' + d[1] + '% private renters &middot; Green ' + d[2] + '%'; }
         },
         {
             src: 'council-tax.json',
