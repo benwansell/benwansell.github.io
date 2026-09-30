@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2029 General Election Predictor (UNS and PS)</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+
+<header class="page-head">
+  <h1>2029 General Election Predictor <span class="sub">(UNS and PS)</span></h1>
+  <p class="byline">
+    By Ben Ansell, Nuffield College, University of Oxford ·
+    <a href="https://www.benwansell.com">benwansell.com</a> ·
+    <a href="https://benansell.substack.com">benansell.substack.com</a> ·
+    @benwansell
+  </p>
+</header>
+
+<div class="layout">
+
+  <aside class="sidebar" id="sidebar">
+    <h2>Polling averages</h2>
+    <p class="help">National vote share (%) for each party.</p>
+
+    <div class="poll-grid" id="pollGrid"></div>
+
+    <h2>Tactical voting</h2>
+    <p class="help">Share of each party's voters switching to the best-placed ally in their seat.</p>
+
+    <div id="tacticalGrid"></div>
+
+    <button type="button" id="resetBtn" class="reset">Reset to defaults</button>
+
+    <div class="totals" id="pollTotal"></div>
+  </aside>
+
+  <main class="main">
+
+    <nav class="tabs" id="tabs" role="tablist">
+      <button role="tab" data-tab="seats"   class="active">Seats</button>
+      <button role="tab" data-tab="plot">Plot</button>
+      <button role="tab" data-tab="demog">Demographics</button>
+      <button role="tab" data-tab="map">Map</button>
+      <button role="tab" data-tab="pr">PR</button>
+    </nav>
+
+    <div class="modeswitch" id="modeSwitch">
+      <span class="lab">Swing model:</span>
+      <label><input type="radio" name="mode" value="uns" checked> Uniform National Swing</label>
+      <label><input type="radio" name="mode" value="ps"> Proportionate Swing</label>
+      <label><input type="radio" name="mode" value="both"> Show both</label>
+    </div>
+
+    <!-- Seats -->
+    <section class="panel active" data-panel="seats">
+      <h3>Predicted seat counts</h3>
+      <div class="pair" id="seatsPair"></div>
+    </section>
+
+    <!-- Plot -->
+    <section class="panel" data-panel="plot">
+      <h3>Predicted seats won <span class="note">— hover or click a point for detail</span></h3>
+      <div class="pair" id="plotPair"></div>
+      <p class="readout" id="plotReadout">Click a constituency in the figure above.</p>
+    </section>
+
+    <!-- Demographics -->
+    <section class="panel" data-panel="demog">
+      <h3>Demographics</h3>
+      <div class="selectrow">
+        <label>X-axis <select id="xDemog"></select></label>
+        <label>Y-axis <select id="yDemog"></select></label>
+      </div>
+      <div class="pair" id="demogPair"></div>
+      <p class="readout" id="demogReadout">Click a constituency in the figure above.</p>
+    </section>
+
+    <!-- Map -->
+    <section class="panel" data-panel="map">
+      <h3>Hex map of predicted winners</h3>
+      <div class="pair maps" id="mapPair"></div>
+      <div class="maplegend" id="mapLegend"></div>
+    </section>
+
+    <!-- PR -->
+    <section class="panel" data-panel="pr">
+      <h3>Westminster under proportional representation</h3>
+      <div class="pair" id="prPair"></div>
+    </section>
+
+    <div class="downloads">
+      <button type="button" id="dlUns">Download data (UNS)</button>
+      <button type="button" id="dlPs">Download data (PS)</button>
+    </div>
+
+    <h3>Difference in seats between UNS and PS (and with PR)</h3>
+    <div class="tablewrap" id="diffTable"></div>
+
+    <h3>Details for a particular constituency</h3>
+    <label class="constpick">Choose a constituency
+      <select id="constPick"></select>
+    </label>
+    <div class="tablewrap" id="constDetail"></div>
+
+    <h3>Top fifty marginals</h3>
+    <div class="pair" id="marginalsPair"></div>
+
+    <section class="info">
+      <h3>Information</h3>
+      <p>Predictions all use Uniform National Swing (UNS) or Proportionate Swing (PS) from GE 2024 on new
+      constituency boundaries. Proportionate Swing is only used for Conservatives and Labour in the PS model.
+      Small parties always use UNS to prevent very large shifts, and this means numbers won't always add to
+      one hundred for PS.</p>
+      <p>The dotted line is 325 seats (a pure majority). A working majority is closer to 320 because of the
+      Speaker and Sinn Féin. Tactical voting shifts a proportion of Labour, Liberal Democrat and Green voters
+      to whichever of those parties did best in GE 2024. Tactical voting between Conservatives and Reform
+      moves voters from the other party to whichever did best in GE 2024. Constituencies are weighted by 2024
+      absolute turnout. Northern Ireland and Chorley (the Speaker's seat) are excluded.</p>
+      <p>2024 vote share taken from Ralph Scott. Brexit vote estimates for new boundaries from Chris Hanretty.
+      New boundaries hex map from Philip Brown and Alasdair Rae, Automatic Knowledge Ltd. Demographics are
+      from the House of Commons Library and ONS — note Scotland only has an age profile.</p>
+      <p>All code produced by Ben Ansell. This is an updated version of the
+      <a href="https://livedataoxford.shinyapps.io/GE2024_Predictor_UNS_and_PS/">GE24 calculator</a> based on
+      GE2019 voting data. Articles about it:
+      <a href="https://benansell.substack.com/p/tactical-coping">Tactical Coping</a> and
+      <a href="https://benansell.substack.com/p/the-moment-of-truth">The Moment of Truth</a>.</p>
+      <p class="tech">This page is static: the data and the whole swing model are loaded into your browser,
+      so nothing is computed on a server.</p>
+    </section>
+
+  </main>
+</div>
+
+<div class="loading" id="loading">Loading constituency data…</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="model.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
