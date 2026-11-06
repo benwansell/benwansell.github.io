@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NEET Atlas</title>
+<meta name="description" content="Young people not in education, employment or training across British local authorities and European regions.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <h1>NEET Atlas</h1>
+    <p>Young people not in education, employment or training, across British local authorities and European regions</p>
+  </div>
+  <div class="seg" role="group" aria-label="Geography">
+    <button data-scope="gb" aria-pressed="true">Great Britain</button>
+    <button data-scope="eu" aria-pressed="false">Europe</button>
+  </div>
+</header>
+<nav class="tabs" role="tablist">
+  <button role="tab" data-tab="map" aria-selected="true">Map</button>
+  <button role="tab" data-tab="corr" aria-selected="false">Correlations</button>
+  <button role="tab" data-tab="about" aria-selected="false">About the data</button>
+</nav>
+
+<main>
+  <section id="tab-map" class="panel">
+    <div class="controls">
+      <label>Measure <select id="measure"></select></label>
+    </div>
+    <p class="note" id="measure-note"></p>
+    <div class="tiles" id="tiles"></div>
+    <div class="map-grid">
+      <div class="map-wrap">
+        <div class="legend" id="legend"></div>
+        <div class="map-stage">
+        <svg id="map" role="img" aria-label="Choropleth map"></svg>
+        <div class="zoom">
+          <button id="zin" aria-label="Zoom in">+</button>
+          <button id="zout" aria-label="Zoom out">&minus;</button>
+          <button id="zreset" aria-label="Reset zoom">&#8634;</button>
+        </div>
+        </div>
+      </div>
+      <aside class="side">
+        <div class="detail" id="detail"></div>
+        <div class="table-head">
+          <input id="search" type="search" placeholder="Find an area" aria-label="Find an area">
+          <button id="csv">Download CSV</button>
+        </div>
+        <div class="table-wrap"><table id="rank"><thead></thead><tbody></tbody></table></div>
+      </aside>
+    </div>
+  </section>
+
+  <section id="tab-corr" class="panel" hidden>
+    <div class="controls">
+      <label>Outcome <select id="outcome"></select></label>
+      <label>Compare <select id="within"></select></label>
+      <label>Highlight <select id="hl"></select></label>
+    </div>
+    <p class="note" id="corr-note"></p>
+    <div class="corr-grid">
+      <div class="card">
+        <h2>Correlation with each local statistic</h2>
+        <p class="sub">Pearson r with 95% interval. Select a row to plot it.</p>
+        <div id="dots"></div>
+      </div>
+      <div class="card">
+        <h2 id="sc-title"></h2>
+        <p class="sub" id="sc-stats"></p>
+        <div id="scatter"></div>
+        <p class="note small" id="sc-note"></p>
+      </div>
+    </div>
+  </section>
+
+  <section id="tab-about" class="panel about" hidden></section>
+</main>
+<footer class="credit">Prepared by Ben Ansell with the aid of Claude Opus 5.5, November 2026</footer>
+<div id="tip" role="tooltip" hidden></div>
+<script src="vendor/d3.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
