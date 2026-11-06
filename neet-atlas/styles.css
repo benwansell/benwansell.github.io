@@ -22,6 +22,9 @@ button, select, input { font: inherit; color: inherit; }
 .top { display: flex; gap: 16px; justify-content: space-between; align-items: center; flex-wrap: wrap; padding: 20px 24px 10px; max-width: 1360px; margin: 0 auto; }
 .brand h1 { font-size: 24px; line-height: 1.2; margin: 0; letter-spacing: -.01em; }
 .brand p { margin: 2px 0 0; color: var(--ink2); }
+.top-actions { display: flex; align-items: center; gap: 10px; }
+.home { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border: 1px solid var(--axis); border-radius: 8px; color: inherit; text-decoration: none; white-space: nowrap; }
+.home:hover { background: var(--grid); }
 .seg { display: inline-flex; border: 1px solid var(--axis); border-radius: 8px; overflow: hidden; }
 .seg button { border: 0; background: transparent; padding: 7px 16px; cursor: pointer; }
 .seg button[aria-pressed="true"] { background: var(--accent); color: #fff; }
@@ -44,6 +47,7 @@ select, input[type=search] { background: var(--surface); border: 1px solid var(-
 .map-wrap { position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
 #map { display: block; width: 100%; height: auto; max-height: 74vh; cursor: grab; touch-action: none; }
 #map path.a { stroke: var(--stroke); stroke-width: .5; vector-effect: non-scaling-stroke; cursor: pointer; }
+#map.us path.a { stroke-width: .2; }
 .nd-bg { fill: var(--surface); }
 .nd-ln { stroke: var(--axis); stroke-width: 2; }
 .st-a { fill: var(--ink); }
@@ -126,3 +130,10 @@ button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px s
   .controls label, .controls select { width: 100%; }
   .legend .sw { width: 34px; }
 }
+#rank.us { table-layout: fixed; width: 100%; }
+#rank.us th:nth-child(2) { width: 112px; }
+#rank.us th:nth-child(3) { width: 82px; }
+#rank.us td:first-child { overflow-wrap: anywhere; }
+#map circle.m { stroke: var(--ink); stroke-width: .75; vector-effect: non-scaling-stroke; cursor: pointer; }
+#map circle.m.sel { stroke-width: 2.5; }
+@media (max-width: 560px) { .top-actions { flex-wrap: wrap; } }

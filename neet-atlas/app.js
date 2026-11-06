@@ -83,27 +83,124 @@ const SCOPES = {
     ],
     defaultX: "inc_gdp",
   },
+  us: {
+    label: "United States", unit: "PUMAs", file: "data/us.json", groupLabel: "State",
+    withinLabel: "Within states (state fixed effects)",
+    size: [960, 620],
+    measures: [
+      { k: "neet", label: "NEET-type rate, American Community Survey 2020–24", short: "NEET rate", unit: "%", geo: "us",
+        desc: "% of all residents aged 16–24",
+        note: "A survey estimate for each area, so check the margin of error before reading much into small gaps. Anyone who attended school or college in the last three months counts as in education, even part-time. That is a wider test than the Great Britain tab uses, so do not compare levels across the two." },
+      { k: "neet_dev", label: "NEET-type rate, gap to state average", short: "Gap to state", unit: "pp", geo: "us", diverging: true, desc: "gap to own state",
+        note: "Shows which areas sit above or below the rest of their state." },
+      { k: "neet_ns", label: "NEET-type rate among those not in school", short: "NEET, not in school", unit: "%", geo: "us",
+        desc: "% of 16–24s not attending school", note: "Removes the college-town effect by leaving everyone attending school or college out of the denominator." },
+      { k: "neet_unemp", label: "Unemployed, not in school", short: "Unemployed", unit: "%", geo: "us", desc: "% of all residents aged 16–24" },
+      { k: "neet_inact", label: "Not in the labor force, not in school", short: "Inactive", unit: "%", geo: "us",
+        desc: "% of all residents aged 16–24", note: "Includes caring for family, long-term sickness and disability, and people in prison." },
+      { k: "student", label: "Attending school or college", short: "In school", unit: "%", geo: "us", desc: "% of all residents aged 16–24" },
+      { k: "neet_moe", label: "Margin of error on the NEET-type rate", short: "Margin of error", unit: "±", geo: "us", desc: "90% margin, in points",
+        note: "How far the NEET-type rate could plausibly sit from the figure shown, at 90% confidence. Darker areas are less certain." },
+    ],
+    outcomes: ["neet", "neet_ns", "neet_unemp", "neet_inact"],
+    covariates: [
+      { k: "inc_hh", label: "Median household income", unit: "$", theme: "Income" },
+      { k: "inc_poverty", label: "Below the poverty line", unit: "%", theme: "Income" },
+      { k: "lab_unemp", label: "Unemployment rate, 16+", unit: "%", theme: "Labor market", mech: "Overlaps with the outcome: unemployed young people are part of the NEET count." },
+      { k: "edu_ba", label: "Bachelor's degree or above (25+)", unit: "%", theme: "Education" },
+      { k: "edu_nohs", label: "No high school diploma (25+)", unit: "%", theme: "Education" },
+      { k: "ind_manuf", label: "Manufacturing", unit: "%", theme: "Industry" },
+      { k: "ind_constr", label: "Construction", unit: "%", theme: "Industry" },
+      { k: "ind_agri", label: "Agriculture, forestry, fishing, mining", unit: "%", theme: "Industry" },
+      { k: "ind_trade", label: "Trade, transport, utilities, hospitality", unit: "%", theme: "Industry" },
+      { k: "ind_fin_prof", label: "Finance, information, professional", unit: "%", theme: "Industry" },
+      { k: "ind_public", label: "Public admin, education, health", unit: "%", theme: "Industry" },
+      { k: "dem_medage", label: "Median age", unit: "yrs", theme: "Demographics" },
+      { k: "dem_age65", label: "Aged 65 and over", unit: "%", theme: "Demographics" },
+      { k: "dem_foreign", label: "Foreign-born", unit: "%", theme: "Demographics" },
+      { k: "dem_nonwhite", label: "Other than non-Hispanic White", unit: "%", theme: "Demographics" },
+      { k: "dem_black", label: "Black, non-Hispanic", unit: "%", theme: "Demographics" },
+      { k: "dem_hisp", label: "Hispanic or Latino", unit: "%", theme: "Demographics" },
+      { k: "dem_density", label: "Population density (log scale)", unit: "/km²", theme: "Demographics", log: true },
+      { k: "student", label: "Attending school (16–24)", unit: "%", theme: "Demographics", mech: "Mechanical link: students and NEETs are mutually exclusive shares of the same 16–24 population." },
+      { k: "ten_own", label: "Owner-occupied homes", unit: "%", theme: "Housing" },
+      { k: "ten_rent", label: "Renter-occupied homes", unit: "%", theme: "Housing" },
+      { k: "hl_disabled", label: "Living with a disability", unit: "%", theme: "Health" },
+      { k: "hl_uninsured", label: "No health insurance", unit: "%", theme: "Health" },
+    ],
+    defaultX: "inc_poverty",
+  },
+  ca: {
+    label: "Canada", unit: "areas", file: "data/ca.json", groupLabel: "Province",
+    withinLabel: "Within provinces (province fixed effects)",
+    size: [900, 760],
+    measures: [
+      { k: "neet", label: "NEET rate, ages 15–24, Census 2021", short: "NEET rate", unit: "%", geo: "ca", desc: "% of 15–24s, census",
+        note: "Metro areas are published by Statistics Canada, and circles mark them so they can be found. “Rest of” areas are worked out from those figures. Anyone who attended school at any point from September 2020 to May 2021 counts as in education, even part-time, so do not compare levels with the other tabs." },
+      { k: "neet_dev", label: "NEET rate, gap to province average", short: "Gap to province", unit: "pp", geo: "ca", diverging: true, desc: "gap to own province",
+        note: "Shows which areas sit above or below the rest of their province." },
+      { k: "neet_chg", label: "Change in NEET rate, 2016 to 2021", short: "Change since 2016", unit: "pp", geo: "ca", diverging: true, desc: "change, metro areas and whole units",
+        note: "2016 figures use 2021 boundaries, so this is like for like. “Rest of” areas are blank because 2016 population figures on the same basis are not loaded. The 2021 census fell during the pandemic, so the rise may partly reflect that and not a lasting trend." },
+      { k: "neet_ns", label: "NEET rate among those not attending school", short: "NEET, not in school", unit: "%", geo: "ca",
+        desc: "% of 15–24s not attending school", note: "Removes the university-town effect by leaving everyone who attended school out of the denominator." },
+      { k: "student", label: "Attended school, September 2020 to May 2021", short: "Attended school", unit: "%", geo: "ca", desc: "% of 15–24s, census" },
+      { k: "neet_prov", label: "NEET rate by province, Census 2021", short: "Census, province", unit: "%", geo: "caprov", desc: "% of 15–24s, census", note: "As published by Statistics Canada, for whole provinces and territories." },
+      { k: "lfs", label: "NEET rate by province, Labour Force Survey 2024–26 average", short: "Survey 2024–26", unit: "%", geo: "caprov", desc: "% of 15–24s, LFS",
+        note: "The measure Statistics Canada uses for international comparison, taken in the first three months of each year. It is published in whole numbers, so small gaps mean little, especially in the territories." },
+    ],
+    outcomes: ["neet", "neet_ns"],
+    covariates: [
+      { k: "inc_hh", label: "Median household income", unit: "$", theme: "Income" },
+      { k: "inc_low", label: "Low income (LIM-AT)", unit: "%", theme: "Income" },
+      { k: "lab_unemp", label: "Unemployment rate, 15+ (May 2021)", unit: "%", theme: "Labour market", mech: "Overlaps with the outcome: unemployed young people are part of the NEET count." },
+      { k: "edu_ba", label: "Bachelor's degree or above (25–64)", unit: "%", theme: "Education" },
+      { k: "edu_none", label: "No certificate or diploma (25–64)", unit: "%", theme: "Education" },
+      { k: "ind_manuf", label: "Manufacturing", unit: "%", theme: "Industry" },
+      { k: "ind_constr", label: "Construction", unit: "%", theme: "Industry" },
+      { k: "ind_agri", label: "Agriculture, forestry, fishing, mining", unit: "%", theme: "Industry" },
+      { k: "ind_trade", label: "Trade, transport, utilities, hospitality", unit: "%", theme: "Industry" },
+      { k: "ind_fin_prof", label: "Finance, information, professional", unit: "%", theme: "Industry" },
+      { k: "ind_public", label: "Public admin, education, health", unit: "%", theme: "Industry" },
+      { k: "dem_medage", label: "Median age", unit: "yrs", theme: "Demographics" },
+      { k: "dem_age65", label: "Aged 65 and over", unit: "%", theme: "Demographics" },
+      { k: "dem_foreign", label: "Immigrants", unit: "%", theme: "Demographics" },
+      { k: "dem_vismin", label: "Visible minority", unit: "%", theme: "Demographics" },
+      { k: "dem_indig", label: "Indigenous identity", unit: "%", theme: "Demographics" },
+      { k: "dem_density", label: "Population density (log scale)", unit: "/km²", theme: "Demographics", log: true },
+      { k: "student", label: "Attended school (15–24)", unit: "%", theme: "Demographics", mech: "Mechanical link: people who attended school cannot be counted as NEET." },
+      { k: "ten_own", label: "Owner households", unit: "%", theme: "Housing" },
+      { k: "ten_rent", label: "Renter households", unit: "%", theme: "Housing" },
+    ],
+    defaultX: "inc_low",
+  },
 };
 
 const SEQ = ["#cde2fb", "#9ec5f4", "#6da7ec", "#3987e5", "#1c5cab", "#0d366b"];
-const SEQ_DARK = ["#104281", "#1c5cab", "#2a78d6", "#5598e7", "#86b6ef", "#cde2fb"];
-const DIV = ["#1c5cab", "#6da7ec", "#b7d3f6", "#f0efec", "#f4bcb8", "#e66767", "#b52f2f"];
-const DIV_DARK = ["#86b6ef", "#3987e5", "#184f95", "#383835", "#8f2f2e", "#d95050", "#f4a5a2"];
+const SEQ_DARK = ["#cde2fb", "#86b6ef", "#5598e7", "#2a78d6", "#1c5cab", "#104281"];   // darker always means higher, as in light mode
+const DIV = ["#1a7a4c", "#5fb37f", "#b5dcc0", "#f0efec", "#f4bcb8", "#e66767", "#b52f2f"];   // green below average, red above; same in both themes
 const isDark = () => matchMedia("(prefers-color-scheme: dark)").matches;
 
 /* ---------- state ---------- */
 const S = {
   scope: "gb", tab: "map", sel: null, sortKey: "v", sortDir: -1, query: "",
-  measure: { gb: "neet", eu: "lfs" }, outcome: { gb: "neet", eu: "lfs" },
-  x: { gb: SCOPES.gb.defaultX, eu: SCOPES.eu.defaultX }, within: { gb: false, eu: false }, hl: { gb: "", eu: "" },
+  measure: { gb: "neet", eu: "lfs", us: "neet", ca: "neet" }, outcome: { gb: "neet", eu: "lfs", us: "neet", ca: "neet" },
+  x: { gb: SCOPES.gb.defaultX, eu: SCOPES.eu.defaultX, us: SCOPES.us.defaultX, ca: SCOPES.ca.defaultX },
+  within: { gb: false, eu: false, us: false, ca: false }, hl: { gb: "", eu: "", us: "", ca: "" },
 };
 const D = { rows: {}, byId: {}, geo: {} };
+// North American files load only when their tab is opened
+const LAZY = { us: ["data/us.json", { us: "data/us.geo.json" }], ca: ["data/ca.json", { ca: "data/ca.geo.json", caprov: "data/caprov.geo.json" }] };
+const loads = {};
+const loadScope = (k) => LAZY[k] ? loads[k] ??= Promise.all([d3.json(LAZY[k][0]), ...Object.values(LAZY[k][1]).map((f) => d3.json(f))]).then(([r, ...g]) => {
+  D.rows[k] = r; D.byId[k] = Object.fromEntries(r.map((d) => [d.id, d]));
+  Object.keys(LAZY[k][1]).forEach((n, i) => { D.geo[n] = g[i]; });
+}).catch((e) => { delete loads[k]; throw e; }) : Promise.resolve();
 const sc = () => SCOPES[S.scope];
 const rows = () => D.rows[S.scope];
 const measure = () => sc().measures.find((m) => m.k === S.measure[S.scope]);
 // A stand-in rate for an area with no figure of its own. Display only: statistics read the measure's own field.
 const fillOf = (r, m) => m.fill && r && !Number.isFinite(r[m.k]) && Number.isFinite(r[m.fill]) ? r[m.fill] : null;
-const unitFmt = (v, u) => v == null ? "n/a" : u === "£" ? "£" + fmt0(v) : u === "PPS" ? fmt0(v) : u === "pp" ? d3.format("+.1f")(v) + " pp"
+const unitFmt = (v, u) => v == null ? "n/a" : u === "£" ? "£" + fmt0(v) : u === "$" ? "$" + fmt0(v) : u === "±" ? "±" + fmt1(v) + " pts" : u === "PPS" ? fmt0(v) : u === "pp" ? d3.format("+.1f")(v) + " pp"
   : u === "/km²" ? fmt0(v) + "/km²" : u === "yrs" ? fmt1(v) + " yrs" : fmt1(v) + "%";
 
 /* ---------- statistics (computed in the browser so the toggles work) ---------- */
@@ -144,8 +241,9 @@ function correlate(data, xk, yk, log, within) {
 const svg = d3.select("#map");
 svg.append("defs").html(`<pattern id="nd" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="7" height="7" class="nd-bg"/><line x1="0" y1="0" x2="0" y2="7" class="nd-ln"/></pattern><pattern id="st" width="5" height="5" patternUnits="userSpaceOnUse"><circle cx="1.25" cy="1.25" r=".55" class="st-a"/><circle cx="3.75" cy="3.75" r=".55" class="st-a"/></pattern>`);
 const gRoot = svg.append("g");
-const gBase = gRoot.append("g"), gAreas = gRoot.append("g"), gFill = gRoot.append("g").style("pointer-events", "none"), gRing = gRoot.append("g");
-const zoom = d3.zoom().scaleExtent([1, 14]).on("zoom", (e) => gRoot.attr("transform", e.transform));
+const gBase = gRoot.append("g"), gAreas = gRoot.append("g"), gFill = gRoot.append("g").style("pointer-events", "none"), gRing = gRoot.append("g"), gDots = gRoot.append("g");
+const DOT = 5;   // Canadian metro markers, in screen pixels at any zoom
+const zoom = d3.zoom().scaleExtent([1, 14]).on("zoom", (e) => { gRoot.attr("transform", e.transform); gDots.selectAll("circle").attr("r", DOT / e.transform.k); });
 svg.call(zoom);
 let path = null, drawnKey = null;
 
@@ -154,11 +252,17 @@ function drawGeometry() {
   if (key === drawnKey) return;
   drawnKey = key;
   const [W, H] = sc().size;
+  zoom.scaleExtent([1, S.scope === "gb" || S.scope === "eu" ? 14 : 60]);
+  svg.classed("us", S.scope === "us");
   svg.attr("viewBox", `0 0 ${W} ${H}`);
   let feats = D.geo[m.geo].features, proj;
   if (S.scope === "gb") {
     feats = feats.filter((f) => f.id[0] !== "N");
     proj = d3.geoTransverseMercator().rotate([2, 0]).fitExtent([[12, 12], [W - 12, H - 12]], { type: "FeatureCollection", features: feats });
+  } else if (S.scope === "us") {
+    proj = d3.geoAlbersUsa().fitExtent([[8, 8], [W - 8, H - 8]], { type: "FeatureCollection", features: feats });
+  } else if (S.scope === "ca") {
+    proj = d3.geoConicConformal().parallels([49, 77]).rotate([91.87, 0]).fitExtent([[8, 8], [W - 8, H - 8]], { type: "FeatureCollection", features: feats });
   } else {
     proj = d3.geoAzimuthalEqualArea().rotate([-12, -52]).fitExtent([[6, 6], [W - 6, H - 6]],
       { type: "MultiPoint", coordinates: [[-11, 36], [-10, 58], [32, 35], [31, 70], [15, 70.5], [26, 35]] });
@@ -170,19 +274,25 @@ function drawGeometry() {
     .on("mousemove", (e, f) => { showTip(e, tipHtml(f.id)); ring("hover", f.id); })
     .on("mouseleave", () => { hideTip(); ring("hover", null); })
     .on("click", (e, f) => { if (D.byId[S.scope][f.id]) select(f.id); });
+  gDots.selectAll("circle").data(m.geo === "ca" ? feats.filter((f) => f.id[0] === "C") : [], (d) => d.id).join("circle")
+    .attr("class", "m").attr("r", DOT).attr("cx", (f) => path.centroid(f)[0]).attr("cy", (f) => path.centroid(f)[1])
+    .on("mousemove", (e, f) => { showTip(e, tipHtml(f.id)); ring("hover", f.id); })
+    .on("mouseleave", () => { hideTip(); ring("hover", null); })
+    .on("click", (e, f) => select(f.id));
   svg.call(zoom.transform, d3.zoomIdentity);
 }
 function featureOf(id) { return gAreas.selectAll("path").data().find((f) => f.id === id); }
 function ring(kind, id) {
   const f = id ? featureOf(id) : null, cls = "ring " + kind;
   gRing.selectAll("path." + kind).data(f ? [f] : []).join("path").attr("class", cls).attr("d", path);
+  if (kind === "sel") gDots.selectAll("circle").classed("sel", (d) => d.id === id);
 }
 function colourScale() {
   const m = measure(), vals = rows().map((d) => d[m.k]).filter(Number.isFinite).sort(d3.ascending);
   if (m.diverging) {
     const q = d3.quantile(vals.map(Math.abs).sort(d3.ascending), 0.95), step = Math.max(1, Math.round(q / 3));
     const t = [-2.5, -1.5, -0.5, 0.5, 1.5, 2.5].map((v) => v * step);
-    return d3.scaleThreshold().domain(t).range(isDark() ? DIV_DARK : DIV);
+    return d3.scaleThreshold().domain(t).range(DIV);
   }
   const t = d3.range(1, 6).map((i) => d3.quantile(vals, i / 6));
   return d3.scaleThreshold().domain(t).range(isDark() ? SEQ_DARK : SEQ);
@@ -193,6 +303,7 @@ function drawMap() {
   gAreas.selectAll("path").attr("fill", (f) => {
     const v = by[f.id]?.[m.k] ?? fillOf(by[f.id], m); return Number.isFinite(v) ? col(v) : "url(#nd)";
   });
+  gDots.selectAll("circle").attr("fill", (f) => { const v = by[f.id]?.[m.k]; return Number.isFinite(v) ? col(v) : "url(#nd)"; });
   gFill.selectAll("path").data(gAreas.selectAll("path").data().filter((f) => fillOf(by[f.id], m) != null), (d) => d.id)
     .join("path").attr("fill", "url(#st)").attr("d", path);
   ring("sel", S.sel);
@@ -209,7 +320,8 @@ function tipHtml(id) {
   if (!r) return `<b>${id}</b><span>No data</span>`;
   const fv = fillOf(r, m);
   if (fv != null) return `<b>${r.name}</b><span>${r.grp}</span><br>No regional figure<br>${r.lfs_state_name} state rate: <strong>${unitFmt(fv, m.unit)}</strong>`;
-  return `<b>${r.name}</b><span>${r.grp}</span><br>${m.short}: <strong>${unitFmt(r[m.k], m.unit)}</strong>`;
+  const moe = m.k === "neet" && r.neet_moe != null ? ` ±${fmt1(r.neet_moe)}` : "";
+  return `<b>${r.name}</b><span>${r.grp}</span><br>${m.short}: <strong>${unitFmt(r[m.k], m.unit)}</strong>${moe}`;
 }
 
 /* ---------- tiles, detail, table ---------- */
@@ -226,12 +338,17 @@ function drawDetail() {
   if (!r) { el.innerHTML = `<div class="g">Select an area on the map or in the table to see its figures.</div>`; return; }
   const m = measure(), v = rows().filter((d) => Number.isFinite(d[m.k])).sort((a, b) => b[m.k] - a[m.k]);
   const pos = v.findIndex((d) => d.id === r.id);
-  const lines = sc().measures.map((x) => { const f = fillOf(r, x); return `<dt>${x.short}</dt><dd>${f != null ? "≈ " + unitFmt(f, x.unit) : unitFmt(r[x.k], x.unit)}</dd>`; }).join("");
+  const lines = sc().measures.filter((x) => S.scope !== "ca" || r[x.k] != null).map((x) => { const f = fillOf(r, x); return `<dt>${x.short}</dt><dd>${f != null ? "≈ " + unitFmt(f, x.unit) : unitFmt(r[x.k], x.unit)}</dd>`; }).join("");
   const rank = pos >= 0 ? `<dt>Rank (${m.short})</dt><dd>${pos + 1} of ${v.length}</dd>` : "";
   const flags = [];
   if (r.lfs_state != null) flags.push(`Eurostat publishes no 2023–25 figure for this region, so ≈ is the rate for ${r.lfs_state_name} as a whole. It is not ranked or used in correlations.${r.lfs_state_low ? " The state rate is itself low reliability." : ""}`);
   if (r.lfs_low) flags.push("Eurostat marks at least one LFS year here as low reliability.");
   if (r.uk_census) flags.push("Built from British census tables on Eurostat's definition. Scottish regions are from 2022.");
+  if (r.kind === "rest") flags.push(`Not published directly. Worked out by subtracting the province's metro areas from its total, so rounding could shift this rate by up to ${d3.format(".2f")(r.rest_err)} points, on top of any sampling error.`);
+  if (r.kind === "province" && r.lfs_se != null) flags.push(`The survey's standard error here is about ${fmt1(r.lfs_se)} points in a typical year.`);
+  if (r.sample_n < 300) flags.push(`Small sample: ${fmt0(r.sample_n)} young people surveyed here across the five years.`);
+  if (r.neet_moe > 5) flags.push("The margin of error is above 5 points, so treat this rate as a rough guide.");
+  if (r.neet_inst >= 20) flags.push(`${fmt0(r.neet_inst)}% of the NEET-type count here live in institutions, such as prisons.`);
   if (r.cens_unk > 3) flags.push(`${fmt1(r.cens_unk)}% of census records have unknown activity status.`);
   el.innerHTML = `<h3>${r.name}</h3><div class="g">${r.grp}</div><dl>${rank}${lines}</dl>`
     + flags.map((f) => `<p class="flag">${f}</p>`).join("");
@@ -243,7 +360,8 @@ function tableRows() {
   return a.sort((p, r) => S.sortDir * d3.ascending(key(p), key(r)));
 }
 function drawTable() {
-  const m = measure(), cols = [["name", "Area"], ["grp", sc().groupLabel], ["v", m.unit === "pp" ? "Gap" : "Rate"]];
+  const m = measure(), cols = [["name", "Area"], ["grp", sc().groupLabel], ["v", m.unit === "pp" ? "Gap" : m.unit === "±" ? "Margin" : "Rate"]];
+  $("#rank").classList.toggle("us", S.scope === "us");
   const arrow = (k) => S.sortKey === k ? (S.sortDir > 0 ? " ↑" : " ↓") : "";
   $("#rank thead").innerHTML = "<tr>" + cols.map(([k, l]) => `<th data-k="${k}" class="${k === "v" ? "n" : ""}">${l}${arrow(k)}</th>`).join("") + "</tr>";
   d3.select("#rank tbody").selectAll("tr").data(tableRows(), (d) => d.id).join("tr")
@@ -293,7 +411,7 @@ function drawScatter() {
   const within = S.within[S.scope], R = correlate(rows(), c.k, yk, c.log, within), hl = S.hl[S.scope];
   const host = $("#scatter"), W = Math.max(300, host.clientWidth), H = Math.min(480, Math.max(320, W * 0.68));
   const m = { t: 10, r: 14, b: 44, l: 50 };
-  $("#sc-title").textContent = `${ym.short} and ${c.label.toLowerCase().replace("gdp", "GDP").replace("ict", "ICT").replace("uk", "UK").replace("pps", "PPS").replace("equality act", "Equality Act")}`;
+  $("#sc-title").textContent = `${ym.short} and ${c.label.toLowerCase().replace("gdp", "GDP").replace("ict", "ICT").replace("uk", "UK").replace("pps", "PPS").replace("equality act", "Equality Act").replace("black", "Black").replace("hispanic", "Hispanic").replace("latino", "Latino").replace("white", "White").replace("bachelor", "Bachelor").replace("indigenous", "Indigenous").replace("lim-at", "LIM-AT")}`;
   $("#sc-stats").textContent = Number.isFinite(R.r)
     ? `r = ${fmt2(R.r)} (95% ${fmt2(R.lo)} to ${fmt2(R.hi)}), Spearman ${fmt2(R.rho)}, R² = ${d3.format(".0%")(R.r ** 2)}, n = ${R.n}${within ? ` in ${R.G} groups` : ""}`
     : "Too few areas with both figures.";
@@ -327,6 +445,8 @@ function corrNote() {
   const within = S.within[S.scope], yk = S.outcome[S.scope];
   if (S.scope === "eu" && yk === "cens" && !within) return "Pooled census correlations mix real differences with national classification differences. Switch Compare to “Within countries” for this outcome.";
   if (S.scope === "gb") return "Most statistics here cover England and Wales only (n = 318), because Scottish census tables for them are not loaded. Pay, density and age 65+ include Scotland. Check n on each plot.";
+  if (S.scope === "ca") return "With about 55 areas these intervals are wide, and Nunavut and the Northwest Territories are outliers that can drive a result, so compare the Spearman figure. Income and median age cannot be calculated for “Rest of” areas, so those plots cover fewer areas.";
+  if (S.scope === "us") return `Each rate here is a survey estimate with its own margin of error, which tends to weaken these correlations.${within ? "" : " Use “Within states” to compare areas inside each state."}`;
   if (S.scope === "eu" && !within) return "Pooled across countries, these correlations mostly reflect differences between national economies and welfare states. Use “Within countries” to look at variation inside each country.";
   return "";
 }
@@ -367,7 +487,8 @@ function setTab(t) {
   render();
 }
 document.querySelectorAll(".tabs button").forEach((b) => b.addEventListener("click", () => setTab(b.dataset.tab)));
-document.querySelectorAll(".seg button").forEach((b) => b.addEventListener("click", () => {
+document.querySelectorAll(".seg button").forEach((b) => b.addEventListener("click", async () => {
+  try { await loadScope(b.dataset.scope); } catch (e) { $("#measure-note").textContent = `Could not load this tab's data (${e.message}).`; return; }
   S.scope = b.dataset.scope; S.sel = null; S.query = ""; $("#search").value = ""; S.sortKey = "v"; S.sortDir = -1; ring("sel", null);
   document.querySelectorAll(".seg button").forEach((x) => x.setAttribute("aria-pressed", x === b));
   fillControls(); render();
@@ -392,9 +513,17 @@ $("#tab-about").innerHTML = `
 <h2>What is measured</h2>
 <p><strong>Great Britain.</strong> No official NEET rate exists for 16–24s at local authority level. Official ONS figures are national, and DfE's local figures cover 16–17s only. This atlas builds an equivalent from Census 2021 table RM024: 16–24s who are unemployed or economically inactive and are not full-time students, as a share of all 16–24s. For England and Wales that gives 12.8%. Scotland uses the equivalent from its 2022 census (tables UV601a and UV603b), which gives 10.1%.</p>
 <p><strong>Scotland is a year apart.</strong> Its census was in March 2022, after lockdowns had ended, while England and Wales counted in March 2021, during one. Definitions are matched: Scotland's “inactive: student” group includes people studying but not full-time (0.47% of its 16–24s), and UV603b is used to move them into the rate, as in England and Wales. The 2.7-point gap between the two splits into 1.8 points of unemployment and 0.9 of inactivity. It may partly reflect the stronger labour market of 2022, so the step at the border should not be read as a pure difference between places. Scottish cells are perturbed for disclosure control, so they may not sum exactly.</p>
+<p><strong>United States.</strong> The US tab builds an equivalent from American Community Survey microdata for 2020–24: 16–24s who are unemployed or not in the labor force and did not attend school or college in the last three months, as a share of all 16–24s. Members of the armed forces count as employed. Nationally that gives 11.4%. The term “disconnected youth” is often used for a similar measure in the US.</p>
+<p><strong>Canada.</strong> The main layers use Statistics Canada's own census NEET measure (table 98-10-0648) for ages 15–24: young people not employed in the census reference week of May 2–8, 2021, who had not attended school at any point since September 2020. Ages 16–24 are not available. Nationally that gives 11.2%, up from 9.2% in 2016. The Labour Force Survey layer (table 37-10-0196) is the measure used for international comparison, published by province only.</p>
 <p><strong>Europe.</strong> The headline is Eurostat's official NEET rate from the Labour Force Survey (table edat_lfse_22), for ages 15–24, by NUTS 2 region. It counts anyone in formal or non-formal education or training as not NEET. The census layers use Census 2021 single-year ages to match 16–24 exactly: unemployed plus “other outside the labour force”, as a share of those with a known status.</p>
 <h2>Why European areas are larger</h2>
 <p>European figures are for NUTS 2 regions, which usually have between 800,000 and 3 million residents, so they are much larger than British local authorities. Comparable figures do not exist for smaller areas. The Labour Force Survey sample is too small, so Eurostat publishes NEET rates only down to NUTS 2, and its 2021 census tables for smaller areas do not record whether people are working, unemployed or inactive. Modelled estimates would look more detailed than the evidence allows, so they are left out.</p>
+<h2>US areas and margins of error</h2>
+<p>US figures are for Public Use Microdata Areas (PUMAs), the smallest areas the Census Bureau publishes microdata for. Each has at least 100,000 residents: rural PUMAs combine several counties, and big cities are split into several PUMAs. All 2,462 in the 50 states and DC are mapped. Puerto Rico and the other territories are not included. Published county tables cover 16–19s only, and too imprecisely to map.</p>
+<p>Unlike the British census figures, these are survey estimates. The typical PUMA rate has a margin of error of about ±2.7 points at 90% confidence, calculated from the Census Bureau's replicate weights, and the “Margin of error” layer shows it for every area. Small gaps between neighbouring areas may not be real. The detail panel warns where the margin is above 5 points, the sample is small, or many of those counted live in institutions.</p>
+<h2>Canadian areas</h2>
+<p>Statistics Canada publishes census NEET rates for 41 census metropolitan areas and for provinces and territories, but not for smaller or rural areas. To fill the map, each “Rest of” area is calculated: the province's count minus the counts of its metro areas. Published rates are rounded, which could shift those figures by up to about 0.6 of a point, and the detail panel gives the figure for each one. Ottawa – Gatineau is shown as its Ontario and Quebec parts so the sums work. The “Rest of” areas mix towns, rural areas and First Nations communities, so one figure can hide a great deal.</p>
+<p>Prince Edward Island and the three territories have no metro area and appear whole. The census covers private households, and the unemployed and inactive split is not published for this measure.</p>
 <h2>Coverage in Great Britain</h2>
 <p>All 350 authorities in England, Wales and Scotland are mapped. Northern Ireland is outside the scope of “British” and is not drawn. Most correlations cover England and Wales only, as Scottish census tables for those statistics are not loaded. Survey data was not used to fill the gap, because mixing sources would distort the comparison. Pay (ASHE 2021), density and age 65+ include Scotland; its density and age figures come from mid-2021 population estimates.</p>
 <h2>Comparing across countries</h2>
@@ -402,6 +531,8 @@ $("#tab-about").innerHTML = `
 <table><thead><tr><th>Census vs LFS (2020–22), 228 regions</th><th class="n">r</th></tr></thead>
 <tbody><tr><td>Within countries</td><td class="n">0.85</td></tr><tr><td>All regions pooled</td><td class="n">0.68</td></tr><tr><td>Between country averages</td><td class="n">0.61</td></tr></tbody></table>
 <p>The gap between the two sources ranges from −2.7 points (Luxembourg) to +15.3 (Spain). One reason is that Eurostat's tables only class students as “outside the labour force”, so a full-time student looking for work counts as unemployed.</p>
+<p>US rates should not be compared directly with the British or European ones either. The US test for being in education is wider: part-time study counts, and so does any attendance in the last three months. The survey also pools five years, including the pandemic, instead of counting everyone on one day.</p>
+<p>Canadian census rates have the same problem, more strongly: any attendance over about eight months counts, and the reference week fell in May 2021, during the pandemic. They also start at age 15 rather than 16.</p>
 <h2>The UK on the Europe map</h2>
 <p>Eurostat's LFS series ends for the UK in 2019, so the UK appears on the LFS 2019 layer but not on later LFS layers. No later source is on the same basis, so it is left blank rather than filled with different data.</p>
 <p>The UK's census is not in Eurostat's 2021 tables, so the two census layers use British tables instead. Local authorities are aggregated to ITL 2 regions, the UK's NUTS 2 equivalent, and Eurostat's definition is applied by counting job-seeking full-time students as unemployed. That adds 4.2 points in England and Wales, which is why Great Britain reads 16.8% here against 12.6% on the Great Britain tab. Both are correct on their own definitions. The British regions are a local reconstruction rather than Eurostat data, and Scottish regions are from 2022. Northern Ireland is not included, and the UK's “country average” on the gap layer is Great Britain only. Across 36 matched regions, British census rates run 6.0 points above LFS 2019, in the middle of the range for other countries, with a regional correlation of 0.64 despite the two-year difference. Argyll and Bute, and North Ayrshire, straddle ITL 2 boundaries and are each assigned whole to one region. UK regions do not enter the Europe correlations, as Eurostat's covariates stop for the UK.</p>
@@ -412,7 +543,7 @@ $("#tab-about").innerHTML = `
 <h2>Things to keep in mind</h2>
 <ul>
 <li><strong>Timing.</strong> Census 2021 took place in March 2021, during a lockdown. People on furlough counted as employed, and student and labour market patterns were unusual.</li>
-<li><strong>Students.</strong> British students are counted at their term-time address, which lowers the rate in university towns. The “non-students” measure removes this effect.</li>
+<li><strong>Students.</strong> British students are counted at their term-time address, which lowers the rate in university towns. The “non-students” measure removes this effect. US college towns behave the same way, and the “not in school” measure does the same job there.</li>
 <li><strong>Sampling.</strong> Census figures are close to complete counts. LFS regional figures are survey estimates, which is why the headline averages three years. Regions with a low-reliability flag say so in the detail panel.</li>
 <li><strong>Correlation.</strong> These are area-level associations. They do not show what is true of individuals (the ecological fallacy) or what causes what. Nearby areas are also not independent, so the intervals shown are too narrow.</li>
 <li><strong>Covariates.</strong> British industry figures describe where residents work, by Census 2021. European figures are LFS employment, averaged over 2021–23. Pay is missing for a few small authorities.</li>
@@ -425,6 +556,8 @@ $("#tab-about").innerHTML = `
 <li><a href="https://www.nomisweb.co.uk/datasets/asher">ASHE 2021</a>, resident analysis, and mid-2021 population estimates (ONS, via Nomis)</li>
 <li><a href="https://ec.europa.eu/eurostat/databrowser/view/edat_lfse_22/default/table">Eurostat</a> edat_lfse_22, cens_21a_r2, nama_10r_2gdp, nama_10r_2hhinc, lfst_r_lfu3rt, edat_lfse_04, edat_lfse_16, lfst_r_lfe2en2, demo_r_pjanind2, demo_r_d3dens (© European Union)</li>
 <li>German survey changes: <a href="https://ec.europa.eu/eurostat/documents/10186/6246844/LFS-2020-Note-on-German-data.pdf">Eurostat note on German LFS data, 2020</a>; <a href="https://www.destatis.de/EN/Themes/Labour/Labour-Market/Employment/Methods/microcensus-2021-labour-market.html?nn=23096">Destatis on methodological changes, 2021</a></li>
+<li><a href="https://www.census.gov/programs-surveys/acs/microdata.html">American Community Survey 2020–24</a> 5-year microdata and summary tables B01001, B01002, B03002, B05012, B15003, B17001, B19013, B23025, B25003, B27010, C18108, C24050 (US Census Bureau); 2020 PUMA cartographic boundaries</li>
+<li><a href="https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=9810064801">Statistics Canada</a> tables 98-10-0648, 98-10-0433 and 37-10-0196, Census Profile 2021, and 2021 cartographic boundary files (Open Government Licence – Canada)</li>
 <li>Boundaries: ONS Open Geography Portal (LAD December 2023, LAD to ITL lookup), Eurostat GISCO (NUTS 2021, NUTS 2024; © EuroGeographics)</li>
 </ul>`;
 
@@ -432,7 +565,7 @@ $("#tab-about").innerHTML = `
 Promise.all([
   d3.json("data/gb.json"), d3.json("data/eu.json"), d3.json("data/gb.geo.json"),
   d3.json("data/n21.geo.json"), d3.json("data/n24.geo.json"), d3.json("data/base.geo.json"), d3.json("data/uk.geo.json"),
-]).then(([gb, eu, g, n21, n24, base, uk]) => {
+]).then(async ([gb, eu, g, n21, n24, base, uk]) => {
   D.rows = { gb, eu };
   D.byId = { gb: Object.fromEntries(gb.map((d) => [d.id, d])), eu: Object.fromEntries(eu.map((d) => [d.id, d])) };
   // 2019 LFS rows use NUTS 2024 codes for the EU, and UK regions exist only in the 2021 file
@@ -441,6 +574,7 @@ Promise.all([
   const n21c = { type: "FeatureCollection", features: [...n21.features.filter((f) => !f.id.startsWith("UK")), ...uk.features] };
   D.geo = { gb: g, n21, n24, n19, n21c, base };
   const [hs, ht, hm] = location.hash.slice(1).split("/");   // e.g. #eu/corr or #eu/map/cens_dev
+  await loadScope(hs);
   if (SCOPES[hs]) { S.scope = hs; document.querySelectorAll(".seg button").forEach((x) => x.setAttribute("aria-pressed", x.dataset.scope === hs)); }
   if (hm && sc().measures.some((m) => m.k === hm)) S.measure[S.scope] = hm;
   fillControls();
