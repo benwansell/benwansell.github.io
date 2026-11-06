@@ -910,3 +910,12 @@ hr {
     .splash-cap { left: 16px; right: 16px; }
     .splash-cap-title { display: block; }
 }
+
+/* Front page: three newest Lab cards */
+.lab-latest { margin-bottom: 3rem; }
+.lab-latest .project-grid { grid-template-columns: repeat(3, 1fr); }
+.lab-latest .project-card h3 { font-family: var(--serif); font-size: 1.1rem; line-height: 1.35; margin: 0 0 0.5rem; }
+.lab-latest .project-card .project-body p { font-size: 0.86rem; line-height: 1.6; color: #666; margin: 0 0 0.9rem; }
+@media (max-width: 700px) {
+    .lab-latest .project-grid { grid-template-columns: 1fr; }
+}

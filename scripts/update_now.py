@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 """Refresh the "Latest" cards on the front page.
 
+The "Latest from the Lab" cards are copied from the Lab page: the three with the
+newest data-added dates. That needs no network. The feed cards are described below.
+
 Fetches the newest Political Calculus post (Substack RSS), the newest
 Rethink episode (BBC podcast RSS) and the newest Prospect column (parsed
 from the Prospect author page, which has no feed), then rewrites the block
@@ -24,6 +27,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 INDEX = ROOT / "index.html"
 CACHE = ROOT / "assets" / "data" / "now.json"
+LAB = ROOT / "projects" / "index.html"
 UA = "Mozilla/5.0 (compatible; benwansell-site-updater; +https://benwansell.github.io/)"
 
 SUBSTACK_FEED = "https://benansell.substack.com/feed"
@@ -107,7 +111,27 @@ def render(cards):
     return "\n".join(out)
 
 
+def update_lab(count=3):
+    """Copy the newest Lab cards into the front page. Leaves it alone if the Lab page can't be read."""
+    found = re.findall(r'([ \t]*<a class="project-card"[^>]*data-added="([\d-]+)".*?</a>)', LAB.read_text(), flags=re.S)
+    if len(found) < count:
+        print(f"WARNING: only {len(found)} dated Lab cards; keeping the current ones", file=sys.stderr)
+        return
+    newest = [card for card, _ in sorted(found, key=lambda c: c[1], reverse=True)[:count]]
+    page = INDEX.read_text()
+    new = re.sub(
+        r"(<!-- LAB:START -->).*?(\n[ \t]*<!-- LAB:END -->)",
+        lambda m: m.group(1) + "\n" + "\n".join(newest) + m.group(2),
+        page,
+        flags=re.S,
+    )
+    if new != page:
+        INDEX.write_text(new)
+        print("Lab cards updated")
+
+
 def main():
+    update_lab()
     cards = json.loads(CACHE.read_text()) if CACHE.exists() else {}
     for key, label, _, fetcher in SOURCES:
         try:
