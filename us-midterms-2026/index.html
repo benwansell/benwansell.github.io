@@ -136,6 +136,8 @@ tr:last-child td { border-bottom: 0; }
 .stats { display: flex; flex-wrap: wrap; gap: 8px 28px; padding: 12px 14px 14px; border-top: 1px solid var(--rule); font-size: 12.5px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
 .stats strong { color: var(--ink); font-weight: 600; }
 .ring { fill: none; stroke: var(--hl); stroke-width: 2; pointer-events: none; }
+.qctl { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; margin: 2px 0 6px; }
+.qnote { font-size: 12.5px; color: var(--ink-2); margin: 0 0 10px; max-width: 78ch; }
 #qtbl td.bar-cell { width: 40%; min-width: 140px; }
 .qbar { position: relative; height: 10px; background: transparent; }
 .qbar i { position: absolute; top: 0; height: 10px; border-radius: 2px; }
@@ -222,6 +224,11 @@ body { margin: 0; }
     </div>
     <section class="table">
       <h3 id="qtitle">By fifths of counties</h3>
+      <div class="qctl"><span class="ctl-label">Fifths with equal</span>
+        <div class="seg" id="qby" role="group" aria-label="Split fifths by">
+          <button data-v="n" aria-pressed="true">Counties</button><button data-v="pop" aria-pressed="false">Population</button><button data-v="votes" aria-pressed="false">Votes</button>
+        </div></div>
+      <p class="qnote" id="qnote"></p>
       <div class="tscroll"><table id="qtbl"><thead></thead><tbody></tbody></table></div>
     </section>
   </section>
@@ -715,16 +722,27 @@ body { margin: 0; }
   }
   function ring(p) { gRing.selectAll("*").remove(); gRing.append("circle").attr("class", "ring").attr("cx", xs(p.x)).attr("cy", ys(p.y)).attr("r", Math.max(6, +gDots.selectAll("circle").filter(d => d === p).attr("r") + 3)); }
 
+  // Fifths: equal numbers of counties, or (counties being indivisible) as near as possible to equal
+  // population or votes — each county goes to the fifth holding the midpoint of its share of the running total.
+  let qby = ["n", "pop", "votes"].includes(ls.get("mt26-qby")) ? ls.get("mt26-qby") : "n";
+  const QBY = { n: "counties", pop: "population", votes: "votes cast" };
   function renderQuint() {
     const xv = sstate.x, yv = sstate.y, sorted = [...P].sort((a, b) => a.x - b.x), n = sorted.length;
-    const qs = d3.range(5).map(i => sorted.slice(Math.floor(i * n / 5), Math.floor((i + 1) * n / 5)));
-    const rows = qs.map(q => { let w = 0, y = 0; q.forEach(p => { w += p.w; y += p.w * p.y; }); return { lo: q[0].x, hi: q[q.length - 1].x, n: q.length, y: y / w, votes: w }; });
-    const maxAbs = d3.max(rows, r => Math.abs(r.y)) || 1;
-    document.getElementById("qtitle").textContent = `${yv.label}, by fifths of counties on ${xv.label.toLowerCase()}`;
-    document.querySelector("#qtbl thead").innerHTML = `<tr><th>Fifth</th><th>${esc(xv.label)} range</th><th class="num">Counties</th><th class="num">Votes</th><th class="num">${yv.type === "shift" ? "Shift" : "Margin"}, vote-weighted</th><th></th></tr>`;
+    const popOf = p => p.dm[DF.pop] || 0, wt = qby === "pop" ? popOf : qby === "votes" ? p => p.w : () => 1;
+    const tot = d3.sum(sorted, wt), qs = [[], [], [], [], []];
+    let cum = 0;
+    sorted.forEach(p => { const w = wt(p); qs[Math.min(4, Math.floor(5 * (cum + w / 2) / tot))].push(p); cum += w; });
+    const rows = qs.filter(q => q.length).map(q => { let w = 0, y = 0; q.forEach(p => { w += p.w; y += p.w * p.y; }); return { lo: q[0].x, hi: q[q.length - 1].x, n: q.length, y: y / w, votes: w, pop: d3.sum(q, popOf) }; });
+    const maxAbs = d3.max(rows, r => Math.abs(r.y)) || 1, popTot = d3.sum(rows, r => r.pop), voteTot = d3.sum(rows, r => r.votes);
+    const share = (v, t) => `<span style="color:var(--muted)"> · ${Math.round(100 * v / t)}%</span>`;
+    document.getElementById("qtitle").textContent = `${yv.label}, by fifths of ${QBY[qby]} on ${xv.label.toLowerCase()}`;
+    document.getElementById("qnote").textContent = qby === "n"
+      ? "Each fifth holds the same number of counties, so the top and bottom fifths can differ hugely in population."
+      : `Counties are ranked on ${xv.label.toLowerCase()} and split so each fifth holds about a fifth of all ${QBY[qby]}. Counties can't be split, so the shares are approximate.`;
+    document.querySelector("#qtbl thead").innerHTML = `<tr><th>Fifth</th><th>${esc(xv.label)} range</th><th class="num">Counties</th><th class="num">Population</th><th class="num">Votes</th><th class="num">${yv.type === "shift" ? "Shift" : "Margin"}, vote-weighted</th><th></th></tr>`;
     document.querySelector("#qtbl tbody").innerHTML = rows.map((r, i) => {
       const wpct = Math.abs(r.y) / maxAbs * 50, left = r.y >= 0 ? 50 : 50 - wpct;
-      return `<tr><td>${["Lowest", "Second", "Middle", "Fourth", "Highest"][i]}</td><td>${xv.fmt(r.lo)} – ${xv.fmt(r.hi)}</td><td class="num">${fmt(r.n)}</td><td class="num">${fmt(r.votes)}</td>
+      return `<tr><td>${["Lowest", "Second", "Middle", "Fourth", "Highest"][i]}</td><td>${xv.fmt(r.lo)} – ${xv.fmt(r.hi)}</td><td class="num">${fmt(r.n)}</td><td class="num">${fmt(r.pop)}${share(r.pop, popTot)}</td><td class="num">${fmt(r.votes)}${share(r.votes, voteTot)}</td>
         <td class="num">${yv.type === "shift" ? shiftTxt(r.y) : pts(r.y)}</td><td class="bar-cell"><div class="qbar"><b></b><i style="left:${left}%;width:${wpct}%;background:${css((r.y >= 0 ? "d" : "r") + "3")}"></i></div></td></tr>`;
     }).join("");
   }
@@ -756,6 +774,10 @@ body { margin: 0; }
   sx.onchange = () => { sstate.x = XVARS.find(v => v.k === sx.value); ls.set("mt26-sx", sstate.x.k); renderScatter(); };
   sy.onchange = () => { sstate.y = YVARS.find(v => v.k === sy.value); ls.set("mt26-sy", sstate.y.k); renderScatter(); };
   sst.onchange = () => { sstate.hi = sst.value; renderScatter(); };
+  const qbyBtns = document.querySelectorAll("#qby button");
+  const syncQby = () => qbyBtns.forEach(b => b.setAttribute("aria-pressed", b.dataset.v === qby));
+  qbyBtns.forEach(b => b.onclick = () => { qby = b.dataset.v; ls.set("mt26-qby", qby); syncQby(); renderQuint(); });
+  syncQby();
 
   // ---------------- routing ----------------
   let scatterDrawn = false;
