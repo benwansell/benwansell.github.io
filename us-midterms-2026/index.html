@@ -1,0 +1,774 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>2026 Midterms by County</title>
+<meta name="description" content="County-level results of the 2026 US midterms for Senate, Governor and House, with shifts from 2024 and earlier elections and scatterplots against county demographics.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Public+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: election-night results board — tab strip, control row, map + sticky county card, then state table. */
+:root {
+  --bg: #f6f6f3; --surface: #fcfcfb; --ink: #121417; --ink-2: #4d5056; --muted: #85878a;
+  --rule: #e0dfd8; --nodata: #e6e5df; --stroke: #fcfcfb; --state-line: #6b6d70; --hl: #121417;
+  --neutral: #cfcdc6; --grid: #ebeae4; --dot-dim: #b9b8b2;
+  --d1: #c7dcf8; --d2: #7fb0ee; --d3: #2a78d6; --d4: #123f7c;
+  --r1: #f6c8c2; --r2: #ec8a82; --r3: #d33f3f; --r4: #861b1e;
+  --i1: #dcd6f6; --i2: #ab9fec; --i3: #6250d6; --i4: #382a91;
+  --c1: #f4e6c4; --c2: #e4c37c; --c3: #c8932c; --c4: #8a6114; --c5: #553b08;
+  --f-display: "Barlow Condensed", "Arial Narrow", system-ui, sans-serif;
+  --f-body: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1011; --surface: #18191a; --ink: #eeede9; --ink-2: #c1c0b8; --muted: #8d8e8f;
+  --rule: #2c2d2e; --nodata: #2a2b2c; --stroke: #18191a; --state-line: #a9aaab; --hl: #ffffff;
+  --neutral: #4a4a47; --grid: #242526; --dot-dim: #4b4c4d; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0f1011; --surface: #18191a; --ink: #eeede9; --ink-2: #c1c0b8; --muted: #8d8e8f;
+  --rule: #2c2d2e; --nodata: #2a2b2c; --stroke: #18191a; --state-line: #a9aaab; --hl: #ffffff;
+  --neutral: #4a4a47; --grid: #242526; --dot-dim: #4b4c4d; color-scheme: dark; }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 14px; line-height: 1.45; }
+.wrap { max-width: 1280px; margin: 0 auto; padding-block: 20px 40px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+header { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px 24px; border-bottom: 2px solid var(--ink); padding-bottom: 0; }
+.hgroup { display: grid; gap: 10px; }
+h1 { font-family: var(--f-display); font-weight: 700; font-size: clamp(30px, 4.6vw, 46px); line-height: 1; margin: 0; letter-spacing: -0.01em; text-wrap: balance; }
+nav.tabs { display: flex; gap: 2px; }
+nav.tabs a { font: 600 16px/1 var(--f-display); letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-2); text-decoration: none;
+  padding: 10px 14px 9px; border-radius: 6px 6px 0 0; }
+nav.tabs a[aria-current="page"] { background: var(--ink); color: var(--bg); }
+nav.tabs a:focus-visible { outline: 2px solid var(--d3); outline-offset: 2px; }
+.stamp { font-size: 12px; color: var(--ink-2); text-align: right; font-variant-numeric: tabular-nums; padding-bottom: 10px; }
+.stamp b { color: var(--ink); font-weight: 600; }
+.controls { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; padding-block: 14px; }
+.controls > div { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; min-width: 0; }
+.seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; background: var(--surface); }
+.seg button { font: 600 15px/1 var(--f-display); letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-2);
+  background: transparent; border: 0; padding: 9px 14px; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--rule); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.seg button:focus-visible, select:focus-visible, .reset:focus-visible { outline: 2px solid var(--d3); outline-offset: 2px; }
+.ctl-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-right: 6px; }
+select { font: 500 14px var(--f-body); color: var(--ink); background: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 7px 8px; max-width: 100%; }
+.summary { font-size: 13px; color: var(--ink-2); flex-basis: 100%; font-variant-numeric: tabular-nums; }
+.summary strong { color: var(--ink); }
+
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 20px; align-items: start; }
+@media (max-width: 860px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+.panel { position: relative; background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; min-width: 0; }
+svg#usmap, svg#scatter { display: block; width: 100%; height: auto; }
+svg#usmap { touch-action: none; }
+.county { stroke: var(--stroke); stroke-width: 0.35; vector-effect: non-scaling-stroke; cursor: pointer; }
+.states { fill: none; stroke: var(--state-line); stroke-width: 0.9; vector-effect: non-scaling-stroke; pointer-events: none; }
+.hl { fill: none; stroke: var(--hl); stroke-width: 2; vector-effect: non-scaling-stroke; pointer-events: none; }
+.pin { fill: none; stroke: var(--hl); stroke-width: 2.5; stroke-dasharray: 3 2; vector-effect: non-scaling-stroke; pointer-events: none; }
+.reset { position: absolute; top: 10px; right: 10px; font: 600 13px var(--f-display); letter-spacing: 0.05em; text-transform: uppercase;
+  background: var(--surface); color: var(--ink); border: 1px solid var(--rule); border-radius: 6px; padding: 6px 10px; cursor: pointer; }
+.hint { position: absolute; left: 12px; top: 10px; font-size: 11px; color: var(--muted); pointer-events: none; }
+.tip { position: absolute; pointer-events: none; background: var(--surface); color: var(--ink); border: 1px solid var(--rule); border-radius: 6px;
+  padding: 6px 9px; font-size: 12px; box-shadow: 0 4px 14px rgba(0,0,0,0.14); white-space: nowrap; font-variant-numeric: tabular-nums; z-index: 2; }
+.tip b { font-weight: 600; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 10px 28px; padding: 12px 14px 14px; border-top: 1px solid var(--rule); font-size: 12px; color: var(--ink-2); }
+.lg-row { display: grid; grid-template-columns: 92px repeat(4, 42px); align-items: center; gap: 2px; }
+.lg-row .nm { font-weight: 600; color: var(--ink); padding-right: 6px; }
+.lg-sw { height: 12px; border-radius: 2px; }
+.lg-ticks { display: grid; grid-template-columns: 92px repeat(4, 42px); gap: 2px; font-size: 10.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.lg-ticks span { text-align: center; }
+.lg-div { display: grid; grid-template-columns: repeat(9, 30px); gap: 2px; }
+.lg-div-ticks { display: grid; grid-template-columns: repeat(9, 30px); gap: 2px; font-size: 10.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.lg-div-ticks span { text-align: center; }
+.lg-ends { display: flex; justify-content: space-between; font-weight: 600; color: var(--ink); }
+.lg-na { display: flex; align-items: center; gap: 6px; }
+.lg-col { display: grid; gap: 3px; min-width: 0; }
+
+aside.card { background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 16px; position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); min-width: 0; }
+.card .eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+.card h2 { font-family: var(--f-display); font-weight: 700; font-size: 28px; line-height: 1.05; margin: 4px 0 2px; text-wrap: balance; }
+.card .sub { color: var(--ink-2); font-size: 12.5px; font-variant-numeric: tabular-nums; }
+.cands { display: grid; gap: 10px; margin-top: 14px; }
+.cand { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; font-variant-numeric: tabular-nums; }
+.cand .n { font-weight: 600; overflow-wrap: anywhere; }
+.cand .p { font-weight: 600; text-align: right; }
+.cand .v { grid-column: 1 / -1; font-size: 12px; color: var(--ink-2); display: flex; justify-content: space-between; gap: 8px; }
+.bar { grid-column: 1 / -1; height: 6px; background: var(--nodata); border-radius: 3px; overflow: hidden; }
+.bar i { display: block; height: 100%; border-radius: 3px; }
+.chip { display: inline-block; font: 600 11px/1 var(--f-body); letter-spacing: 0.04em; padding: 3px 6px; border-radius: 4px; border: 1px solid var(--rule); color: var(--ink-2); vertical-align: 2px; }
+.chip.called { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.status { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--rule); font-size: 12.5px; color: var(--ink-2); display: grid; gap: 6px; }
+.status strong { color: var(--ink); font-weight: 600; }
+.dists { margin: 4px 0 0; padding: 0; list-style: none; display: grid; gap: 3px; }
+.dists li { display: flex; justify-content: space-between; gap: 8px; font-variant-numeric: tabular-nums; }
+.empty { color: var(--ink-2); }
+.shift { display: grid; grid-template-columns: auto 1fr auto; gap: 6px 12px; margin-top: 14px; font-variant-numeric: tabular-nums; align-items: baseline; }
+.shift .k { color: var(--ink-2); font-size: 12.5px; }
+.shift .v { font-weight: 600; text-align: right; }
+.shift .big { font-family: var(--f-display); font-size: 34px; font-weight: 700; line-height: 1; grid-column: 1 / -1; }
+.shift .sm { font-size: 12px; color: var(--muted); text-align: right; }
+.warn { margin-top: 10px; font-size: 12px; color: var(--ink-2); border-left: 3px solid var(--neutral); padding-left: 8px; }
+
+section.table { margin-top: 28px; }
+section.table h3 { font-family: var(--f-display); font-weight: 700; font-size: 24px; margin: 0 0 8px; }
+.tscroll { overflow-x: auto; border: 1px solid var(--rule); border-radius: 8px; background: var(--surface); max-height: 560px; }
+table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; font-size: 13px; }
+th, td { padding: 7px 12px; text-align: left; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); font-weight: 600; background: var(--surface); position: sticky; top: 0; }
+td.num, th.num { text-align: right; }
+tr:last-child td { border-bottom: 0; }
+#tbl tbody tr { cursor: pointer; }
+#tbl tbody tr:hover td { background: var(--bg); }
+.sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+.notes { margin-top: 22px; font-size: 12.5px; color: var(--ink-2); max-width: 78ch; display: grid; gap: 6px; }
+.notes a { color: var(--ink); }
+.loading { padding: 80px 20px; text-align: center; color: var(--muted); }
+
+/* scatter */
+.axis text { fill: var(--muted); font: 11px var(--f-body); font-variant-numeric: tabular-nums; }
+.axis line, .axis path { stroke: var(--rule); }
+.gridline line { stroke: var(--grid); }
+.zero { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 3 3; }
+.axlabel { fill: var(--ink-2); font: 600 12px var(--f-body); }
+.dot { stroke: var(--surface); stroke-width: 0.6; }
+.fit { stroke: var(--ink); stroke-width: 2; fill: none; }
+.stats { display: flex; flex-wrap: wrap; gap: 8px 28px; padding: 12px 14px 14px; border-top: 1px solid var(--rule); font-size: 12.5px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.stats strong { color: var(--ink); font-weight: 600; }
+.ring { fill: none; stroke: var(--hl); stroke-width: 2; pointer-events: none; }
+#qtbl td.bar-cell { width: 40%; min-width: 140px; }
+.qbar { position: relative; height: 10px; background: transparent; }
+.qbar i { position: absolute; top: 0; height: 10px; border-radius: 2px; }
+.qbar b { position: absolute; top: -3px; bottom: -3px; left: 50%; width: 1px; background: var(--muted); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+.home { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 8px; padding: 6px 11px; border: 1px solid var(--rule); border-radius: 6px; color: var(--ink); text-decoration: none; font-size: 13px; }
+.home:hover { background: var(--surface); }
+body { margin: 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="hgroup">
+      <h1>2026 Midterms by County</h1>
+      <nav class="tabs" aria-label="Views">
+        <a href="#map" id="tab-map" aria-current="page">Map</a>
+        <a href="#demographics" id="tab-demo">Demographics</a>
+      </nav>
+    </div>
+    <div class="stamp"><a class="home" href="https://benwansell.github.io/" aria-label="Home: Ben Ansell's website"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M2 7.5 8 2l6 5.5M3.5 6.5V14h3.2v-4h2.6v4h3.2V6.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Home</a><br>2026 results unofficial · civicAPI pull <b id="pulled">…</b></div>
+  </header>
+
+  <!-- ===================== MAP VIEW ===================== -->
+  <section id="view-map">
+    <div class="controls">
+      <div><label class="ctl-label" for="mode">Election</label><select id="mode"></select></div>
+      <div id="viewwrap"><span class="ctl-label">Show</span>
+        <span class="seg" id="view" role="group" aria-label="Map shows">
+          <button type="button" data-v="result" aria-pressed="true">Leader &amp; margin</button>
+          <button type="button" data-v="counted" aria-pressed="false">Vote counted</button>
+        </span></div>
+      <div><span class="ctl-label">Shape</span>
+        <span class="seg" id="shape" role="group" aria-label="County shapes">
+          <button type="button" data-v="geo" aria-pressed="true">Geographic</button>
+          <button type="button" data-v="pop" aria-pressed="false">Sized by population</button>
+        </span></div>
+      <div><label class="ctl-label" for="state">Zoom to</label>
+        <select id="state"><option value="">Whole country</option></select></div>
+      <div class="summary" id="summary"></div>
+    </div>
+
+    <div class="grid">
+      <div class="panel" id="mapbox">
+        <div class="loading" id="loading">Loading county boundaries and results…</div>
+        <svg id="usmap" viewBox="0 0 975 610" role="img" aria-label="County map" hidden></svg>
+        <button class="reset" id="reset" type="button" hidden>Reset zoom</button>
+        <div class="hint" id="hint" hidden>Scroll or pinch to zoom · click a county to pin it</div>
+        <div class="tip" id="tip" hidden></div>
+        <div class="legend" id="legend"></div>
+      </div>
+      <aside class="card" id="card" aria-live="polite">
+        <div class="eyebrow">County detail</div>
+        <h2>Hover a county</h2>
+        <p class="empty">Move over the map to see the vote in each county. Click to keep a county in this panel.</p>
+      </aside>
+    </div>
+
+    <section class="table">
+      <h3 id="ttitle">Senate races</h3>
+      <div class="tscroll"><table id="tbl"><thead></thead><tbody></tbody></table></div>
+    </section>
+  </section>
+
+  <!-- ===================== DEMOGRAPHICS VIEW ===================== -->
+  <section id="view-demo" hidden>
+    <div class="controls">
+      <div><label class="ctl-label" for="sx">Across</label><select id="sx"></select></div>
+      <div><label class="ctl-label" for="sy">Up</label><select id="sy"></select></div>
+      <div><label class="ctl-label" for="sst">Highlight</label><select id="sst"><option value="">No state</option></select></div>
+      <div class="summary" id="ssummary"></div>
+    </div>
+    <div class="grid">
+      <div class="panel" id="scatbox">
+        <svg id="scatter" viewBox="0 0 900 560" role="img" aria-label="Scatterplot of counties"></svg>
+        <div class="tip" id="stip" hidden></div>
+        <div class="stats" id="sstats"></div>
+      </div>
+      <aside class="card" id="scard" aria-live="polite">
+        <div class="eyebrow">County detail</div>
+        <h2>Hover a dot</h2>
+        <p class="empty">Each dot is a county, sized by its 2026 vote. Hover to see its numbers; click to pin it.</p>
+      </aside>
+    </div>
+    <section class="table">
+      <h3 id="qtitle">By fifths of counties</h3>
+      <div class="tscroll"><table id="qtbl"><thead></thead><tbody></tbody></table></div>
+    </section>
+  </section>
+
+  <div class="notes">
+    <div>Leader maps colour each county by the candidate (or, for the House, the party) ahead there, shaded by their lead over second place. Shift maps show the change in the two-party margin, Democrat minus Republican, in percentage points.</div>
+    <div>In Senate and Governor races where no Democrat finished in the top two, the leading non-Republican (for example Dan Osborn in Nebraska) is counted on the Democratic side of shift calculations. Counties where either election had a House district without both a Democratic and a Republican candidate are left grey in shift maps and dropped from scatterplots.</div>
+    <div>House results are every district's vote summed by party within each county. District lines changed in several states between 2024 and 2026, so House shifts mix real movement with new matchups. Chicago is combined with suburban Cook County.</div>
+    <div>Historical results cover the 48 contiguous states, so Alaska and Hawaii are grey before 2026. Connecticut is mapped by its eight historical counties. The ACS now reports Connecticut by planning region, so its county demographics are built by adding up town estimates, with median income and age interpolated from income and age brackets. Alaska's Chugach and Copper River areas are shown together as Valdez-Cordova.</div>
+    <div>Sources: 2026 results, <a href="https://civicapi.org" target="_blank" rel="noopener">civicAPI</a>, unofficial until states certify. 2000–2024 results, Heideman (2026), <a href="https://doi.org/10.5281/zenodo.22976553" target="_blank" rel="noopener">U.S. county-level election results, 1990–2024</a>, CC BY 4.0. Demographics, US Census Bureau American Community Survey 2020–2024 5-year estimates and 2024 Gazetteer. Boundaries, US Census Bureau via us-atlas.</div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+<script>
+(async function () {
+  const STATES = {AL:"Alabama",AK:"Alaska",AZ:"Arizona",AR:"Arkansas",CA:"California",CO:"Colorado",CT:"Connecticut",DE:"Delaware",DC:"District of Columbia",FL:"Florida",GA:"Georgia",HI:"Hawaii",ID:"Idaho",IL:"Illinois",IN:"Indiana",IA:"Iowa",KS:"Kansas",KY:"Kentucky",LA:"Louisiana",ME:"Maine",MD:"Maryland",MA:"Massachusetts",MI:"Michigan",MN:"Minnesota",MS:"Mississippi",MO:"Missouri",MT:"Montana",NE:"Nebraska",NV:"Nevada",NH:"New Hampshire",NJ:"New Jersey",NM:"New Mexico",NY:"New York",NC:"North Carolina",ND:"North Dakota",OH:"Ohio",OK:"Oklahoma",OR:"Oregon",PA:"Pennsylvania",RI:"Rhode Island",SC:"South Carolina",SD:"South Dakota",TN:"Tennessee",TX:"Texas",UT:"Utah",VT:"Vermont",VA:"Virginia",WA:"Washington",WV:"West Virginia",WI:"Wisconsin",WY:"Wyoming"};
+  const FIPS_ST = {"01":"AL","02":"AK","04":"AZ","05":"AR","06":"CA","08":"CO","09":"CT","10":"DE","11":"DC","12":"FL","13":"GA","15":"HI","16":"ID","17":"IL","18":"IN","19":"IA","20":"KS","21":"KY","22":"LA","23":"ME","24":"MD","25":"MA","26":"MI","27":"MN","28":"MS","29":"MO","30":"MT","31":"NE","32":"NV","33":"NH","34":"NJ","35":"NM","36":"NY","37":"NC","38":"ND","39":"OH","40":"OK","41":"OR","42":"PA","44":"RI","45":"SC","46":"SD","47":"TN","48":"TX","49":"UT","50":"VT","51":"VA","53":"WA","54":"WV","55":"WI","56":"WY"};
+  const OFFICE_LABEL = {senate: "Senate", governor: "Governor", house: "House", president: "President"};
+  const BINS = [0.05, 0.15, 0.30], BIN_LABELS = ["<5", "5–15", "15–30", "30+"];
+  const CBINS = [50, 80, 95, 99], CBIN_LABELS = ["<50", "50–80", "80–95", "95–99", "99+"];
+  const SBINS = [1, 3, 6, 10];   // shift bins in points (|shift|); <1 is neutral
+  const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const clean = s => String(s ?? "").replace(/\s+/g, " ");
+  const fmt = d3.format(","), pct = v => (v * 100).toFixed(1) + "%";
+  const pts = v => (v > 0 ? "D+" : v < 0 ? "R+" : "") + Math.abs(v).toFixed(1);
+  const shiftTxt = v => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(1) + " toward " + (v >= 0 ? "D" : "R");
+  const side = p => p === "Democratic" ? "d" : p === "Republican" ? "r" : "i";
+  const abbr = p => p === "Democratic" ? "D" : p === "Republican" ? "R" : (p === "Independent" || /Unenrolled|Unaffiliated|No Party|Nonpartisan/.test(p || "")) ? "I" : (p ? p.split(/\s+/).map(w => w[0]).join("").slice(0, 3).toUpperCase() : "–");
+  const css = n => `var(--${n})`;
+  const binIdx = m => m < BINS[0] ? 1 : m < BINS[1] ? 2 : m < BINS[2] ? 3 : 4;
+  const cIdx = p => p < CBINS[0] ? 1 : p < CBINS[1] ? 2 : p < CBINS[2] ? 3 : p < CBINS[3] ? 4 : 5;
+  const shiftFill = s => { const a = Math.abs(s); if (a < SBINS[0]) return css("neutral"); const i = a < SBINS[1] ? 1 : a < SBINS[2] ? 2 : a < SBINS[3] ? 3 : 4; return css((s > 0 ? "d" : "r") + i); };
+  const ls = { get(k) { try { return localStorage.getItem(k); } catch (_) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (_) {} } };
+
+  let data, topo, hist, demog;
+  try {
+    [data, topo, hist, demog] = await Promise.all(["data.json", "counties-10m.json", "history.json", "demog.json"].map(u => fetch(u).then(r => { if (!r.ok) throw new Error(u); return r.json(); })));
+  } catch (e) {
+    document.getElementById("loading").textContent = "The map data did not load. Reload the page to try again.";
+    return;
+  }
+  document.getElementById("pulled").textContent = new Date(data.pulled_at).toUTCString().replace(":00 GMT", " UTC").replace(/^\w+, /, "");
+
+  const counties = topojson.feature(topo, topo.objects.counties).features.filter(f => FIPS_ST[f.id.slice(0, 2)]);
+  const countyById = new Map(counties.map(f => [f.id, f]));
+  const statesFeat = topojson.feature(topo, topo.objects.states).features;
+  const stateMesh = topojson.mesh(topo, topo.objects.states, (a, b) => a !== b);
+  const nation = topojson.feature(topo, topo.objects.nation);
+  const projection = d3.geoAlbersUsa().fitExtent([[10, 10], [965, 600]], nation);
+  const path = d3.geoPath(projection);
+
+  // ---------------- data access ----------------
+  // A "source" is either a live 2026 office or a historical office-year.
+  const live = o => ({ kind: "live", office: o, label: `${OFFICE_LABEL[o]} 2026`, short: `${OFFICE_LABEL[o]} '26` });
+  const past = (o, y) => ({ kind: "hist", office: o, year: y, label: `${OFFICE_LABEL[o]} ${y}`, short: `${o === "president" ? "Pres" : OFFICE_LABEL[o]} '${String(y).slice(2)}` });
+
+  // Two-party view of a county for a source: {d, r, o, t, uncontested, oppNote, pr}
+  function twoParty(src, fips) {
+    if (src.kind === "hist") {
+      const rec = hist[src.office]?.[src.year]?.[fips]; if (!rec) return null;
+      const [d, r, o, flag] = rec;
+      return { d, r, o, t: d + r + o, uncontested: !!(flag & 1) || !d || !r, partial: !!(flag & 2) };
+    }
+    const rec = data.offices[src.office][fips]; if (!rec) return null;
+    if (src.office === "house") {
+      const [races, d, r, o, pr] = rec;
+      const partial = races.some(id => { const c = data.races[id].c; return !c.some(x => x[1] === "Democratic") || !c.some(x => x[1] === "Republican"); });
+      return { d, r, o, t: d + r + o, pr, uncontested: !d || !r, partial };
+    }
+    const [rid, v, t, pr] = rec, race = data.races[rid];
+    let di = race.c.slice(0, 2).findIndex(c => c[1] === "Democratic");
+    if (di < 0) di = race.c.findIndex(c => c[1] === "Democratic");
+    const top2NoD = race.c.slice(0, 2).every(c => c[1] !== "Democratic");
+    if (top2NoD) di = race.c.findIndex(c => c[1] !== "Republican");
+    const ri = race.c.findIndex(c => c[1] === "Republican");
+    if (di < 0 || ri < 0) return { d: 0, r: 0, o: t, t, pr, uncontested: true };
+    const d = v[di] || 0, r = v[ri] || 0;
+    return { d, r, o: t - d - r, t, pr, uncontested: false,
+      oppNote: race.c[di][1] !== "Democratic" ? `${clean(race.c[di][0])} (${abbr(race.c[di][1])}) counted on the Democratic side` : null };
+  }
+  // Counties with any uncontested House seat (or one missing from the source) are left out of margins.
+  const margin = tp => tp && !tp.uncontested && !tp.partial && (tp.d + tp.r) ? (tp.d - tp.r) / (tp.d + tp.r) * 100 : null;
+
+  // Candidate rows for the leader map / card
+  function rowsFor(src, fips) {
+    if (src.kind === "live" && src.office !== "house") {
+      const rec = data.offices[src.office][fips]; if (!rec) return null;
+      const [rid, v, t, pr] = rec, race = data.races[rid];
+      return { rows: race.c.map((c, i) => [clean(c[0]), c[1], v[i] || 0]).sort((a, b) => b[2] - a[2]), t, pr, races: [rid] };
+    }
+    const tp = twoParty(src, fips); if (!tp) return null;
+    const rows = [["Democratic", "Democratic", tp.d], ["Republican", "Republican", tp.r], ["Other candidates", "Other", tp.o]]
+      .filter(x => x[2] > 0 || x[1] !== "Other").sort((a, b) => b[2] - a[2]);
+    return { rows, t: tp.t, pr: tp.pr ?? null, races: src.kind === "live" ? data.offices.house[fips][0] : [] };
+  }
+
+  // ---------------- modes ----------------
+  const MODES = [];
+  ["senate", "governor", "house"].forEach(o => MODES.push({ key: "live-" + o, group: "2026 results", label: `${OFFICE_LABEL[o]} 2026`, type: "live", src: live(o) }));
+  [["president", 2024, live("house")], ["house", 2024, live("house")], ["president", 2024, live("senate")], ["president", 2024, live("governor")], ["president", 2020, past("president", 2024)], ["house", 2022, past("house", 2024)]]
+    .forEach(([o, y, tgt]) => MODES.push({ key: `shift-${o}${y}-${tgt.kind === "live" ? tgt.office + "26" : tgt.office + tgt.year}`, group: "Shift between elections",
+      label: `${OFFICE_LABEL[o]} ${y} → ${tgt.label}`, type: "shift", base: past(o, y), src: tgt }));
+  for (let y = 2024; y >= 2000; y -= 4) MODES.push({ key: "hist-president" + y, group: "President, past results", label: `President ${y}`, type: "hist", src: past("president", y) });
+  for (let y = 2024; y >= 2000; y -= 2) MODES.push({ key: "hist-house" + y, group: "House, past results", label: `House ${y}`, type: "hist", src: past("house", y) });
+  const modeSel = document.getElementById("mode");
+  d3.groups(MODES, m => m.group).forEach(([g, ms]) => { const og = document.createElement("optgroup"); og.label = g; ms.forEach(m => og.append(new Option(m.label, m.key))); modeSel.append(og); });
+
+  const state = { mode: MODES[0], view: "result", pinned: null, shape: "geo" };
+  { const k = ls.get("mt26-mode"); const m = MODES.find(m => m.key === k); if (m) state.mode = m; }
+  modeSel.value = state.mode.key;
+
+  function shiftFor(mode, fips) {
+    const a = twoParty(mode.base, fips), b = twoParty(mode.src, fips);
+    const ma = margin(a), mb = margin(b);
+    if (ma == null || mb == null) return { a, b, ma, mb, s: null };
+    return { a, b, ma, mb, s: mb - ma };
+  }
+  function fillFor(fips) {
+    const m = state.mode;
+    if (m.type === "shift") { const s = shiftFor(m, fips).s; return s == null ? css("nodata") : shiftFill(s); }
+    const s = rowsFor(m.src, fips);
+    if (!s || !s.t) return css("nodata");
+    if (m.type === "live" && state.view === "counted") return s.pr == null ? css("nodata") : css("c" + cIdx(s.pr));
+    const [a, b] = s.rows, mg = (a[2] - (b ? b[2] : 0)) / s.t;
+    return css(side(a[1]) + binIdx(mg));
+  }
+
+  // ---------------- draw map ----------------
+  const svg = d3.select("#usmap").attr("hidden", null);
+  document.getElementById("loading").remove();
+  document.getElementById("hint").hidden = false;
+  const g = svg.append("g");
+  const cPaths = g.append("g").selectAll("path").data(counties).join("path").attr("class", "county").attr("d", path);
+  g.append("path").attr("class", "states").attr("d", path(stateMesh));
+  g.append("path").attr("class", "states").attr("d", path(nation)).style("stroke-width", 0.6);
+  const hl = g.append("path").attr("class", "hl"), pin = g.append("path").attr("class", "pin");
+  const geoG = d3.select(cPaths.node().parentNode), statesSel = g.selectAll(".states");
+  const bubbleG = g.insert("g", ".states").attr("display", "none");
+
+  // ---- Population-sized circles (Dorling cartogram): one circle per county, area proportional to
+  // ACS population, started at the county's centroid and pushed apart so circles do not overlap.
+  let bubbles = null, bubbleById = null;
+  function buildBubbles() {
+    const nodes = counties.map(f => { const c = path.centroid(f); return { f, x: c[0], y: c[1], x0: c[0], y0: c[1], p: demog.counties[f.id]?.[0] || 0 }; })
+      .filter(n => isFinite(n.x) && isFinite(n.y));
+    const s = Math.sqrt(0.2 * 975 * 610 / (Math.PI * d3.sum(nodes, n => n.p)));   // circles cover ~20% of the frame
+    nodes.forEach(n => n.r = Math.max(0.7, Math.sqrt(n.p) * s));
+    const sim = d3.forceSimulation(nodes)
+      .force("x", d3.forceX(n => n.x0).strength(0.2)).force("y", d3.forceY(n => n.y0).strength(0.2))
+      .force("collide", d3.forceCollide(n => n.r + 0.25).iterations(3)).stop();
+    for (let i = 0; i < 180; i++) sim.tick();
+    bubbleById = new Map(nodes.map(n => [n.f.id, n]));
+    bubbles = bubbleG.selectAll("circle").data(nodes.map(n => n.f)).join("circle").attr("class", "county")
+      .attr("cx", f => bubbleById.get(f.id).x).attr("cy", f => bubbleById.get(f.id).y).attr("r", f => bubbleById.get(f.id).r);
+    attachCountyEvents(bubbles);
+  }
+  function shapeD(f) {
+    const n = state.shape === "pop" && bubbleById && bubbleById.get(f.id);
+    if (!n) return path(f);
+    const r = Math.max(n.r, 2);
+    return `M${n.x - r},${n.y}a${r},${r} 0 1,0 ${2 * r},0a${r},${r} 0 1,0 ${-2 * r},0`;
+  }
+  function setShape(v) {
+    state.shape = v;
+    if (v === "pop" && !bubbles) buildBubbles();
+    geoG.attr("display", v === "pop" ? "none" : null);
+    bubbleG.attr("display", v === "pop" ? null : "none");
+    statesSel.style("opacity", v === "pop" ? 0.25 : null);
+    hl.attr("d", null);
+    pin.attr("d", state.pinned ? shapeD(state.pinned) : null);
+    document.querySelectorAll("#shape button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === v));
+    ls.set("mt26-shape", v);
+  }
+
+  const zoom = d3.zoom().scaleExtent([1, 14]).on("zoom", e => {
+    g.attr("transform", e.transform);
+    document.getElementById("reset").hidden = e.transform.k < 1.01;
+  });
+  svg.call(zoom);
+  const stSel = document.getElementById("state");
+  const resetZoom = () => { svg.transition().duration(500).call(zoom.transform, d3.zoomIdentity); stSel.value = ""; };
+  document.getElementById("reset").onclick = resetZoom;
+  function zoomTo(feat) {
+    const [[x0, y0], [x1, y1]] = path.bounds(feat);
+    const k = Math.min(14, 0.85 / Math.max((x1 - x0) / 975, (y1 - y0) / 610));
+    svg.transition().duration(600).call(zoom.transform, d3.zoomIdentity.translate(975 / 2, 610 / 2).scale(k).translate(-(x0 + x1) / 2, -(y0 + y1) / 2));
+  }
+  const stateList = statesFeat.filter(f => FIPS_ST[f.id]).sort((a, b) => a.properties.name.localeCompare(b.properties.name));
+  stateList.forEach(f => stSel.add(new Option(f.properties.name, f.id)));
+  stSel.onchange = () => { const f = statesFeat.find(f => f.id === stSel.value); f ? zoomTo(f) : resetZoom(); };
+
+  const tip = document.getElementById("tip"), box = document.getElementById("mapbox");
+  function placeTip(t, container, e) {
+    const r = container.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+    t.style.left = Math.min(Math.max(8, x + 14), r.width - t.offsetWidth - 8) + "px";
+    t.style.top = Math.max(8, y - 38) + "px";
+  }
+  function tipText(f) {
+    const m = state.mode, st = FIPS_ST[f.id.slice(0, 2)], head = `<b>${esc(f.properties.name)}</b>, ${st}`;
+    if (m.type === "shift") { const s = shiftFor(m, f.id); return s.s == null ? head + " · no comparison" : `${head} · ${pts(s.ma)} → ${pts(s.mb)} · <b>${shiftTxt(s.s)}</b>`; }
+    const s = rowsFor(m.src, f.id);
+    if (!s || !s.t) return head + ` · no ${m.src.label} vote`;
+    if (m.type === "live" && state.view === "counted") return head + ` · ${s.pr == null ? "count n/a" : s.pr.toFixed(0) + "% counted"}`;
+    const [a, b] = s.rows, mg = (a[2] - (b ? b[2] : 0)) / s.t;
+    const who = (m.type === "live" && m.src.office !== "house") ? `${esc(a[0])} (${abbr(a[1])})` : abbr(a[1]);
+    return `${head} · ${who} +${(mg * 100).toFixed(1)}`;
+  }
+  function attachCountyEvents(sel) {
+    sel.on("pointermove", function (e, f) {
+      hl.attr("d", shapeD(f)); tip.innerHTML = tipText(f); tip.hidden = false; placeTip(tip, box, e);
+      if (!state.pinned) renderCard(f);
+    }).on("pointerleave", () => { hl.attr("d", null); tip.hidden = true; })
+      .on("click", (e, f) => {
+        if (state.pinned && state.pinned.id === f.id) { state.pinned = null; pin.attr("d", null); }
+        else { state.pinned = f; pin.attr("d", shapeD(f)); }
+        renderCard(f);
+      });
+  }
+  attachCountyEvents(cPaths);
+
+  function candBlock(s) {
+    let html = `<div class="cands">`;
+    for (const [name, party, v] of s.rows) {
+      const share = v / s.t;
+      html += `<div class="cand"><span class="n">${esc(name)}</span><span class="p">${pct(share)}</span>
+        <div class="bar"><i style="width:${(share * 100).toFixed(1)}%;background:${party === "Other" ? css("muted") : css(side(party) + "3")}"></i></div>
+        <div class="v"><span>${esc(party)}</span><span>${fmt(v)}</span></div></div>`;
+    }
+    return html + `</div>`;
+  }
+  function renderCard(f) {
+    const card = document.getElementById("card"), st = FIPS_ST[f.id.slice(0, 2)], m = state.mode;
+    let html = `<div class="eyebrow">${esc(m.label)}${state.pinned && state.pinned.id === f.id ? " · pinned" : ""}</div>
+      <h2>${esc(f.properties.name)}</h2><div class="sub">${esc(STATES[st] || st)} · FIPS ${f.id}</div>`;
+    if (m.type === "shift") {
+      const s = shiftFor(m, f.id);
+      if (s.s == null) {
+        const why = !s.a ? `No ${m.base.label} data for this county${["AK", "HI"].includes(st) ? " (the historical file covers the 48 contiguous states)" : ""}.`
+          : !s.b ? `No ${m.src.label} race here.` : "In one of the two elections, a House district here lacked a Democratic or a Republican candidate, so the margin is not comparable.";
+        card.innerHTML = html + `<p class="empty">${why}</p>`; return;
+      }
+      html += `<div class="shift"><div class="big" style="color:${s.s >= 0 ? css("d3") : css("r3")}">${shiftTxt(s.s)}</div>
+        <span class="k">${esc(m.base.label)}</span><span></span><span class="v">${pts(s.ma)}</span>
+        <span class="k">${esc(m.src.label)}</span><span></span><span class="v">${pts(s.mb)}</span>
+        <span class="k">Votes</span><span></span><span class="sm">${fmt(s.a.t)} → ${fmt(s.b.t)}</span></div>`;
+      const notes = [s.b.oppNote, s.b.partial && m.src.office === "house" ? "Includes a House district without both major parties." : null,
+        s.a.partial ? "Excludes an unopposed seat that was not on the ballot." : null].filter(Boolean);
+      if (notes.length) html += `<div class="warn">${notes.map(esc).join("<br>")}</div>`;
+      card.innerHTML = html; return;
+    }
+    const s = rowsFor(m.src, f.id);
+    if (!s || !s.t) { card.innerHTML = html + `<p class="empty">No ${esc(m.src.label)} vote recorded for this county.</p>`; return; }
+    html += `<div class="sub" style="margin-top:6px">${fmt(s.t)} votes${s.pr != null ? ` · ${s.pr.toFixed(0)}% of expected vote counted` : ""}</div>` + candBlock(s);
+    if (m.type === "live") {
+      html += `<div class="status">`;
+      if (m.src.office === "house") {
+        html += `<div><strong>${s.races.length === 1 ? "District" : "Districts"} in this county</strong></div><ul class="dists">` +
+          s.races.map(id => { const r = data.races[id]; return `<li><span>${esc(r.d)}</span><span>${r.w ? esc(clean(r.w)) : "Not called"}</span></li>`; }).join("") + `</ul>`;
+      } else {
+        const race = data.races[s.races[0]], tot = race.c.reduce((a, c) => a + c[2], 0);
+        html += `<div><strong>Statewide</strong> · ${race.pr.toFixed(0)}% counted</div><div>${race.w ? `<span class="chip called">Called</span> ${esc(clean(race.w))}` : `<span class="chip">Not called</span>`}</div>`;
+        html += `<div>${race.c.slice(0, 2).map(c => `${esc(clean(c[0]))} (${abbr(c[1])}) ${pct(c[2] / tot)}`).join(" · ")}</div>`;
+      }
+      html += `</div>`;
+    } else {
+      const tp = twoParty(m.src, f.id);
+      if (tp.uncontested) html += `<div class="warn">No Democratic or no Republican candidate on the ballot here.</div>`;
+      else if (tp.partial) html += `<div class="warn">Excludes an unopposed seat that was not on the ballot.</div>`;
+    }
+    card.innerHTML = html;
+  }
+
+  // ---------------- legend ----------------
+  function renderLegend() {
+    const L = document.getElementById("legend"), m = state.mode;
+    const na = `<div class="lg-na"><span class="lg-sw" style="width:22px;background:${css("nodata")}"></span>No race or no data</div>`;
+    if (m.type === "shift") {
+      const order = ["r4", "r3", "r2", "r1", "neutral", "d1", "d2", "d3", "d4"];
+      L.innerHTML = `<div class="lg-col"><div class="lg-ends"><span>Toward Republicans</span><span>Toward Democrats</span></div>
+        <div class="lg-div">${order.map(k => `<span class="lg-sw" style="background:${css(k)}"></span>`).join("")}</div>
+        <div class="lg-div-ticks">${["10+", "6–10", "3–6", "1–3", "<1", "1–3", "3–6", "6–10", "10+"].map(l => `<span>${l}</span>`).join("")}</div></div>
+        <div class="lg-na" style="color:var(--muted)">Change in two-party margin, points</div>${na}`;
+      return;
+    }
+    if (m.type === "live" && state.view === "counted") {
+      L.innerHTML = `<div class="lg-col"><div class="lg-row" style="grid-template-columns:92px repeat(5,42px)"><span class="nm">Vote counted</span>${[1,2,3,4,5].map(i => `<span class="lg-sw" style="background:${css("c" + i)}"></span>`).join("")}</div>
+        <div class="lg-ticks" style="grid-template-columns:92px repeat(5,42px)"><span></span>${CBIN_LABELS.map(l => `<span>${l}</span>`).join("")}</div></div>${na}`;
+      return;
+    }
+    const rows = [["d", "Democrat"], ["r", "Republican"], ["i", (m.type === "live" && m.src.office !== "house") ? "Independent" : "Other"]];
+    L.innerHTML = `<div class="lg-col">${rows.map(([k, n]) => `<div class="lg-row"><span class="nm">${n}</span>${[1,2,3,4].map(i => `<span class="lg-sw" style="background:${css(k + i)}"></span>`).join("")}</div>`).join("")}
+      <div class="lg-ticks"><span style="text-align:left">lead, pts</span>${BIN_LABELS.map(l => `<span>${l}</span>`).join("")}</div></div>${na}`;
+  }
+
+  // ---------------- summary + table ----------------
+  function winnerParty(r) { const c = r.c.find(c => r.w && c[0] === r.w); return c ? c[1] : null; }
+  function stateAgg(src) {   // sum two-party votes over counties by state
+    const by = new Map();
+    for (const f of counties) {
+      const tp = twoParty(src, f.id); if (!tp) continue;
+      const st = FIPS_ST[f.id.slice(0, 2)], a = by.get(st) || { d: 0, r: 0, o: 0, n: 0 };
+      a.d += tp.d; a.r += tp.r; a.o += tp.o; a.n++; by.set(st, a);
+    }
+    return by;
+  }
+  function liveRaces(o) { return Object.entries(data.races).filter(([, r]) => r.o === o).map(([id, r]) => ({ id, ...r })); }
+  function renderSummary() {
+    const m = state.mode, el = document.getElementById("summary");
+    if (m.type === "live") {
+      const rs = liveRaces(m.src.office), called = rs.filter(r => r.w);
+      const by = d3.rollup(called, v => v.length, r => side(winnerParty(r)));
+      const parts = [["d", "Democratic"], ["r", "Republican"], ["i", "Independent/other"]].filter(([k]) => by.get(k))
+        .map(([k, n]) => `<span class="sw" style="background:${css(k + "3")}"></span>${n} <strong>${by.get(k)}</strong>`);
+      el.innerHTML = `<strong>${rs.length}</strong> ${OFFICE_LABEL[m.src.office]} races · <strong>${called.length}</strong> called: ${parts.join(" &nbsp; ")}`;
+    } else if (m.type === "hist") {
+      let d = 0, r = 0, o = 0; stateAgg(m.src).forEach(a => { d += a.d; r += a.r; o += a.o; });
+      const t = d + r + o;
+      el.innerHTML = `${esc(m.src.label)}, 48 states: <span class="sw" style="background:${css("d3")}"></span>Democratic <strong>${pct(d / t)}</strong> &nbsp; <span class="sw" style="background:${css("r3")}"></span>Republican <strong>${pct(r / t)}</strong> &nbsp; Other ${pct(o / t)} · ${fmt(t)} votes`;
+    } else {
+      let da = 0, ra = 0, db = 0, rb = 0, n = 0; const ss = [];
+      for (const f of counties) { const s = shiftFor(m, f.id); if (s.s == null) continue; n++; ss.push(s.s); da += s.a.d; ra += s.a.r; db += s.b.d; rb += s.b.r; }
+      const agg = n ? ((db - rb) / (db + rb) - (da - ra) / (da + ra)) * 100 : 0;
+      el.innerHTML = `<strong>${fmt(n)}</strong> counties compared · margin across them ${pts((da - ra) / (da + ra) * 100)} → ${pts((db - rb) / (db + rb) * 100)}, <strong>${shiftTxt(agg)}</strong> · median county ${shiftTxt(d3.median(ss) || 0)}`;
+    }
+  }
+  function renderTable() {
+    const m = state.mode, thead = document.querySelector("#tbl thead"), tbody = document.querySelector("#tbl tbody"), T = document.getElementById("ttitle");
+    const stName = s => esc(STATES[s] || s);
+    if (m.type === "live" && m.src.office === "house") {
+      T.textContent = "House seats by state";
+      const byState = d3.groups(liveRaces("house"), r => r.s).sort((a, b) => (STATES[a[0]] || "").localeCompare(STATES[b[0]] || ""));
+      thead.innerHTML = `<tr><th>State</th><th class="num">Seats</th><th class="num">Dem won</th><th class="num">Rep won</th><th class="num">Other won</th><th class="num">Not called</th></tr>`;
+      tbody.innerHTML = byState.map(([s, list]) => { const c = k => list.filter(r => r.w && side(winnerParty(r)) === k).length;
+        return `<tr data-st="${s}"><td>${stName(s)}</td><td class="num">${list.length}</td><td class="num">${c("d")}</td><td class="num">${c("r")}</td><td class="num">${c("i")}</td><td class="num">${list.filter(r => !r.w).length}</td></tr>`; }).join("");
+    } else if (m.type === "live") {
+      T.textContent = `${OFFICE_LABEL[m.src.office]} races`;
+      const rs = liveRaces(m.src.office).sort((a, b) => (STATES[a.s] || "").localeCompare(STATES[b.s] || ""));
+      thead.innerHTML = `<tr><th>State</th><th>Leader</th><th class="num">Share</th><th>Runner-up</th><th class="num">Share</th><th class="num">Lead</th><th class="num">Counted</th><th>Status</th></tr>`;
+      tbody.innerHTML = rs.map(r => { const tot = r.c.reduce((a, c) => a + c[2], 0) || 1, [a, b] = r.c, nm = c => c ? `${esc(clean(c[0]))} (${abbr(c[1])})` : "–";
+        return `<tr data-st="${r.s}"><td>${stName(r.s)}</td><td><span class="sw" style="background:${css(side(a[1]) + "3")}"></span>${nm(a)}</td><td class="num">${pct(a[2] / tot)}</td>
+          <td>${nm(b)}</td><td class="num">${b ? pct(b[2] / tot) : "–"}</td><td class="num">+${(((a[2] - (b ? b[2] : 0)) / tot) * 100).toFixed(1)}</td><td class="num">${r.pr.toFixed(0)}%</td>
+          <td>${r.w ? `<span class="chip called">Called</span> ${r.called ? r.called.slice(5).replace("-", "/") : ""}` : `<span class="chip">Not called</span>`}</td></tr>`; }).join("");
+    } else if (m.type === "hist") {
+      T.textContent = `${m.src.label} by state`;
+      const by = [...stateAgg(m.src)].sort((a, b) => (STATES[a[0]] || "").localeCompare(STATES[b[0]] || ""));
+      thead.innerHTML = `<tr><th>State</th><th class="num">Democratic</th><th class="num">Republican</th><th class="num">Other</th><th class="num">Margin</th><th class="num">Votes</th></tr>`;
+      tbody.innerHTML = by.map(([s, a]) => { const t = a.d + a.r + a.o || 1, mg = (a.d + a.r) ? (a.d - a.r) / (a.d + a.r) * 100 : 0;
+        return `<tr data-st="${s}"><td>${stName(s)}</td><td class="num">${pct(a.d / t)}</td><td class="num">${pct(a.r / t)}</td><td class="num">${pct(a.o / t)}</td>
+          <td class="num"><span class="sw" style="background:${css((mg >= 0 ? "d" : "r") + "3")}"></span>${pts(mg)}</td><td class="num">${fmt(a.d + a.r + a.o)}</td></tr>`; }).join("");
+    } else {
+      T.textContent = `${m.label}, by state`;
+      const by = new Map();
+      for (const f of counties) { const s = shiftFor(m, f.id); if (s.s == null) continue; const st = FIPS_ST[f.id.slice(0, 2)], a = by.get(st) || { da: 0, ra: 0, db: 0, rb: 0, n: 0 };
+        a.da += s.a.d; a.ra += s.a.r; a.db += s.b.d; a.rb += s.b.r; a.n++; by.set(st, a); }
+      const rows = [...by].map(([s, a]) => { const ma = (a.da - a.ra) / (a.da + a.ra) * 100, mb = (a.db - a.rb) / (a.db + a.rb) * 100; return { s, ma, mb, sh: mb - ma, n: a.n }; })
+        .sort((a, b) => b.sh - a.sh);
+      thead.innerHTML = `<tr><th>State</th><th class="num">${esc(m.base.short)} margin</th><th class="num">${esc(m.src.short)} margin</th><th class="num">Shift</th><th class="num">Counties</th></tr>`;
+      tbody.innerHTML = rows.map(r => `<tr data-st="${r.s}"><td>${stName(r.s)}</td><td class="num">${pts(r.ma)}</td><td class="num">${pts(r.mb)}</td>
+        <td class="num"><span class="sw" style="background:${shiftFill(r.sh)}"></span>${shiftTxt(r.sh)}</td><td class="num">${r.n}</td></tr>`).join("");
+    }
+    tbody.querySelectorAll("tr").forEach(tr => tr.onclick = () => {
+      const f = statesFeat.find(f => FIPS_ST[f.id] === tr.dataset.st);
+      if (f) { stSel.value = f.id; zoomTo(f); box.scrollIntoView({ behavior: "smooth", block: "start" }); }
+    });
+  }
+
+  function renderMap() {
+    document.getElementById("viewwrap").hidden = state.mode.type !== "live";
+    cPaths.attr("fill", f => fillFor(f.id));
+    if (bubbles) bubbles.attr("fill", f => fillFor(f.id));
+    renderLegend(); renderSummary(); renderTable();
+    if (state.shape === "pop") document.getElementById("legend").insertAdjacentHTML("beforeend",
+      `<div class="lg-na" style="color:var(--muted)">Circle area = county population (ACS 2020–2024)</div>`);
+    if (state.pinned) renderCard(state.pinned);
+    svg.attr("aria-label", `County map, ${state.mode.label}`);
+  }
+  modeSel.onchange = () => { state.mode = MODES.find(m => m.key === modeSel.value); ls.set("mt26-mode", state.mode.key); renderMap(); };
+  { const el = document.getElementById("view");
+    el.addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; state.view = b.dataset.v;
+      el.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b)); renderMap(); }); }
+  document.getElementById("shape").addEventListener("click", e => { const b = e.target.closest("button"); if (!b || b.dataset.v === state.shape) return; setShape(b.dataset.v); renderMap(); });
+  setShape(ls.get("mt26-shape") === "pop" ? "pop" : "geo");
+  renderMap();
+
+  // ======================= DEMOGRAPHICS =======================
+  const DF = Object.fromEntries(demog.fields.map((k, i) => [k, i]));
+  const XVARS = [
+    { k: "ba", label: "Adults with a bachelor's degree", unit: "%", fmt: v => v.toFixed(1) + "%" },
+    { k: "income", label: "Median household income", unit: "$", fmt: v => "$" + fmt(Math.round(v)), tick: d3.format("$~s") },
+    { k: "density", label: "People per square mile", log: true, fmt: v => v < 10 ? v.toFixed(v < 1 ? 2 : 1) : fmt(Math.round(v)), tick: d3.format("~s") },
+    { k: "pop", label: "Population", log: true, fmt: v => fmt(v), tick: d3.format("~s") },
+    { k: "white", label: "White, non-Hispanic", fmt: v => v.toFixed(1) + "%" },
+    { k: "black", label: "Black, non-Hispanic", fmt: v => v.toFixed(1) + "%" },
+    { k: "hispanic", label: "Hispanic or Latino", fmt: v => v.toFixed(1) + "%" },
+    { k: "asian", label: "Asian, non-Hispanic", fmt: v => v.toFixed(1) + "%" },
+    { k: "foreign", label: "Born outside the US", fmt: v => v.toFixed(1) + "%" },
+    { k: "owner", label: "Homes that are owner-occupied", fmt: v => v.toFixed(1) + "%" },
+    { k: "age", label: "Median age", fmt: v => v.toFixed(1) + " yrs" },
+  ];
+  const YVARS = [
+    { k: "m-house26", label: "House 2026 margin", type: "margin", src: live("house") },
+    { k: "m-senate26", label: "Senate 2026 margin", type: "margin", src: live("senate") },
+    { k: "m-governor26", label: "Governor 2026 margin", type: "margin", src: live("governor") },
+    { k: "m-pres24", label: "President 2024 margin", type: "margin", src: past("president", 2024) },
+    { k: "s-p24h26", label: "Shift, President 2024 → House 2026", type: "shift", base: past("president", 2024), src: live("house") },
+    { k: "s-h24h26", label: "Shift, House 2024 → House 2026", type: "shift", base: past("house", 2024), src: live("house") },
+    { k: "s-p24s26", label: "Shift, President 2024 → Senate 2026", type: "shift", base: past("president", 2024), src: live("senate") },
+    { k: "s-p20p24", label: "Shift, President 2020 → 2024", type: "shift", base: past("president", 2020), src: past("president", 2024) },
+  ];
+  const sx = document.getElementById("sx"), sy = document.getElementById("sy"), sst = document.getElementById("sst");
+  XVARS.forEach(v => sx.add(new Option(v.label, v.k))); YVARS.forEach(v => sy.add(new Option(v.label, v.k)));
+  stateList.forEach(f => sst.add(new Option(f.properties.name, FIPS_ST[f.id])));
+  const sstate = { x: XVARS[0], y: YVARS[4], hi: "", pinned: null };
+  { const a = XVARS.find(v => v.k === ls.get("mt26-sx")), b = YVARS.find(v => v.k === ls.get("mt26-sy")); if (a) sstate.x = a; if (b) sstate.y = b; }
+  sx.value = sstate.x.k; sy.value = sstate.y.k;
+
+  function yValue(yv, fips) {
+    if (yv.type === "margin") { const tp = twoParty(yv.src, fips); const m = margin(tp); return m == null ? null : { y: m, w: tp.t, tp }; }
+    const s = shiftFor(yv, fips); return s.s == null ? null : { y: s.s, w: s.b.t, s };
+  }
+  function points() {
+    const xi = DF[sstate.x.k], out = [];
+    for (const f of counties) {
+      const dm = demog.counties[f.id]; if (!dm) continue;
+      const x = dm[xi]; if (x == null || (sstate.x.log && x <= 0)) continue;
+      const yv = yValue(sstate.y, f.id); if (!yv || !yv.w) continue;
+      out.push({ f, x, y: yv.y, w: yv.w, st: FIPS_ST[f.id.slice(0, 2)], extra: yv, dm });
+    }
+    return out;
+  }
+  function wstats(P, tx) {   // vote-weighted least squares on transformed x
+    let W = 0, mx = 0, my = 0;
+    for (const p of P) { W += p.w; mx += p.w * tx(p.x); my += p.w * p.y; }
+    mx /= W; my /= W;
+    let sxx = 0, sxy = 0, syy = 0;
+    for (const p of P) { const dx = tx(p.x) - mx, dy = p.y - my; sxx += p.w * dx * dx; sxy += p.w * dx * dy; syy += p.w * dy * dy; }
+    const b = sxy / sxx; return { b, a: my - b * mx, r: sxy / Math.sqrt(sxx * syy), my };
+  }
+
+  const W = 900, H = 560, M = { t: 18, r: 20, b: 52, l: 64 };
+  const ssvg = d3.select("#scatter");
+  const gGrid = ssvg.append("g"), gAx = ssvg.append("g"), gDots = ssvg.append("g"), gFit = ssvg.append("g"), gRing = ssvg.append("g");
+  const stip = document.getElementById("stip"), sbox = document.getElementById("scatbox");
+  let delaunay = null, P = [], xs, ys;
+
+  function renderScatter() {
+    P = points();
+    const xv = sstate.x, yv = sstate.y;
+    xs = (xv.log ? d3.scaleLog() : d3.scaleLinear()).domain(d3.extent(P, p => p.x)).range([M.l, W - M.r]).nice();
+    const yext = d3.extent(P, p => p.y), ypad = (yext[1] - yext[0]) * 0.04 || 1;
+    ys = d3.scaleLinear().domain([Math.min(yext[0] - ypad, 0), Math.max(yext[1] + ypad, 0)]).range([H - M.b, M.t]).nice();
+    const rs = d3.scaleSqrt().domain([0, d3.max(P, p => p.w)]).range([0, 22]);
+
+    gGrid.selectAll("*").remove(); gAx.selectAll("*").remove();
+    gGrid.attr("class", "gridline").call(d3.axisLeft(ys).ticks(8).tickSize(-(W - M.l - M.r)).tickFormat("")).attr("transform", `translate(${M.l},0)`).select(".domain").remove();
+    gGrid.append("line").attr("class", "zero").attr("x1", M.l).attr("x2", W - M.r).attr("y1", ys(0)).attr("y2", ys(0));
+    const xAxis = d3.axisBottom(xs).ticks(xv.log ? 6 : 8, xv.tick ? undefined : undefined);
+    if (xv.log) xAxis.ticks(6, "~s"); else if (xv.tick) xAxis.tickFormat(xv.tick); else xAxis.tickFormat(d => d + (xv.k === "age" ? "" : "%"));
+    gAx.append("g").attr("class", "axis").attr("transform", `translate(0,${H - M.b})`).call(xAxis);
+    gAx.append("g").attr("class", "axis").attr("transform", `translate(${M.l},0)`).call(d3.axisLeft(ys).ticks(8).tickFormat(d => d === 0 ? "0" : yv.type === "shift" ? (d > 0 ? "+" : "−") + Math.abs(d) : (d > 0 ? "D+" : "R+") + Math.abs(d)));
+    gAx.append("text").attr("class", "axlabel").attr("x", (M.l + W - M.r) / 2).attr("y", H - 12).attr("text-anchor", "middle").text(xv.label + (xv.log ? " (log scale)" : ""));
+    gAx.append("text").attr("class", "axlabel").attr("transform", `translate(16,${(M.t + H - M.b) / 2}) rotate(-90)`).attr("text-anchor", "middle")
+      .text(yv.type === "shift" ? yv.label.replace("Shift, ", "") + ": shift toward D (+) or R (−), pts" : yv.label + ", pts");
+
+    const hi = sstate.hi;
+    const sorted = [...P].sort((a, b) => (hi ? (a.st === hi) - (b.st === hi) : 0) || b.w - a.w);
+    gDots.selectAll("circle").data(sorted, p => p.f.id).join("circle").attr("class", "dot")
+      .attr("cx", p => xs(p.x)).attr("cy", p => ys(p.y)).attr("r", p => Math.max(1.6, rs(p.w)))
+      .attr("fill", p => (hi && p.st !== hi) ? css("dot-dim") : css((p.y >= 0 ? "d" : "r") + "3"))
+      .attr("fill-opacity", p => (hi && p.st !== hi) ? 0.35 : hi ? 0.9 : 0.6);
+
+    const tx = xv.log ? Math.log10 : v => v, st = wstats(P, tx);
+    const [x0, x1] = xs.domain(), N = 40, line = [];
+    for (let i = 0; i <= N; i++) { const xv0 = xv.log ? Math.pow(10, Math.log10(x0) + (Math.log10(x1) - Math.log10(x0)) * i / N) : x0 + (x1 - x0) * i / N; line.push([xs(xv0), ys(st.a + st.b * tx(xv0))]); }
+    gFit.selectAll("*").remove();
+    gFit.append("path").attr("class", "fit").attr("d", d3.line()(line));
+
+    delaunay = d3.Delaunay.from(P, p => xs(p.x), p => ys(p.y));
+    const per = xv.log ? "per tenfold increase" : xv.k === "income" ? "per $10,000" : xv.k === "age" ? "per year" : "per 10 points";
+    const scale = xv.log ? 1 : xv.k === "income" ? 10000 : xv.k === "age" ? 1 : 10;
+    document.getElementById("sstats").innerHTML = `<span><strong>${fmt(P.length)}</strong> counties</span>
+      <span>Vote-weighted correlation <strong>r = ${st.r.toFixed(2)}</strong></span>
+      <span>Fitted line: <strong>${(st.b * scale >= 0 ? "+" : "−") + Math.abs(st.b * scale).toFixed(1)} pts</strong> ${per}</span>
+      <span>Dots: blue = Democratic side of zero, red = Republican side. Size = votes cast.</span>`;
+    document.getElementById("ssummary").innerHTML = hi ? `Highlighting <strong>${esc(STATES[hi])}</strong> · ${P.filter(p => p.st === hi).length} counties` : "Pick a state to pick out its counties.";
+    renderQuint(st, tx);
+    if (sstate.pinned) { const p = P.find(p => p.f.id === sstate.pinned); p ? ring(p) : (sstate.pinned = null, gRing.selectAll("*").remove()); }
+    ssvg.attr("aria-label", `Scatterplot: ${xv.label} against ${yv.label}, ${P.length} counties, weighted r ${st.r.toFixed(2)}`);
+  }
+  function ring(p) { gRing.selectAll("*").remove(); gRing.append("circle").attr("class", "ring").attr("cx", xs(p.x)).attr("cy", ys(p.y)).attr("r", Math.max(6, +gDots.selectAll("circle").filter(d => d === p).attr("r") + 3)); }
+
+  function renderQuint() {
+    const xv = sstate.x, yv = sstate.y, sorted = [...P].sort((a, b) => a.x - b.x), n = sorted.length;
+    const qs = d3.range(5).map(i => sorted.slice(Math.floor(i * n / 5), Math.floor((i + 1) * n / 5)));
+    const rows = qs.map(q => { let w = 0, y = 0; q.forEach(p => { w += p.w; y += p.w * p.y; }); return { lo: q[0].x, hi: q[q.length - 1].x, n: q.length, y: y / w, votes: w }; });
+    const maxAbs = d3.max(rows, r => Math.abs(r.y)) || 1;
+    document.getElementById("qtitle").textContent = `${yv.label}, by fifths of counties on ${xv.label.toLowerCase()}`;
+    document.querySelector("#qtbl thead").innerHTML = `<tr><th>Fifth</th><th>${esc(xv.label)} range</th><th class="num">Counties</th><th class="num">Votes</th><th class="num">${yv.type === "shift" ? "Shift" : "Margin"}, vote-weighted</th><th></th></tr>`;
+    document.querySelector("#qtbl tbody").innerHTML = rows.map((r, i) => {
+      const wpct = Math.abs(r.y) / maxAbs * 50, left = r.y >= 0 ? 50 : 50 - wpct;
+      return `<tr><td>${["Lowest", "Second", "Middle", "Fourth", "Highest"][i]}</td><td>${xv.fmt(r.lo)} – ${xv.fmt(r.hi)}</td><td class="num">${fmt(r.n)}</td><td class="num">${fmt(r.votes)}</td>
+        <td class="num">${yv.type === "shift" ? shiftTxt(r.y) : pts(r.y)}</td><td class="bar-cell"><div class="qbar"><b></b><i style="left:${left}%;width:${wpct}%;background:${css((r.y >= 0 ? "d" : "r") + "3")}"></i></div></td></tr>`;
+    }).join("");
+  }
+
+  function scard(p) {
+    const xv = sstate.x, yv = sstate.y, card = document.getElementById("scard");
+    let html = `<div class="eyebrow">${sstate.pinned === p.f.id ? "Pinned" : "County detail"}</div><h2>${esc(p.f.properties.name)}</h2><div class="sub">${esc(STATES[p.st])} · FIPS ${p.f.id}</div>`;
+    html += `<div class="shift"><div class="big" style="color:${p.y >= 0 ? css("d3") : css("r3")}">${yv.type === "shift" ? shiftTxt(p.y) : pts(p.y)}</div>`;
+    if (yv.type === "shift") html += `<span class="k">${esc(yv.base.label)}</span><span></span><span class="v">${pts(p.extra.s.ma)}</span><span class="k">${esc(yv.src.label)}</span><span></span><span class="v">${pts(p.extra.s.mb)}</span>`;
+    else html += `<span class="k">${esc(yv.label)}</span><span></span><span class="v">${fmt(p.w)} votes</span>`;
+    html += `</div><div class="status">` + XVARS.map(v => { const val = p.dm[DF[v.k]]; return `<div style="display:flex;justify-content:space-between;gap:8px"><span>${v.k === xv.k ? "<strong>" + esc(v.label) + "</strong>" : esc(v.label)}</span><span style="font-variant-numeric:tabular-nums">${val == null ? "–" : v.fmt(val)}</span></div>`; }).join("") + `</div>`;
+    const oppNote = yv.type === "shift" ? p.extra.s.b.oppNote : p.extra.tp.oppNote;
+    if (oppNote) html += `<div class="warn">${esc(oppNote)}</div>`;
+    card.innerHTML = html;
+  }
+  function nearest(e) {
+    if (!delaunay || !P.length) return null;
+    const pt = d3.pointer(e, ssvg.node()), i = delaunay.find(pt[0], pt[1]), p = P[i];
+    return Math.hypot(xs(p.x) - pt[0], ys(p.y) - pt[1]) < 30 ? p : null;
+  }
+  ssvg.on("pointermove", e => {
+    const p = nearest(e);
+    if (!p) { stip.hidden = true; return; }
+    stip.innerHTML = `<b>${esc(p.f.properties.name)}</b>, ${p.st} · ${sstate.x.fmt(p.x)} · ${sstate.y.type === "shift" ? shiftTxt(p.y) : pts(p.y)}`;
+    stip.hidden = false; placeTip(stip, sbox, e);
+    if (!sstate.pinned) { ring(p); scard(p); }
+  }).on("pointerleave", () => { stip.hidden = true; if (!sstate.pinned) gRing.selectAll("*").remove(); })
+    .on("click", e => { const p = nearest(e); if (!p) return; sstate.pinned = sstate.pinned === p.f.id ? null : p.f.id; ring(p); scard(p); });
+  sx.onchange = () => { sstate.x = XVARS.find(v => v.k === sx.value); ls.set("mt26-sx", sstate.x.k); renderScatter(); };
+  sy.onchange = () => { sstate.y = YVARS.find(v => v.k === sy.value); ls.set("mt26-sy", sstate.y.k); renderScatter(); };
+  sst.onchange = () => { sstate.hi = sst.value; renderScatter(); };
+
+  // ---------------- routing ----------------
+  let scatterDrawn = false;
+  function route() {
+    const demo = location.hash === "#demographics";
+    document.getElementById("view-map").hidden = demo; document.getElementById("view-demo").hidden = !demo;
+    document.getElementById("tab-map").toggleAttribute("aria-current", !demo); document.getElementById("tab-demo").toggleAttribute("aria-current", demo);
+    if (demo) document.getElementById("tab-demo").setAttribute("aria-current", "page"); else document.getElementById("tab-map").setAttribute("aria-current", "page");
+    if (demo && !scatterDrawn) { renderScatter(); scatterDrawn = true; }
+  }
+  window.addEventListener("hashchange", route);
+  route();
+})();
+</script>
+</body>
+</html>
