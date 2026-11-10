@@ -132,6 +132,7 @@ tr:last-child td { border-bottom: 0; }
 .zero { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 3 3; }
 .axlabel { fill: var(--ink-2); font: 600 12px var(--f-body); }
 .dot { stroke: var(--surface); stroke-width: 0.6; }
+.dlab { font: 600 10.5px var(--f-body); fill: var(--ink); pointer-events: none; paint-order: stroke; stroke: var(--surface); stroke-width: 3px; stroke-linejoin: round; }
 .fit { stroke: var(--ink); stroke-width: 2; fill: none; }
 .stats { display: flex; flex-wrap: wrap; gap: 8px 28px; padding: 12px 14px 14px; border-top: 1px solid var(--rule); font-size: 12.5px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
 .stats strong { color: var(--ink); font-weight: 600; }
@@ -175,6 +176,11 @@ body { margin: 0; }
           <button type="button" data-v="geo" aria-pressed="true">Geographic</button>
           <button type="button" data-v="pop" aria-pressed="false">Sized by population</button>
         </span></div>
+      <div><span class="ctl-label">Level</span>
+        <span class="seg level" role="group" aria-label="Show counties or states">
+          <button type="button" data-v="county" aria-pressed="true">Counties</button>
+          <button type="button" data-v="state" aria-pressed="false">States</button>
+        </span></div>
       <div><label class="ctl-label" for="state">Zoom to</label>
         <select id="state"><option value="">Whole country</option></select></div>
       <div class="summary" id="summary"></div>
@@ -207,6 +213,11 @@ body { margin: 0; }
     <div class="controls">
       <div><label class="ctl-label" for="sx">Across</label><select id="sx"></select></div>
       <div><label class="ctl-label" for="sy">Up</label><select id="sy"></select></div>
+      <div><span class="ctl-label">Level</span>
+        <span class="seg level" role="group" aria-label="Show counties or states">
+          <button type="button" data-v="county" aria-pressed="true">Counties</button>
+          <button type="button" data-v="state" aria-pressed="false">States</button>
+        </span></div>
       <div><label class="ctl-label" for="sst">Highlight</label><select id="sst"><option value="">No state</option></select></div>
       <div class="summary" id="ssummary"></div>
     </div>
@@ -237,6 +248,7 @@ body { margin: 0; }
     <div>Leader maps colour each county by the candidate (or, for the House, the party) ahead there, shaded by their lead over second place. Shift maps show the change in the two-party margin, Democrat minus Republican, in percentage points.</div>
     <div>In Senate and Governor races where no Democrat finished in the top two, the leading non-Republican (for example Dan Osborn in Nebraska) is counted on the Democratic side of shift calculations. Counties where either election had a House district without both a Democratic and a Republican candidate are left grey in shift maps and dropped from scatterplots.</div>
     <div>House results are every district's vote summed by party within each county. District lines changed in several states between 2024 and 2026, so House shifts mix real movement with new matchups. Chicago is combined with suburban Cook County.</div>
+    <div>States view. Votes are each state's county results added up. Senate and Governor races use the statewide count. House margins and shifts use only the counties that pass the county rules above, so a state's figure can leave out some of its counties; the detail panel says how many. State demographics are the ACS's own state estimates. The tariff, ICE, gas and grant measures are averages of the state's counties weighted by population, which for per-person measures equals the state total divided by state population.</div>
     <div>Historical results cover the 48 contiguous states, so Alaska and Hawaii are grey before 2026. Connecticut is mapped by its eight historical counties. The ACS now reports Connecticut by planning region, so its county demographics are built by adding up town estimates, with median income and age interpolated from income and age brackets. Alaska's Chugach and Copper River areas are shown together as Valdez-Cordova.</div>
     <div>Tariffs, ICE, gas and grants. ICE arrests run from January 20, 2025 to early August 2026 (Deportation Data Project, from ICE records released under FOIA). "Location known" counts only arrests whose county is named or whose site is specific, about a third of them; the rest are placed by the ICE office's city, which piles arrests onto counties with jails and processing sites. Later deportations count arrested people who later left the country. Tariff increases weight each industry's change in rates by its share of the county's private jobs. "Rates paid" uses duties actually collected (Census trade data), and "announced" uses rates announced through April 9, 2025 (Richmond Fed). Neither counts higher input costs or retaliation, and many small county-industry job counts are estimated. Gas prices are AAA's metro average where AAA reports the county's metro, else its state average. Research grants are NIH, NSF and other federal grants to universities, counted in the county of the university's address. These are county associations, not evidence that any of these changed votes.</div>
     <div>Sources: 2026 results, <a href="https://civicapi.org" target="_blank" rel="noopener">civicAPI</a>, unofficial until states certify. 2000–2024 results, Heideman (2026), <a href="https://doi.org/10.5281/zenodo.22976553" target="_blank" rel="noopener">U.S. county-level election results, 1990–2024</a>, CC BY 4.0. Demographics, US Census Bureau American Community Survey 2020–2024 5-year estimates and 2024 Gazetteer. ICE, <a href="https://deportationdata.org" target="_blank" rel="noopener">Deportation Data Project</a>. Tariffs, Census Bureau international trade data, BLS QCEW and Richmond Fed Economic Brief 25-15. Gas, AAA. Grants, NIH RePORTER and USAspending. Boundaries, US Census Bureau via us-atlas.</div>
@@ -267,6 +279,8 @@ body { margin: 0; }
   const shiftFill = s => { const a = Math.abs(s); if (a < SBINS[0]) return css("neutral"); const i = a < SBINS[1] ? 1 : a < SBINS[2] ? 2 : a < SBINS[3] ? 3 : 4; return css((s > 0 ? "d" : "r") + i); };
   const ls = { get(k) { try { return localStorage.getItem(k); } catch (_) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (_) {} } };
 
+  let level = ls.get("mt26-level") === "state" ? "state" : "county";
+  const unit = (n = 1) => level === "state" ? (n === 1 ? "state" : "states") : (n === 1 ? "county" : "counties");
   let data, topo, hist, demog, policy;
   try {
     [data, topo, hist, demog, policy] = await Promise.all(["data.json", "counties-10m.json", "history.json", "demog.json", "policy.json"].map(u => fetch(u).then(r => { if (!r.ok) throw new Error(u); return r.json(); })));
@@ -350,7 +364,55 @@ body { margin: 0; }
     if (ma == null || mb == null) return { a, b, ma, mb, s: null };
     return { a, b, ma, mb, s: mb - ma };
   }
+  // State totals for the current mode (map at state level). Shifts use only comparable counties.
+  let SA = new Map();
+  function stateAggMode(m) {
+    const out = new Map(), stOf = f => FIPS_ST[f.id.slice(0, 2)];
+    if (m.type === "shift") {
+      for (const f of counties) {
+        const st = stOf(f), a = out.get(st) || { da: 0, ra: 0, ta: 0, db: 0, rb: 0, tb: 0, n: 0, N: 0 }; a.N++;
+        const s = shiftFor(m, f.id);
+        if (s.s != null) { a.da += s.a.d; a.ra += s.a.r; a.ta += s.a.t; a.db += s.b.d; a.rb += s.b.r; a.tb += s.b.t; a.n++; }
+        out.set(st, a);
+      }
+      out.forEach(a => { if (a.n) { a.ma = (a.da - a.ra) / (a.da + a.ra) * 100; a.mb = (a.db - a.rb) / (a.db + a.rb) * 100; a.s = a.mb - a.ma; } else a.s = null; });
+      return out;
+    }
+    if (m.src.kind === "live" && m.src.office !== "house") {
+      for (const r of liveRaces(m.src.office)) {
+        let t = 0;
+        for (const f of counties) { if (stOf(f) !== r.s) continue; const rec = data.offices[m.src.office][f.id]; if (rec && String(rec[0]) === String(r.id)) t += rec[2]; }
+        const rows = r.c.map(c => [clean(c[0]), c[1], c[2]]).sort((a, b) => b[2] - a[2]);
+        out.set(r.s, { rows, t: Math.max(t, d3.sum(rows, x => x[2])), pr: r.pr, race: r });
+      }
+      return out;
+    }
+    for (const f of counties) {
+      const tp = twoParty(m.src, f.id); if (!tp) continue;
+      const st = stOf(f), a = out.get(st) || { d: 0, r: 0, o: 0, prw: 0, prt: 0, n: 0, unc: 0 };
+      a.d += tp.d; a.r += tp.r; a.o += tp.o; a.n++;
+      if (tp.pr != null) { a.prw += tp.pr * tp.t; a.prt += tp.t; }
+      if (tp.uncontested || tp.partial) a.unc++;
+      out.set(st, a);
+    }
+    out.forEach((a, st) => {
+      a.t = a.d + a.r + a.o; a.pr = a.prt ? a.prw / a.prt : null;
+      a.rows = [["Democratic", "Democratic", a.d], ["Republican", "Republican", a.r], ["Other candidates", "Other", a.o]].filter(x => x[2] > 0 || x[1] !== "Other").sort((x, y) => y[2] - x[2]);
+      a.races = m.src.kind === "live" ? liveRaces("house").filter(r => r.s === st) : [];
+    });
+    return out;
+  }
+  function fillForState(fips) {
+    const m = state.mode, a = SA.get(FIPS_ST[fips]);
+    if (!a) return css("nodata");
+    if (m.type === "shift") return a.s == null ? css("nodata") : shiftFill(a.s);
+    if (!a.t) return css("nodata");
+    if (m.type === "live" && state.view === "counted") return a.pr == null ? css("nodata") : css("c" + cIdx(a.pr));
+    const [x, y] = a.rows, mg = (x[2] - (y ? y[2] : 0)) / a.t;
+    return css(side(x[1]) + binIdx(mg));
+  }
   function fillFor(fips) {
+    if (fips.length === 2) return fillForState(fips);
     const m = state.mode;
     if (m.type === "shift") { const s = shiftFor(m, fips).s; return s == null ? css("nodata") : shiftFill(s); }
     const s = rowsFor(m.src, fips);
@@ -371,12 +433,17 @@ body { margin: 0; }
   const hl = g.append("path").attr("class", "hl"), pin = g.append("path").attr("class", "pin");
   const geoG = d3.select(cPaths.node().parentNode), statesSel = g.selectAll(".states");
   const bubbleG = g.insert("g", ".states").attr("display", "none");
+  const stFeats = statesFeat.filter(f => FIPS_ST[f.id]);
+  const sGeoG = g.insert("g", ".states").attr("display", "none");
+  const sPaths = sGeoG.selectAll("path").data(stFeats).join("path").attr("class", "county").attr("d", path);
+  const sBubbleG = g.insert("g", ".states").attr("display", "none");
+  let sBubbles = null, sBubbleById = null;
 
   // ---- Population-sized circles (Dorling cartogram): one circle per county, area proportional to
   // ACS population, started at the county's centroid and pushed apart so circles do not overlap.
   let bubbles = null, bubbleById = null;
-  function buildBubbles() {
-    const nodes = counties.map(f => { const c = path.centroid(f); return { f, x: c[0], y: c[1], x0: c[0], y0: c[1], p: demog.counties[f.id]?.[0] || 0 }; })
+  function dorling(feats, popOf) {
+    const nodes = feats.map(f => { const c = path.centroid(f); return { f, x: c[0], y: c[1], x0: c[0], y0: c[1], p: popOf(f) }; })
       .filter(n => isFinite(n.x) && isFinite(n.y));
     const s = Math.sqrt(0.2 * 975 * 610 / (Math.PI * d3.sum(nodes, n => n.p)));   // circles cover ~20% of the frame
     nodes.forEach(n => n.r = Math.max(0.7, Math.sqrt(n.p) * s));
@@ -384,23 +451,36 @@ body { margin: 0; }
       .force("x", d3.forceX(n => n.x0).strength(0.2)).force("y", d3.forceY(n => n.y0).strength(0.2))
       .force("collide", d3.forceCollide(n => n.r + 0.25).iterations(3)).stop();
     for (let i = 0; i < 180; i++) sim.tick();
-    bubbleById = new Map(nodes.map(n => [n.f.id, n]));
-    bubbles = bubbleG.selectAll("circle").data(nodes.map(n => n.f)).join("circle").attr("class", "county")
-      .attr("cx", f => bubbleById.get(f.id).x).attr("cy", f => bubbleById.get(f.id).y).attr("r", f => bubbleById.get(f.id).r);
-    attachCountyEvents(bubbles);
+    return nodes;
+  }
+  function circles(grp, nodes) {
+    const byId = new Map(nodes.map(n => [n.f.id, n]));
+    const sel = grp.selectAll("circle").data(nodes.map(n => n.f)).join("circle").attr("class", "county")
+      .attr("cx", f => byId.get(f.id).x).attr("cy", f => byId.get(f.id).y).attr("r", f => byId.get(f.id).r);
+    attachCountyEvents(sel);
+    return [sel, byId];
+  }
+  function buildBubbles() { [bubbles, bubbleById] = circles(bubbleG, dorling(counties, f => demog.counties[f.id]?.[0] || 0)); }
+  function buildStateBubbles() { [sBubbles, sBubbleById] = circles(sBubbleG, dorling(stFeats, f => demog.states[f.id]?.[0] || 0)); }
+  function applyLayers() {
+    const st = level === "state", pop = state.shape === "pop";
+    if (pop && !st && !bubbles) buildBubbles();
+    if (pop && st && !sBubbles) buildStateBubbles();
+    geoG.attr("display", !st && !pop ? null : "none");
+    bubbleG.attr("display", !st && pop ? null : "none");
+    sGeoG.attr("display", st && !pop ? null : "none");
+    sBubbleG.attr("display", st && pop ? null : "none");
+    statesSel.style("opacity", pop ? 0.25 : null);
   }
   function shapeD(f) {
-    const n = state.shape === "pop" && bubbleById && bubbleById.get(f.id);
+    const byId = f.id.length === 2 ? sBubbleById : bubbleById, n = state.shape === "pop" && byId && byId.get(f.id);
     if (!n) return path(f);
     const r = Math.max(n.r, 2);
     return `M${n.x - r},${n.y}a${r},${r} 0 1,0 ${2 * r},0a${r},${r} 0 1,0 ${-2 * r},0`;
   }
   function setShape(v) {
     state.shape = v;
-    if (v === "pop" && !bubbles) buildBubbles();
-    geoG.attr("display", v === "pop" ? "none" : null);
-    bubbleG.attr("display", v === "pop" ? null : "none");
-    statesSel.style("opacity", v === "pop" ? 0.25 : null);
+    applyLayers();
     hl.attr("d", null);
     pin.attr("d", state.pinned ? shapeD(state.pinned) : null);
     document.querySelectorAll("#shape button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === v));
@@ -430,7 +510,17 @@ body { margin: 0; }
     t.style.left = Math.min(Math.max(8, x + 14), r.width - t.offsetWidth - 8) + "px";
     t.style.top = Math.max(8, y - 38) + "px";
   }
+  function tipTextState(f) {
+    const m = state.mode, a = SA.get(FIPS_ST[f.id]), head = `<b>${esc(f.properties.name)}</b>`;
+    if (m.type === "shift") return !a || a.s == null ? head + " · no comparison" : `${head} · ${pts(a.ma)} → ${pts(a.mb)} · <b>${shiftTxt(a.s)}</b>`;
+    if (!a || !a.t) return head + ` · no ${m.src.label} vote`;
+    if (m.type === "live" && state.view === "counted") return head + ` · ${a.pr == null ? "count n/a" : a.pr.toFixed(0) + "% counted"}`;
+    const [x, y] = a.rows, mg = (x[2] - (y ? y[2] : 0)) / a.t;
+    const who = (m.type === "live" && m.src.office !== "house") ? `${esc(x[0])} (${abbr(x[1])})` : abbr(x[1]);
+    return `${head} · ${who} +${(mg * 100).toFixed(1)}`;
+  }
   function tipText(f) {
+    if (f.id.length === 2) return tipTextState(f);
     const m = state.mode, st = FIPS_ST[f.id.slice(0, 2)], head = `<b>${esc(f.properties.name)}</b>, ${st}`;
     if (m.type === "shift") { const s = shiftFor(m, f.id); return s.s == null ? head + " · no comparison" : `${head} · ${pts(s.ma)} → ${pts(s.mb)} · <b>${shiftTxt(s.s)}</b>`; }
     const s = rowsFor(m.src, f.id);
@@ -452,6 +542,7 @@ body { margin: 0; }
       });
   }
   attachCountyEvents(cPaths);
+  attachCountyEvents(sPaths);
 
   function candBlock(s) {
     let html = `<div class="cands">`;
@@ -463,7 +554,36 @@ body { margin: 0; }
     }
     return html + `</div>`;
   }
+  function renderStateCard(f) {
+    const card = document.getElementById("card"), st = FIPS_ST[f.id], m = state.mode, a = SA.get(st);
+    let html = `<div class="eyebrow">${esc(m.label)}${state.pinned && state.pinned.id === f.id ? " · pinned" : ""}</div>
+      <h2>${esc(f.properties.name)}</h2><div class="sub">State total, added up from its counties</div>`;
+    if (m.type === "shift") {
+      if (!a || a.s == null) {
+        const why = ["AK", "HI"].includes(st) ? "The historical file covers the 48 contiguous states, so there is no comparison." : "No county here can be compared between these two elections.";
+        card.innerHTML = html + `<p class="empty">${why}</p>`; return;
+      }
+      html += `<div class="shift"><div class="big" style="color:${a.s >= 0 ? css("d3") : css("r3")}">${shiftTxt(a.s)}</div>
+        <span class="k">${esc(m.base.label)}</span><span></span><span class="v">${pts(a.ma)}</span>
+        <span class="k">${esc(m.src.label)}</span><span></span><span class="v">${pts(a.mb)}</span>
+        <span class="k">Votes</span><span></span><span class="sm">${fmt(a.ta)} → ${fmt(a.tb)}</span></div>`;
+      if (a.n < a.N) html += `<div class="warn">Covers ${a.n} of ${a.N} counties. The others had a House district without both major parties in one of the two elections, or no data.</div>`;
+      card.innerHTML = html; return;
+    }
+    if (!a || !a.t) { card.innerHTML = html + `<p class="empty">No ${esc(m.src.label)} vote recorded for this state.</p>`; return; }
+    html += `<div class="sub" style="margin-top:6px">${fmt(a.t)} votes${a.pr != null ? ` · ${a.pr.toFixed(0)}% of expected vote counted` : ""}</div>` + candBlock(a);
+    if (m.type === "live" && m.src.office !== "house") {
+      const race = a.race;
+      html += `<div class="status"><div>${race.w ? `<span class="chip called">Called</span> ${esc(clean(race.w))}` : `<span class="chip">Not called</span>`}</div></div>`;
+    } else if (m.type === "live") {
+      const c = k => a.races.filter(r => r.w && side(winnerParty(r)) === k).length, nc = a.races.filter(r => !r.w).length;
+      html += `<div class="status"><div><strong>${a.races.length} ${a.races.length === 1 ? "seat" : "seats"}</strong> · Democrats won ${c("d")} · Republicans won ${c("r")}${c("i") ? ` · others won ${c("i")}` : ""}${nc ? ` · ${nc} not called` : ""}</div></div>`;
+    }
+    if (m.src.office === "house" && a.unc) html += `<div class="warn">${a.unc} of ${a.n} counties had a House district without both major parties, so this total mixes contested and uncontested seats.</div>`;
+    card.innerHTML = html;
+  }
   function renderCard(f) {
+    if (f.id.length === 2) return renderStateCard(f);
     const card = document.getElementById("card"), st = FIPS_ST[f.id.slice(0, 2)], m = state.mode;
     let html = `<div class="eyebrow">${esc(m.label)}${state.pinned && state.pinned.id === f.id ? " · pinned" : ""}</div>
       <h2>${esc(f.properties.name)}</h2><div class="sub">${esc(STATES[st] || st)} · FIPS ${f.id}</div>`;
@@ -601,13 +721,19 @@ body { margin: 0; }
 
   function renderMap() {
     document.getElementById("viewwrap").hidden = state.mode.type !== "live";
-    cPaths.attr("fill", f => fillFor(f.id));
-    if (bubbles) bubbles.attr("fill", f => fillFor(f.id));
+    if (level === "state") {
+      SA = stateAggMode(state.mode);
+      sPaths.attr("fill", f => fillFor(f.id));
+      if (sBubbles) sBubbles.attr("fill", f => fillFor(f.id));
+    } else {
+      cPaths.attr("fill", f => fillFor(f.id));
+      if (bubbles) bubbles.attr("fill", f => fillFor(f.id));
+    }
     renderLegend(); renderSummary(); renderTable();
     if (state.shape === "pop") document.getElementById("legend").insertAdjacentHTML("beforeend",
-      `<div class="lg-na" style="color:var(--muted)">Circle area = county population (ACS 2020–2024)</div>`);
+      `<div class="lg-na" style="color:var(--muted)">Circle area = ${unit()} population (ACS 2020–2024)</div>`);
     if (state.pinned) renderCard(state.pinned);
-    svg.attr("aria-label", `County map, ${state.mode.label}`);
+    svg.attr("aria-label", `${level === "state" ? "State" : "County"} map, ${state.mode.label}`);
   }
   modeSel.onchange = () => { state.mode = MODES.find(m => m.key === modeSel.value); ls.set("mt26-mode", state.mode.key); renderMap(); };
   { const el = document.getElementById("view");
@@ -636,7 +762,17 @@ body { margin: 0; }
     { k: "grants", label: "University research grants per person, FY24", symlog: true, fmt: money, tick: d => "$" + d3.format("~s")(d) },
     { k: "grants_chg", label: "Change in research grants per person, FY24–26", symlog: true, fmt: v => sgn(v) + money(v), tick: d => sgn(d) + "$" + d3.format("~s")(Math.abs(d)) },
   ].map(v => ({ ...v, group: "policy" }));
-  const xval = (v, fips) => (v.group === "policy" ? policy.counties[fips]?.[PF[v.k]] : demog.counties[fips]?.[DF[v.k]]) ?? null;
+  // State policy values: population-weighted means of the state's counties.
+  const POL_ST = {};
+  for (const [f, vals] of Object.entries(policy.counties)) {
+    const p = demog.counties[f]?.[0]; if (!p) continue;
+    const a = POL_ST[f.slice(0, 2)] || (POL_ST[f.slice(0, 2)] = policy.fields.map(() => [0, 0]));
+    vals.forEach((v, i) => { if (v != null) { a[i][0] += v * p; a[i][1] += p; } });
+  }
+  const xval = (v, fips) => {
+    if (fips.length === 2) { if (v.group !== "policy") return demog.states[fips]?.[DF[v.k]] ?? null; const a = POL_ST[fips]?.[PF[v.k]]; return a && a[1] ? a[0] / a[1] : null; }
+    return (v.group === "policy" ? policy.counties[fips]?.[PF[v.k]] : demog.counties[fips]?.[DF[v.k]]) ?? null;
+  };
   const XDEMOG = [
     { k: "ba", label: "Adults with a bachelor's degree", unit: "%", fmt: v => v.toFixed(1) + "%" },
     { k: "income", label: "Median household income", unit: "$", fmt: v => "$" + fmt(Math.round(v)), tick: d3.format("$~s") },
@@ -673,8 +809,35 @@ body { margin: 0; }
     if (yv.type === "margin") { const tp = twoParty(yv.src, fips); const m = margin(tp); return m == null ? null : { y: m, w: tp.t, tp }; }
     const s = shiftFor(yv, fips); return s.s == null ? null : { y: s.s, w: s.b.t, s };
   }
+  function stateY(yv) {   // state margin or shift from the counties that pass the county rules
+    const by = new Map();
+    for (const f of counties) {
+      const st = FIPS_ST[f.id.slice(0, 2)], a = by.get(st) || { d: 0, r: 0, t: 0, da: 0, ra: 0, n: 0, N: 0, opp: null }; a.N++;
+      if (yv.type === "margin") { const tp = twoParty(yv.src, f.id); if (margin(tp) != null) { a.d += tp.d; a.r += tp.r; a.t += tp.t; a.n++; a.opp = a.opp || tp.oppNote; } }
+      else { const s = shiftFor(yv, f.id); if (s.s != null) { a.da += s.a.d; a.ra += s.a.r; a.d += s.b.d; a.r += s.b.r; a.t += s.b.t; a.n++; a.opp = a.opp || s.b.oppNote; } }
+      by.set(st, a);
+    }
+    const out = new Map();
+    by.forEach((a, st) => {
+      if (!a.n) return;
+      const mb = (a.d - a.r) / (a.d + a.r) * 100;
+      if (yv.type === "margin") out.set(st, { y: mb, w: a.t, tp: { oppNote: a.opp }, n: a.n, N: a.N });
+      else { const ma = (a.da - a.ra) / (a.da + a.ra) * 100; out.set(st, { y: mb - ma, w: a.t, s: { ma, mb, b: { oppNote: a.opp } }, n: a.n, N: a.N }); }
+    });
+    return out;
+  }
   function points() {
     const out = [];
+    if (level === "state") {
+      const Y = stateY(sstate.y);
+      for (const f of stFeats) {
+        const st = FIPS_ST[f.id], dm = demog.states[f.id]; if (!dm) continue;
+        const x = xval(sstate.x, f.id); if (x == null || (sstate.x.log && x <= 0)) continue;
+        const yv = Y.get(st); if (!yv || !yv.w) continue;
+        out.push({ f, x, y: yv.y, w: yv.w, st, extra: yv, dm });
+      }
+      return out;
+    }
     for (const f of counties) {
       const dm = demog.counties[f.id]; if (!dm) continue;
       const x = xval(sstate.x, f.id); if (x == null || (sstate.x.log && x <= 0)) continue;
@@ -694,7 +857,7 @@ body { margin: 0; }
 
   const W = 900, H = 560, M = { t: 18, r: 20, b: 52, l: 64 };
   const ssvg = d3.select("#scatter");
-  const gGrid = ssvg.append("g"), gAx = ssvg.append("g"), gDots = ssvg.append("g"), gFit = ssvg.append("g"), gRing = ssvg.append("g");
+  const gGrid = ssvg.append("g"), gAx = ssvg.append("g"), gDots = ssvg.append("g"), gFit = ssvg.append("g"), gLab = ssvg.append("g"), gRing = ssvg.append("g");
   const stip = document.getElementById("stip"), sbox = document.getElementById("scatbox");
   let delaunay = null, P = [], xs, ys;
 
@@ -727,7 +890,9 @@ body { margin: 0; }
     gDots.selectAll("circle").data(sorted, p => p.f.id).join("circle").attr("class", "dot")
       .attr("cx", p => xs(p.x)).attr("cy", p => ys(p.y)).attr("r", p => Math.max(1.6, rs(p.w)))
       .attr("fill", p => (hi && p.st !== hi) ? css("dot-dim") : css((p.y >= 0 ? "d" : "r") + "3"))
-      .attr("fill-opacity", p => (hi && p.st !== hi) ? 0.35 : hi ? 0.9 : 0.6);
+      .attr("fill-opacity", p => (hi && p.st !== hi) ? 0.35 : hi || level === "state" ? 0.85 : 0.6);
+    gLab.selectAll("text").data(level === "state" ? sorted : [], p => p.f.id).join("text").attr("class", "dlab")
+      .attr("x", p => xs(p.x)).attr("y", p => ys(p.y) + 3.5).attr("text-anchor", "middle").text(p => p.st);
 
     const tx = xv.log ? Math.log10 : xv.symlog ? slog : v => v, st = wstats(P, tx);
     const [x0, x1] = xs.domain(), N = 80, line = [];
@@ -738,21 +903,21 @@ body { margin: 0; }
     delaunay = d3.Delaunay.from(P, p => xs(p.x), p => ys(p.y));
     const per = xv.per || (xv.log ? "per tenfold increase" : xv.symlog ? "per tenfold increase (well above zero)" : xv.k === "income" ? "per $10,000" : xv.k === "age" ? "per year" : "per 10 points");
     const scale = xv.scale || (xv.log ? 1 : xv.symlog ? Math.LN10 : xv.k === "income" ? 10000 : xv.k === "age" ? 1 : 10);
-    document.getElementById("sstats").innerHTML = `<span><strong>${fmt(P.length)}</strong> counties</span>
+    document.getElementById("sstats").innerHTML = `<span><strong>${fmt(P.length)}</strong> ${unit(P.length)}</span>
       <span>Vote-weighted correlation <strong>r = ${st.r.toFixed(2)}</strong></span>
       <span>Fitted line: <strong>${(st.b * scale >= 0 ? "+" : "−") + Math.abs(st.b * scale).toFixed(1)} pts</strong> ${per}</span>
       <span>Dots: blue = Democratic side of zero, red = Republican side. Size = votes cast.</span>`;
-    document.getElementById("ssummary").innerHTML = hi ? `Highlighting <strong>${esc(STATES[hi])}</strong> · ${P.filter(p => p.st === hi).length} counties` : "Pick a state to pick out its counties.";
+    document.getElementById("ssummary").innerHTML = hi ? `Highlighting <strong>${esc(STATES[hi])}</strong>${level === "state" ? "" : ` · ${P.filter(p => p.st === hi).length} counties`}` : level === "state" ? "Pick a state to pick it out." : "Pick a state to pick out its counties.";
     renderQuint(st, tx);
     if (sstate.pinned) { const p = P.find(p => p.f.id === sstate.pinned); p ? ring(p) : (sstate.pinned = null, gRing.selectAll("*").remove()); }
-    ssvg.attr("aria-label", `Scatterplot: ${xv.label} against ${yv.label}, ${P.length} counties, weighted r ${st.r.toFixed(2)}`);
+    ssvg.attr("aria-label", `Scatterplot: ${xv.label} against ${yv.label}, ${P.length} ${unit(P.length)}, weighted r ${st.r.toFixed(2)}`);
   }
   function ring(p) { gRing.selectAll("*").remove(); gRing.append("circle").attr("class", "ring").attr("cx", xs(p.x)).attr("cy", ys(p.y)).attr("r", Math.max(6, +gDots.selectAll("circle").filter(d => d === p).attr("r") + 3)); }
 
   // Fifths: equal numbers of counties, or (counties being indivisible) as near as possible to equal
   // population or votes — each county goes to the fifth holding the midpoint of its share of the running total.
   let qby = ["n", "pop", "votes"].includes(ls.get("mt26-qby")) ? ls.get("mt26-qby") : "n";
-  const QBY = { n: "counties", pop: "population", votes: "votes cast" };
+  const QBY = { get n() { return unit(2); }, pop: "population", votes: "votes cast" };
   function renderQuint() {
     const xv = sstate.x, yv = sstate.y, sorted = [...P].sort((a, b) => a.x - b.x), n = sorted.length;
     const popOf = p => p.dm[DF.pop] || 0, wt = qby === "pop" ? popOf : qby === "votes" ? p => p.w : () => 1;
@@ -764,9 +929,10 @@ body { margin: 0; }
     const share = (v, t) => `<span style="color:var(--muted)"> · ${Math.round(100 * v / t)}%</span>`;
     document.getElementById("qtitle").textContent = `${yv.label}, by fifths of ${QBY[qby]} on ${lcFirst(xv.label)}`;
     document.getElementById("qnote").textContent = qby === "n"
-      ? "Each fifth holds the same number of counties, so the top and bottom fifths can differ hugely in population."
-      : `Counties are ranked on ${lcFirst(xv.label)} and split so each fifth holds about a fifth of all ${QBY[qby]}. Counties can't be split, so the shares are approximate.`;
-    document.querySelector("#qtbl thead").innerHTML = `<tr><th>Fifth</th><th>${esc(xv.label)} range</th><th class="num">Counties</th><th class="num">Population</th><th class="num">Votes</th><th class="num">${yv.type === "shift" ? "Shift" : "Margin"}, vote-weighted</th><th></th></tr>`;
+      ? `Each fifth holds the same number of ${unit(2)}, so the top and bottom fifths can differ hugely in population.`
+      : `${level === "state" ? "States" : "Counties"} are ranked on ${lcFirst(xv.label)} and split so each fifth holds about a fifth of all ${QBY[qby]}. ${level === "state" ? "States" : "Counties"} can't be split, so the shares are approximate.`;
+    document.querySelector('#qby button[data-v="n"]').textContent = level === "state" ? "States" : "Counties";
+    document.querySelector("#qtbl thead").innerHTML = `<tr><th>Fifth</th><th>${esc(xv.label)} range</th><th class="num">${level === "state" ? "States" : "Counties"}</th><th class="num">Population</th><th class="num">Votes</th><th class="num">${yv.type === "shift" ? "Shift" : "Margin"}, vote-weighted</th><th></th></tr>`;
     document.querySelector("#qtbl tbody").innerHTML = rows.map((r, i) => {
       const wpct = Math.abs(r.y) / maxAbs * 50, left = r.y >= 0 ? 50 : 50 - wpct;
       return `<tr><td>${["Lowest", "Second", "Middle", "Fourth", "Highest"][i]}</td><td>${xv.fmt(r.lo)} – ${xv.fmt(r.hi)}</td><td class="num">${fmt(r.n)}</td><td class="num">${fmt(r.pop)}${share(r.pop, popTot)}</td><td class="num">${fmt(r.votes)}${share(r.votes, voteTot)}</td>
@@ -776,7 +942,9 @@ body { margin: 0; }
 
   function scard(p) {
     const xv = sstate.x, yv = sstate.y, card = document.getElementById("scard");
-    let html = `<div class="eyebrow">${sstate.pinned === p.f.id ? "Pinned" : "County detail"}</div><h2>${esc(p.f.properties.name)}</h2><div class="sub">${esc(STATES[p.st])} · FIPS ${p.f.id}</div>`;
+    const isSt = p.f.id.length === 2;
+    let html = `<div class="eyebrow">${sstate.pinned === p.f.id ? "Pinned" : isSt ? "State detail" : "County detail"}</div><h2>${esc(p.f.properties.name)}</h2>`
+      + (isSt ? `<div class="sub">${p.extra.n < p.extra.N ? `Vote from ${p.extra.n} of ${p.extra.N} counties (the rest fail the county rules)` : "State total"}</div>` : `<div class="sub">${esc(STATES[p.st])} · FIPS ${p.f.id}</div>`);
     html += `<div class="shift"><div class="big" style="color:${p.y >= 0 ? css("d3") : css("r3")}">${yv.type === "shift" ? shiftTxt(p.y) : pts(p.y)}</div>`;
     if (yv.type === "shift") html += `<span class="k">${esc(yv.base.label)}</span><span></span><span class="v">${pts(p.extra.s.ma)}</span><span class="k">${esc(yv.src.label)}</span><span></span><span class="v">${pts(p.extra.s.mb)}</span>`;
     else html += `<span class="k">${esc(yv.label)}</span><span></span><span class="v">${fmt(p.w)} votes</span>`;
@@ -793,7 +961,7 @@ body { margin: 0; }
   ssvg.on("pointermove", e => {
     const p = nearest(e);
     if (!p) { stip.hidden = true; return; }
-    stip.innerHTML = `<b>${esc(p.f.properties.name)}</b>, ${p.st} · ${sstate.x.fmt(p.x)} · ${sstate.y.type === "shift" ? shiftTxt(p.y) : pts(p.y)}`;
+    stip.innerHTML = `<b>${esc(p.f.properties.name)}</b>${p.f.id.length === 2 ? "" : ", " + p.st} · ${sstate.x.fmt(p.x)} · ${sstate.y.type === "shift" ? shiftTxt(p.y) : pts(p.y)}`;
     stip.hidden = false; placeTip(stip, sbox, e);
     if (!sstate.pinned) { ring(p); scard(p); }
   }).on("pointerleave", () => { stip.hidden = true; if (!sstate.pinned) gRing.selectAll("*").remove(); })
@@ -815,6 +983,22 @@ body { margin: 0; }
     if (demo) document.getElementById("tab-demo").setAttribute("aria-current", "page"); else document.getElementById("tab-map").setAttribute("aria-current", "page");
     if (demo && !scatterDrawn) { renderScatter(); scatterDrawn = true; }
   }
+  function resetCards() {
+    if (!state.pinned) document.getElementById("card").innerHTML = `<div class="eyebrow">${level === "state" ? "State" : "County"} detail</div><h2>Hover a ${unit()}</h2><p class="empty">Move over the map to see the vote in each ${unit()}. Click to keep a ${unit()} in this panel.</p>`;
+    if (!sstate.pinned) document.getElementById("scard").innerHTML = `<div class="eyebrow">${level === "state" ? "State" : "County"} detail</div><h2>Hover a dot</h2><p class="empty">Each dot is a ${unit()}, sized by its 2026 vote. Hover to see its numbers; click to pin it.</p>`;
+    document.getElementById("hint").textContent = `Scroll or pinch to zoom · click a ${unit()} to pin it`;
+  }
+  function setLevel(v) {
+    level = v; ls.set("mt26-level", v);
+    document.querySelectorAll(".seg.level button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === v));
+    state.pinned = null; pin.attr("d", null); hl.attr("d", null); tip.hidden = true;
+    sstate.pinned = null; gRing.selectAll("*").remove(); stip.hidden = true;
+    resetCards(); applyLayers(); renderMap();
+    if (location.hash === "#demographics") renderScatter(); else scatterDrawn = false;
+  }
+  document.querySelectorAll(".seg.level").forEach(el => el.addEventListener("click", e => { const b = e.target.closest("button"); if (b && b.dataset.v !== level) setLevel(b.dataset.v); }));
+  document.querySelectorAll(".seg.level button").forEach(b => b.setAttribute("aria-pressed", b.dataset.v === level));
+  if (level === "state") { resetCards(); applyLayers(); renderMap(); }
   window.addEventListener("hashchange", route);
   route();
 })();
