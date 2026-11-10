@@ -238,7 +238,9 @@ body { margin: 0; }
     <div>In Senate and Governor races where no Democrat finished in the top two, the leading non-Republican (for example Dan Osborn in Nebraska) is counted on the Democratic side of shift calculations. Counties where either election had a House district without both a Democratic and a Republican candidate are left grey in shift maps and dropped from scatterplots.</div>
     <div>House results are every district's vote summed by party within each county. District lines changed in several states between 2024 and 2026, so House shifts mix real movement with new matchups. Chicago is combined with suburban Cook County.</div>
     <div>Historical results cover the 48 contiguous states, so Alaska and Hawaii are grey before 2026. Connecticut is mapped by its eight historical counties. The ACS now reports Connecticut by planning region, so its county demographics are built by adding up town estimates, with median income and age interpolated from income and age brackets. Alaska's Chugach and Copper River areas are shown together as Valdez-Cordova.</div>
-    <div>Sources: 2026 results, <a href="https://civicapi.org" target="_blank" rel="noopener">civicAPI</a>, unofficial until states certify. 2000–2024 results, Heideman (2026), <a href="https://doi.org/10.5281/zenodo.22976553" target="_blank" rel="noopener">U.S. county-level election results, 1990–2024</a>, CC BY 4.0. Demographics, US Census Bureau American Community Survey 2020–2024 5-year estimates and 2024 Gazetteer. Boundaries, US Census Bureau via us-atlas.</div>
+    <div>Tariffs, ICE, gas and grants. ICE arrests run from January 20, 2025 to early August 2026 (Deportation Data Project, from ICE records released under FOIA). "Location known" counts only arrests whose county is named or whose site is specific, about a third of them; the rest are placed by the ICE office's city, which piles arrests onto counties with jails and processing sites. Later deportations count arrested people who later left the country. Tariff increases weight each industry's change in rates by its share of the county's private jobs. "Rates paid" uses duties actually collected (Census trade data), and "announced" uses rates announced through April 9, 2025 (Richmond Fed). Neither counts higher input costs or retaliation, and many small county-industry job counts are estimated. Gas prices are AAA's metro average where AAA reports the county's metro, else its state average. Research grants are NIH, NSF and other federal grants to universities, counted in the county of the university's address. These are county associations, not evidence that any of these changed votes.</div>
+    <div>Sources: 2026 results, <a href="https://civicapi.org" target="_blank" rel="noopener">civicAPI</a>, unofficial until states certify. 2000–2024 results, Heideman (2026), <a href="https://doi.org/10.5281/zenodo.22976553" target="_blank" rel="noopener">U.S. county-level election results, 1990–2024</a>, CC BY 4.0. Demographics, US Census Bureau American Community Survey 2020–2024 5-year estimates and 2024 Gazetteer. ICE, <a href="https://deportationdata.org" target="_blank" rel="noopener">Deportation Data Project</a>. Tariffs, Census Bureau international trade data, BLS QCEW and Richmond Fed Economic Brief 25-15. Gas, AAA. Grants, NIH RePORTER and USAspending. Boundaries, US Census Bureau via us-atlas.</div>
+    <div>Created by Ben Ansell using Claude Opus 5.5, 10 November 2026.</div>
   </div>
 </div>
 
@@ -265,9 +267,9 @@ body { margin: 0; }
   const shiftFill = s => { const a = Math.abs(s); if (a < SBINS[0]) return css("neutral"); const i = a < SBINS[1] ? 1 : a < SBINS[2] ? 2 : a < SBINS[3] ? 3 : 4; return css((s > 0 ? "d" : "r") + i); };
   const ls = { get(k) { try { return localStorage.getItem(k); } catch (_) { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch (_) {} } };
 
-  let data, topo, hist, demog;
+  let data, topo, hist, demog, policy;
   try {
-    [data, topo, hist, demog] = await Promise.all(["data.json", "counties-10m.json", "history.json", "demog.json"].map(u => fetch(u).then(r => { if (!r.ok) throw new Error(u); return r.json(); })));
+    [data, topo, hist, demog, policy] = await Promise.all(["data.json", "counties-10m.json", "history.json", "demog.json", "policy.json"].map(u => fetch(u).then(r => { if (!r.ok) throw new Error(u); return r.json(); })));
   } catch (e) {
     document.getElementById("loading").textContent = "The map data did not load. Reload the page to try again.";
     return;
@@ -617,7 +619,25 @@ body { margin: 0; }
 
   // ======================= DEMOGRAPHICS =======================
   const DF = Object.fromEntries(demog.fields.map((k, i) => [k, i]));
-  const XVARS = [
+  const PF = Object.fromEntries(policy.fields.map((k, i) => [k, i]));
+  const slog = v => Math.sign(v) * Math.log1p(Math.abs(v));   // the transform d3.scaleSymlog uses
+  const lcFirst = s => /^[A-Z]{2}/.test(s) ? s : s[0].toLowerCase() + s.slice(1);   // keeps "ICE", lowercases "Median age"
+  const sgn = v => (v > 0 ? "+" : v < 0 ? "−" : "");
+  const per10k = v => v < 10 ? v.toFixed(1) : fmt(Math.round(v));
+  const money = v => "$" + (Math.abs(v) < 10 ? Math.abs(v).toFixed(2) : fmt(Math.round(Math.abs(v))));
+  const POLICY = [
+    { k: "ice_loc", label: "ICE arrests per 10,000, location known", symlog: true, fmt: per10k, tick: d3.format("~s") },
+    { k: "ice_all", label: "ICE arrests per 10,000, all placed", symlog: true, fmt: per10k, tick: d3.format("~s") },
+    { k: "deported", label: "Later deportations per 10,000", symlog: true, fmt: per10k, tick: d3.format("~s") },
+    { k: "tariff_paid", label: "Tariff increase, rates paid", fmt: v => v.toFixed(2) + " pts", tick: d => d + " pts", per: "per point", scale: 1 },
+    { k: "tariff_ann", label: "Tariff increase, announced", fmt: v => v.toFixed(2) + " pts", tick: d => d + " pts", per: "per point", scale: 1 },
+    { k: "gas_now", label: "Gas price, Nov 2 2026", fmt: v => "$" + v.toFixed(2), tick: d => "$" + d.toFixed(2), per: "per 10 cents", scale: 0.1 },
+    { k: "gas_chg", label: "Gas price change, year to Nov 2", fmt: v => sgn(v) + "$" + Math.abs(v).toFixed(2), tick: d => sgn(d) + "$" + Math.abs(d).toFixed(2), per: "per 10 cents", scale: 0.1 },
+    { k: "grants", label: "University research grants per person, FY24", symlog: true, fmt: money, tick: d => "$" + d3.format("~s")(d) },
+    { k: "grants_chg", label: "Change in research grants per person, FY24–26", symlog: true, fmt: v => sgn(v) + money(v), tick: d => sgn(d) + "$" + d3.format("~s")(Math.abs(d)) },
+  ].map(v => ({ ...v, group: "policy" }));
+  const xval = (v, fips) => (v.group === "policy" ? policy.counties[fips]?.[PF[v.k]] : demog.counties[fips]?.[DF[v.k]]) ?? null;
+  const XDEMOG = [
     { k: "ba", label: "Adults with a bachelor's degree", unit: "%", fmt: v => v.toFixed(1) + "%" },
     { k: "income", label: "Median household income", unit: "$", fmt: v => "$" + fmt(Math.round(v)), tick: d3.format("$~s") },
     { k: "density", label: "People per square mile", log: true, fmt: v => v < 10 ? v.toFixed(v < 1 ? 2 : 1) : fmt(Math.round(v)), tick: d3.format("~s") },
@@ -629,7 +649,8 @@ body { margin: 0; }
     { k: "foreign", label: "Born outside the US", fmt: v => v.toFixed(1) + "%" },
     { k: "owner", label: "Homes that are owner-occupied", fmt: v => v.toFixed(1) + "%" },
     { k: "age", label: "Median age", fmt: v => v.toFixed(1) + " yrs" },
-  ];
+  ].map(v => ({ ...v, group: "demog" }));
+  const XVARS = [...XDEMOG, ...POLICY];
   const YVARS = [
     { k: "m-house26", label: "House 2026 margin", type: "margin", src: live("house") },
     { k: "m-senate26", label: "Senate 2026 margin", type: "margin", src: live("senate") },
@@ -641,7 +662,8 @@ body { margin: 0; }
     { k: "s-p20p24", label: "Shift, President 2020 → 2024", type: "shift", base: past("president", 2020), src: past("president", 2024) },
   ];
   const sx = document.getElementById("sx"), sy = document.getElementById("sy"), sst = document.getElementById("sst");
-  XVARS.forEach(v => sx.add(new Option(v.label, v.k))); YVARS.forEach(v => sy.add(new Option(v.label, v.k)));
+  [["Demographics", XDEMOG], ["Tariffs, ICE, gas and grants", POLICY]].forEach(([g, vs]) => { const og = document.createElement("optgroup"); og.label = g; vs.forEach(v => og.append(new Option(v.label, v.k))); sx.append(og); });
+  YVARS.forEach(v => sy.add(new Option(v.label, v.k)));
   stateList.forEach(f => sst.add(new Option(f.properties.name, FIPS_ST[f.id])));
   const sstate = { x: XVARS[0], y: YVARS[4], hi: "", pinned: null };
   { const a = XVARS.find(v => v.k === ls.get("mt26-sx")), b = YVARS.find(v => v.k === ls.get("mt26-sy")); if (a) sstate.x = a; if (b) sstate.y = b; }
@@ -652,10 +674,10 @@ body { margin: 0; }
     const s = shiftFor(yv, fips); return s.s == null ? null : { y: s.s, w: s.b.t, s };
   }
   function points() {
-    const xi = DF[sstate.x.k], out = [];
+    const out = [];
     for (const f of counties) {
       const dm = demog.counties[f.id]; if (!dm) continue;
-      const x = dm[xi]; if (x == null || (sstate.x.log && x <= 0)) continue;
+      const x = xval(sstate.x, f.id); if (x == null || (sstate.x.log && x <= 0)) continue;
       const yv = yValue(sstate.y, f.id); if (!yv || !yv.w) continue;
       out.push({ f, x, y: yv.y, w: yv.w, st: FIPS_ST[f.id.slice(0, 2)], extra: yv, dm });
     }
@@ -679,7 +701,8 @@ body { margin: 0; }
   function renderScatter() {
     P = points();
     const xv = sstate.x, yv = sstate.y;
-    xs = (xv.log ? d3.scaleLog() : d3.scaleLinear()).domain(d3.extent(P, p => p.x)).range([M.l, W - M.r]).nice();
+    xs = (xv.log ? d3.scaleLog() : xv.symlog ? d3.scaleSymlog() : d3.scaleLinear()).domain(d3.extent(P, p => p.x)).range([M.l, W - M.r]);
+    if (!xv.symlog) xs.nice();
     const yext = d3.extent(P, p => p.y), ypad = (yext[1] - yext[0]) * 0.04 || 1;
     ys = d3.scaleLinear().domain([Math.min(yext[0] - ypad, 0), Math.max(yext[1] + ypad, 0)]).range([H - M.b, M.t]).nice();
     const rs = d3.scaleSqrt().domain([0, d3.max(P, p => p.w)]).range([0, 22]);
@@ -688,10 +711,14 @@ body { margin: 0; }
     gGrid.attr("class", "gridline").call(d3.axisLeft(ys).ticks(8).tickSize(-(W - M.l - M.r)).tickFormat("")).attr("transform", `translate(${M.l},0)`).select(".domain").remove();
     gGrid.append("line").attr("class", "zero").attr("x1", M.l).attr("x2", W - M.r).attr("y1", ys(0)).attr("y2", ys(0));
     const xAxis = d3.axisBottom(xs).ticks(xv.log ? 6 : 8, xv.tick ? undefined : undefined);
-    if (xv.log) xAxis.ticks(6, "~s"); else if (xv.tick) xAxis.tickFormat(xv.tick); else xAxis.tickFormat(d => d + (xv.k === "age" ? "" : "%"));
+    if (xv.symlog) {   // 0, ±1, ±10, ±100 … inside the data range
+      const [lo, hi] = xs.domain(), tv = [0];
+      for (let t = 1; t <= Math.max(Math.abs(lo), Math.abs(hi)); t *= 10) { if (t <= hi) tv.push(t); if (-t >= lo) tv.unshift(-t); }
+      xAxis.tickValues(tv).tickFormat(xv.tick);
+    } else if (xv.log) xAxis.ticks(6, "~s"); else if (xv.tick) xAxis.tickFormat(xv.tick); else xAxis.tickFormat(d => d + (xv.k === "age" ? "" : "%"));
     gAx.append("g").attr("class", "axis").attr("transform", `translate(0,${H - M.b})`).call(xAxis);
     gAx.append("g").attr("class", "axis").attr("transform", `translate(${M.l},0)`).call(d3.axisLeft(ys).ticks(8).tickFormat(d => d === 0 ? "0" : yv.type === "shift" ? (d > 0 ? "+" : "−") + Math.abs(d) : (d > 0 ? "D+" : "R+") + Math.abs(d)));
-    gAx.append("text").attr("class", "axlabel").attr("x", (M.l + W - M.r) / 2).attr("y", H - 12).attr("text-anchor", "middle").text(xv.label + (xv.log ? " (log scale)" : ""));
+    gAx.append("text").attr("class", "axlabel").attr("x", (M.l + W - M.r) / 2).attr("y", H - 12).attr("text-anchor", "middle").text(xv.label + (xv.log ? " (log scale)" : xv.symlog ? " (log scale, zero kept)" : ""));
     gAx.append("text").attr("class", "axlabel").attr("transform", `translate(16,${(M.t + H - M.b) / 2}) rotate(-90)`).attr("text-anchor", "middle")
       .text(yv.type === "shift" ? yv.label.replace("Shift, ", "") + ": shift toward D (+) or R (−), pts" : yv.label + ", pts");
 
@@ -702,15 +729,15 @@ body { margin: 0; }
       .attr("fill", p => (hi && p.st !== hi) ? css("dot-dim") : css((p.y >= 0 ? "d" : "r") + "3"))
       .attr("fill-opacity", p => (hi && p.st !== hi) ? 0.35 : hi ? 0.9 : 0.6);
 
-    const tx = xv.log ? Math.log10 : v => v, st = wstats(P, tx);
-    const [x0, x1] = xs.domain(), N = 40, line = [];
-    for (let i = 0; i <= N; i++) { const xv0 = xv.log ? Math.pow(10, Math.log10(x0) + (Math.log10(x1) - Math.log10(x0)) * i / N) : x0 + (x1 - x0) * i / N; line.push([xs(xv0), ys(st.a + st.b * tx(xv0))]); }
+    const tx = xv.log ? Math.log10 : xv.symlog ? slog : v => v, st = wstats(P, tx);
+    const [x0, x1] = xs.domain(), N = 80, line = [];
+    for (let i = 0; i <= N; i++) { const xv0 = xv.log || xv.symlog ? xs.invert(M.l + (W - M.r - M.l) * i / N) : x0 + (x1 - x0) * i / N; line.push([xs(xv0), ys(st.a + st.b * tx(xv0))]); }
     gFit.selectAll("*").remove();
     gFit.append("path").attr("class", "fit").attr("d", d3.line()(line));
 
     delaunay = d3.Delaunay.from(P, p => xs(p.x), p => ys(p.y));
-    const per = xv.log ? "per tenfold increase" : xv.k === "income" ? "per $10,000" : xv.k === "age" ? "per year" : "per 10 points";
-    const scale = xv.log ? 1 : xv.k === "income" ? 10000 : xv.k === "age" ? 1 : 10;
+    const per = xv.per || (xv.log ? "per tenfold increase" : xv.symlog ? "per tenfold increase (well above zero)" : xv.k === "income" ? "per $10,000" : xv.k === "age" ? "per year" : "per 10 points");
+    const scale = xv.scale || (xv.log ? 1 : xv.symlog ? Math.LN10 : xv.k === "income" ? 10000 : xv.k === "age" ? 1 : 10);
     document.getElementById("sstats").innerHTML = `<span><strong>${fmt(P.length)}</strong> counties</span>
       <span>Vote-weighted correlation <strong>r = ${st.r.toFixed(2)}</strong></span>
       <span>Fitted line: <strong>${(st.b * scale >= 0 ? "+" : "−") + Math.abs(st.b * scale).toFixed(1)} pts</strong> ${per}</span>
@@ -735,10 +762,10 @@ body { margin: 0; }
     const rows = qs.filter(q => q.length).map(q => { let w = 0, y = 0; q.forEach(p => { w += p.w; y += p.w * p.y; }); return { lo: q[0].x, hi: q[q.length - 1].x, n: q.length, y: y / w, votes: w, pop: d3.sum(q, popOf) }; });
     const maxAbs = d3.max(rows, r => Math.abs(r.y)) || 1, popTot = d3.sum(rows, r => r.pop), voteTot = d3.sum(rows, r => r.votes);
     const share = (v, t) => `<span style="color:var(--muted)"> · ${Math.round(100 * v / t)}%</span>`;
-    document.getElementById("qtitle").textContent = `${yv.label}, by fifths of ${QBY[qby]} on ${xv.label.toLowerCase()}`;
+    document.getElementById("qtitle").textContent = `${yv.label}, by fifths of ${QBY[qby]} on ${lcFirst(xv.label)}`;
     document.getElementById("qnote").textContent = qby === "n"
       ? "Each fifth holds the same number of counties, so the top and bottom fifths can differ hugely in population."
-      : `Counties are ranked on ${xv.label.toLowerCase()} and split so each fifth holds about a fifth of all ${QBY[qby]}. Counties can't be split, so the shares are approximate.`;
+      : `Counties are ranked on ${lcFirst(xv.label)} and split so each fifth holds about a fifth of all ${QBY[qby]}. Counties can't be split, so the shares are approximate.`;
     document.querySelector("#qtbl thead").innerHTML = `<tr><th>Fifth</th><th>${esc(xv.label)} range</th><th class="num">Counties</th><th class="num">Population</th><th class="num">Votes</th><th class="num">${yv.type === "shift" ? "Shift" : "Margin"}, vote-weighted</th><th></th></tr>`;
     document.querySelector("#qtbl tbody").innerHTML = rows.map((r, i) => {
       const wpct = Math.abs(r.y) / maxAbs * 50, left = r.y >= 0 ? 50 : 50 - wpct;
@@ -753,7 +780,7 @@ body { margin: 0; }
     html += `<div class="shift"><div class="big" style="color:${p.y >= 0 ? css("d3") : css("r3")}">${yv.type === "shift" ? shiftTxt(p.y) : pts(p.y)}</div>`;
     if (yv.type === "shift") html += `<span class="k">${esc(yv.base.label)}</span><span></span><span class="v">${pts(p.extra.s.ma)}</span><span class="k">${esc(yv.src.label)}</span><span></span><span class="v">${pts(p.extra.s.mb)}</span>`;
     else html += `<span class="k">${esc(yv.label)}</span><span></span><span class="v">${fmt(p.w)} votes</span>`;
-    html += `</div><div class="status">` + XVARS.map(v => { const val = p.dm[DF[v.k]]; return `<div style="display:flex;justify-content:space-between;gap:8px"><span>${v.k === xv.k ? "<strong>" + esc(v.label) + "</strong>" : esc(v.label)}</span><span style="font-variant-numeric:tabular-nums">${val == null ? "–" : v.fmt(val)}</span></div>`; }).join("") + `</div>`;
+    html += `</div><div class="status">` + (xv.group === "policy" ? POLICY : XDEMOG).map(v => { const val = xval(v, p.f.id); return `<div style="display:flex;justify-content:space-between;gap:8px"><span>${v.k === xv.k ? "<strong>" + esc(v.label) + "</strong>" : esc(v.label)}</span><span style="font-variant-numeric:tabular-nums">${val == null ? "–" : v.fmt(val)}</span></div>`; }).join("") + `</div>`;
     const oppNote = yv.type === "shift" ? p.extra.s.b.oppNote : p.extra.tp.oppNote;
     if (oppNote) html += `<div class="warn">${esc(oppNote)}</div>`;
     card.innerHTML = html;
