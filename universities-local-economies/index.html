@@ -1,0 +1,587 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<title>Universities and Local Economies</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="How much each university in England, Wales and Scotland adds to its local authority's economy, with spillover estimates, maps, and scatterplots against local demographics, deprivation and council politics.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: an atlas board. Tab strip under a ruled masthead; map or chart on the left, a sticky "place card" on the right
+   (like a gazetteer entry); tables below. Ink-blue accent, sequential ramp from pale stone to deep ink. */
+:root {
+  --bg: #f4f5f3; --surface: #fbfbfa; --ink: #15191e; --ink-2: #4a525c; --muted: #7d858d;
+  --rule: #dcdfdc; --grid: #e8eae7; --nodata: #e3e5e1; --stroke: #fbfbfa; --hl: #15191e; --accent: #1f4e8c;
+  --s1: #e9eef3; --s2: #c3d3e4; --s3: #8fb0d2; --s4: #5b88bb; --s5: #2f5f99; --s6: #163a6b;
+  --lab: #d50000; --con: #0a6ac9; --ld: #f59b00; --grn: #2f9e44; --ref: #12b6cf; --snp: #e8c400; --pc: #1d8a6c;
+  --oth: #8a8f96; --noc: #c7cbc6;
+  --eng: #5b6f8a; --wal: #c0392b; --sco: #2a7fb8;
+  --f-display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #101215; --surface: #171a1e; --ink: #ecedeb; --ink-2: #bcc2c8; --muted: #8b939b;
+  --rule: #2b3036; --grid: #22262b; --nodata: #262a2f; --stroke: #171a1e; --hl: #ffffff; --accent: #7fa8de;
+  --s1: #1f2a37; --s2: #26405e; --s3: #2f5a8a; --s4: #4a7cb8; --s5: #7fa8de; --s6: #c3d6f0;
+  --noc: #50555b; --oth: #8a8f96; --eng: #9aaac0; --wal: #e0705f; --sco: #6fb0de; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #101215; --surface: #171a1e; --ink: #ecedeb; --ink-2: #bcc2c8; --muted: #8b939b;
+  --rule: #2b3036; --grid: #22262b; --nodata: #262a2f; --stroke: #171a1e; --hl: #ffffff; --accent: #7fa8de;
+  --s1: #1f2a37; --s2: #26405e; --s3: #2f5a8a; --s4: #4a7cb8; --s5: #7fa8de; --s6: #c3d6f0;
+  --noc: #50555b; --oth: #8a8f96; --eng: #9aaac0; --wal: #e0705f; --sco: #6fb0de; color-scheme: dark; }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 14px; line-height: 1.45; margin: 0; }
+.wrap { max-width: 1280px; margin: 0 auto; padding-block: 20px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+header { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 10px 24px; border-bottom: 2px solid var(--ink); }
+.hgroup { display: grid; gap: 4px; padding-bottom: 10px; }
+h1 { font: 700 clamp(30px, 4.4vw, 44px)/1 var(--f-display); margin: 0; letter-spacing: -0.01em; text-wrap: balance; }
+.lede { color: var(--ink-2); max-width: 70ch; margin: 2px 0 0; }
+nav.tabs { display: flex; gap: 2px; flex-wrap: wrap; }
+nav.tabs a { font: 600 15px/1 var(--f-display); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); text-decoration: none;
+  padding: 10px 14px 9px; border-radius: 6px 6px 0 0; }
+nav.tabs a[aria-current="page"] { background: var(--ink); color: var(--bg); }
+nav.tabs a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.controls { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; padding-block: 14px; }
+.ctl { display: flex; align-items: center; gap: 6px; min-width: 0; flex-wrap: wrap; }
+.ctl-label { font: 600 11px var(--f-display); text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); }
+select, input[type="search"] { font: 500 14px var(--f-body); color: var(--ink); background: var(--surface); border: 1px solid var(--rule);
+  border-radius: 6px; padding: 7px 8px; max-width: 100%; }
+select { max-width: min(100%, 420px); }
+.seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; background: var(--surface); }
+.seg button { font: 600 14px/1 var(--f-display); letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-2);
+  background: transparent; border: 0; padding: 8px 12px; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--rule); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.check { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-2); font-size: 13px; cursor: pointer; }
+.btn { font: 600 13px var(--f-display); letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-2); background: var(--surface);
+  border: 1px solid var(--rule); border-radius: 6px; padding: 7px 10px; cursor: pointer; }
+
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 20px; align-items: start; }
+@media (max-width: 880px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+.panel { position: relative; background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; min-width: 0; }
+svg { display: block; width: 100%; height: auto; }
+#mapsvg { touch-action: none; }
+.la { stroke: var(--stroke); stroke-width: 0.4; vector-effect: non-scaling-stroke; cursor: pointer; }
+.la.sel { stroke: var(--hl); stroke-width: 2; }
+.hex { stroke: var(--stroke); stroke-width: 1; cursor: pointer; }
+.hex.sel { stroke: var(--hl); stroke-width: 2.5; }
+.map-note { position: absolute; left: 12px; bottom: 10px; font-size: 12px; color: var(--muted); max-width: 46%; }
+.map-tools { position: absolute; right: 10px; top: 10px; display: flex; gap: 6px; }
+.legend { padding: 12px 14px 4px; display: grid; gap: 6px; }
+.legend-title { font: 600 13px var(--f-display); letter-spacing: 0.03em; color: var(--ink); }
+.legend-row { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; font-size: 12px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.sw { display: inline-block; width: 14px; height: 12px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+.ramp { display: flex; align-items: stretch; }
+.ramp span { flex: 1; height: 12px; }
+.ramp-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.caution { font-size: 12px; color: var(--ink-2); background: var(--grid); border-radius: 6px; padding: 8px 10px; }
+
+aside.card { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); padding: 16px; display: grid; gap: 12px; }
+.card h2 { font: 700 26px/1.05 var(--f-display); margin: 0; text-wrap: balance; }
+.card .sub { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
+.big { display: flex; gap: 14px; flex-wrap: wrap; }
+.big div { display: grid; }
+.big b { font: 700 24px/1 var(--f-display); font-variant-numeric: tabular-nums; }
+.big span { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+dl.kv { display: grid; grid-template-columns: 1fr auto; gap: 3px 12px; margin: 0; font-size: 13px; }
+dl.kv dt { color: var(--ink-2); }
+dl.kv dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; font-weight: 500; }
+.card h3 { font: 600 12px var(--f-display); text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin: 4px 0 0; border-top: 1px solid var(--rule); padding-top: 10px; }
+.unilist { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; font-size: 13px; }
+.unilist li { display: flex; justify-content: space-between; gap: 10px; }
+.unilist li span:last-child { color: var(--ink-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.seatbar { display: flex; height: 10px; border-radius: 3px; overflow: hidden; background: var(--grid); }
+.pill { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; color: #fff; }
+
+.tip { position: absolute; pointer-events: none; background: var(--ink); color: var(--bg); padding: 6px 9px; border-radius: 6px; font-size: 12px;
+  line-height: 1.35; max-width: 260px; opacity: 0; transition: opacity .1s; z-index: 5; font-variant-numeric: tabular-nums; }
+.axis text { fill: var(--ink-2); font-size: 11px; font-family: var(--f-body); }
+.axis line, .axis path { stroke: var(--rule); }
+.gridline line { stroke: var(--grid); }
+.dot { stroke: var(--surface); stroke-width: 0.8; cursor: pointer; }
+.dot.dim { opacity: 0.15; }
+.dot.sel { stroke: var(--hl); stroke-width: 2; }
+.lbl { font-size: 11px; fill: var(--ink); paint-order: stroke; stroke: var(--surface); stroke-width: 3px; stroke-linejoin: round; pointer-events: none; }
+.fit { stroke: var(--ink-2); stroke-width: 1.5; stroke-dasharray: 5 4; fill: none; }
+.stats { padding: 10px 14px 14px; font-size: 13px; color: var(--ink-2); font-variant-numeric: tabular-nums; display: grid; gap: 4px; }
+.stats strong { color: var(--ink); }
+
+.tablewrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; font-variant-numeric: tabular-nums; }
+th, td { padding: 7px 10px; border-bottom: 1px solid var(--rule); text-align: right; white-space: nowrap; }
+th:first-child, td:first-child, th:nth-child(2), td:nth-child(2) { text-align: left; }
+td:first-child { white-space: normal; min-width: 220px; }
+th { font: 600 12px var(--f-display); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); cursor: pointer; user-select: none; position: sticky; top: 0; background: var(--surface); }
+th[aria-sort="descending"]::after { content: " ↓"; } th[aria-sort="ascending"]::after { content: " ↑"; }
+tr:hover td { background: var(--grid); }
+.about { max-width: 72ch; display: grid; gap: 4px; padding-block: 8px; }
+.about h2 { font: 700 22px var(--f-display); margin: 18px 0 2px; }
+.about p, .about li { color: var(--ink-2); }
+.about a { color: var(--accent); }
+.credit { margin-top: 6px; color: var(--ink-2); }
+.foot { margin-top: 28px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--rule); padding-top: 10px; }
+[hidden] { display: none !important; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+.home { display: inline-flex; align-items: center; gap: 6px; width: fit-content; margin-bottom: 6px; padding: 6px 11px; border: 1px solid var(--rule); border-radius: 6px; color: var(--ink); background: var(--surface); text-decoration: none; font: 600 13px var(--f-body); }
+.home:hover { background: var(--grid); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="hgroup">
+      <a class="home" href="https://benwansell.github.io/" aria-label="Home: Ben Ansell's website"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M2 7.5 8 2l6 5.5M3.5 6.5V14h3.2v-4h2.6v4h3.2V6.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Home</a>
+      <h1>Universities and Local Economies</h1>
+      <p class="lede">How much of each local authority's economy in England, Wales and Scotland its universities account for in 2023/24, and how that compares with the place itself: who lives there, what they earn, and who runs the council.</p>
+    </div>
+    <nav class="tabs" aria-label="Views">
+      <a href="#map" data-view="map">Map</a>
+      <a href="#compare" data-view="compare">Compare</a>
+      <a href="#universities" data-view="universities">Universities</a>
+      <a href="#about" data-view="about">About</a>
+    </nav>
+  </header>
+
+  <!-- MAP -->
+  <section id="view-map" data-view="map">
+    <div class="controls">
+      <div class="ctl"><label class="ctl-label" for="mapVar">Show</label><select id="mapVar"></select></div>
+      <div class="ctl"><span class="ctl-label">Shape</span>
+        <div class="seg" id="shapeSeg"><button type="button" data-shape="geo" aria-pressed="true">Map</button><button type="button" data-shape="hex" aria-pressed="false">Hexes</button></div></div>
+      <div class="ctl"><label class="ctl-label" for="laSearch">Find</label><input id="laSearch" type="search" list="laList" placeholder="Local authority" autocomplete="off"><datalist id="laList"></datalist></div>
+    </div>
+    <div class="grid">
+      <div class="panel">
+        <div class="legend" id="legend"></div>
+        <svg id="mapsvg" viewBox="0 0 600 760" role="img" aria-label="Map of local authorities in Great Britain"></svg>
+        <div class="map-tools"><button class="btn" id="zoomReset" type="button">Reset zoom</button></div>
+        <div class="map-note" id="mapNote">Scroll or pinch to zoom. Click an area for details.</div>
+        <div class="tip" id="mapTip"></div>
+      </div>
+      <aside class="panel card" id="card" aria-live="polite"></aside>
+    </div>
+  </section>
+
+  <!-- COMPARE -->
+  <section id="view-compare" data-view="compare" hidden>
+    <div class="controls">
+      <div class="ctl"><label class="ctl-label" for="xVar">Across</label><select id="xVar"></select></div>
+      <div class="ctl"><label class="ctl-label" for="yVar">Up</label><select id="yVar"></select></div>
+      <div class="ctl"><label class="ctl-label" for="colBy">Colour</label>
+        <select id="colBy"><option value="nation">Nation</option><option value="control">Council control</option><option value="largest_party">Largest party on council</option></select></div>
+      <div class="ctl"><label class="ctl-label" for="sizeBy">Size</label>
+        <select id="sizeBy"><option value="pop">Population</option><option value="he_gva_m">University GVA</option><option value="none">Equal</option></select></div>
+      <label class="check"><input type="checkbox" id="hostsOnly" checked> University hosts only</label>
+      <label class="check"><input type="checkbox" id="noOxbridge"> Leave out Oxford and Cambridge</label>
+      <label class="check"><input type="checkbox" id="logX"> Log across</label>
+      <label class="check"><input type="checkbox" id="logY"> Log up</label>
+      <div class="ctl"><label class="ctl-label" for="scSearch">Highlight</label><input id="scSearch" type="search" list="laList" placeholder="Local authority" autocomplete="off"></div>
+    </div>
+    <div class="grid">
+      <div class="panel">
+        <svg id="scatter" viewBox="0 0 760 520" role="img" aria-label="Scatterplot of local authorities"></svg>
+        <div class="stats" id="scStats"></div>
+        <div class="tip" id="scTip"></div>
+      </div>
+      <aside class="panel card" id="card2" aria-live="polite"></aside>
+    </div>
+  </section>
+
+  <!-- UNIVERSITIES -->
+  <section id="view-universities" data-view="universities" hidden>
+    <div class="controls">
+      <div class="ctl"><label class="ctl-label" for="uniSearch">Filter</label><input id="uniSearch" type="search" placeholder="University or place" autocomplete="off"></div>
+      <div class="ctl" id="uniCount" style="color:var(--ink-2);font-size:13px"></div>
+    </div>
+    <div class="panel tablewrap"><table id="uniTable"><thead></thead><tbody></tbody></table></div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="view-about" data-view="about" hidden>
+    <div class="about">
+      <h2>What the numbers mean</h2>
+      <p><strong>Direct share</strong> is a university's gross value added (GVA) as a share of its host local authority's GVA. University GVA is income less investment income, donations and bought-in goods and services: in effect, its payroll plus its operating surplus. Local authority GVA is the ONS balanced measure at current prices. Each 2023/24 university figure is compared with 5/12 of calendar 2023 plus 7/12 of 2024 local GVA.</p>
+      <p><strong>Central share</strong> adds the spillovers that stay in the host area: the university's supply chain, spending by staff who live locally, and spending by students who moved there. They come from the ONS 2023 input-output tables, localised for each area with the Flegg location quotient and BRES employment. <strong>Upper bound</strong> treats every UK-sourced purchase, every staff member and every student as local and additional, using national Type II multipliers. It is a ceiling, not an estimate.</p>
+      <p>Oxford and Cambridge figures leave out Oxford University Press and Cambridge University Press &amp; Assessment, whose income is mostly earned worldwide. Exeter's Penryn campus counts towards Cornwall. Other multi-campus universities sit at their main campus because no open campus-level data exists.</p>
+      <h2>Comparing across England, Wales and Scotland</h2>
+      <p><strong>Deprivation</strong> is the share of an area's small neighbourhoods in its own nation's most deprived 20%, using the English Indices of Deprivation 2025, the Welsh Index of Multiple Deprivation 2019 and the Scottish Index of Multiple Deprivation 2020v2. The three indices use different indicators, years and neighbourhood sizes. A value says how an area sits within its own nation, so compare areas within a nation, not across borders. Ethnicity comes from Census 2021 in England and Wales and Census 2022 in Scotland.</p>
+      <p>For England only, the <strong>English Indices of Deprivation 2025</strong> local authority summaries add the IMD average score, the share of neighbourhoods in England's most deprived 10%, extent (the share of residents living in the most deprived areas), and average scores for each domain: income, employment, education and skills, health and disability, crime, barriers to housing and services, and living environment, plus the child (IDACI) and older-person (IDAOPI) income indices. Income, employment, IDACI and IDAOPI scores are the share of the relevant population that is deprived; the other domain scores are on their own scales, where higher means more deprived.</p>
+      <p><strong>Local GVA per resident</strong> leaves out the City of London, where workplace GVA divided by a population of about 15,000 gives roughly £1m a head.</p>
+      <p><strong>Politics</strong> is the make-up of the district or unitary council in 2026. "Control" means one party holds more than half the seats; otherwise the council is in no overall control. In two-tier areas this is the district council, not the county.</p>
+      <h2>Sources</h2>
+      <ul>
+        <li>HESA Finance Table 1 (May 2026) and DT051 Table 1 student enrolments, 2023/24; OfS size and shape of provision (2026-2) for franchised students.</li>
+        <li>ONS Regional GDP: local authorities (September 2026 edition); ONS UK input-output analytical tables 2023; BRES 2024; Census 2021 origin–destination flows (ODWP09EW) and Scotland's Census 2022 origin–destination tables.</li>
+        <li>Student Income and Expenditure Survey 2021/22 (DfE).</li>
+        <li>ONS mid-2025 population estimates; Annual Population Survey, January–December 2025 (degree-level qualifications, employment rate); ASHE 2025 resident analysis (median full-time annual pay); UK House Price Index; Census 2021 TS021 and Scotland's Census 2022 UV201 (ethnic group).</li>
+        <li>English Indices of Deprivation 2025 (files 1 and 10); WIMD 2019; SIMD 2020v2.</li>
+        <li>Council composition: <a href="https://opencouncildata.co.uk/" target="_blank" rel="noopener">Open Council Data UK</a>, 2026.</li>
+        <li>Boundaries: ONS Open Geography Portal, local authority districts December 2024 (ultra-generalised). Contains OS data © Crown copyright and database right 2024. Hex layout: <a href="https://github.com/odileeds/hexmaps" target="_blank" rel="noopener">Open Innovations hexmaps</a> (MIT).</li>
+      </ul>
+      <h2>Caveats</h2>
+      <ul>
+        <li>All figures are estimates. Spillover figures rest on model assumptions: fixed input mixes, no displacement, and staff-residence shares from Census commuting flows taken around lockdown.</li>
+        <li>OUP's GVA is estimated from its turnover. Some press activity is local, so Oxford's and Cambridge's true shares sit between the figures with and without the presses.</li>
+        <li>Survey-based series (APS, ASHE) have wide margins in small authorities and are missing for the Isles of Scilly and the City of London.</li>
+      </ul>
+    </div>
+  </section>
+
+  <div class="foot"><div id="foot"></div><div class="credit">Produced by Ben Ansell with aid of Claude Opus 5.5.</div></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script>
+(async function () {
+  const [LAJ, UNIS, GEO, HEX] = await Promise.all(["la.json", "unis.json", "lad.geojson", "lad.hexjson"].map(f => fetch(f).then(r => r.json())));
+  const LA = LAJ.la, META = LAJ.meta, CODES = Object.keys(LA);
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+  // ---------- formats ----------
+  const f1 = d3.format(",.1f"), f0 = d3.format(",.0f"), f2 = d3.format(",.2f");
+  const pct = v => v == null ? "–" : f1(v) + "%";
+  const pct2 = v => v == null ? "–" : f2(v) + "%";
+  const gbp = v => v == null ? "–" : "£" + f0(v);
+  const gbpm = v => v == null ? "–" : "£" + (v >= 100 ? f0(v) : f1(v)) + "m";
+  const num = v => v == null ? "–" : f0(v);
+  const gbpBig = v => v == null ? "–" : (v >= 1000 ? "£" + f1(v / 1000) + "bn" : gbpm(v));
+
+  // ---------- variables ----------
+  const VARS = [
+    { k: "share_direct", g: "University", label: "University GVA, % of local GVA (direct)", fmt: pct2, host: true },
+    { k: "share_central", g: "University", label: "University GVA, % of local GVA (with local spillovers)", fmt: pct2, host: true },
+    { k: "share_upper", g: "University", label: "University GVA, % of local GVA (upper bound)", fmt: pct2, host: true },
+    { k: "he_gva_m", g: "University", label: "University GVA (£m)", fmt: gbpm, host: true, log: true },
+    { k: "he_income_m", g: "University", label: "University income (£m)", fmt: gbpm, host: true, log: true },
+    { k: "he_gva_per_head", g: "University", label: "University GVA per resident (£)", fmt: gbp, host: true, log: true },
+    { k: "ft_students", g: "University", label: "Full-time students taught locally", fmt: num, host: true, log: true },
+    { k: "students_per_1000", g: "University", label: "Full-time students per 1,000 residents", fmt: f1, host: true },
+    { k: "intl_pct", g: "University", label: "International share of full-time students (%)", fmt: pct, host: true },
+    { k: "pop", g: "Place", label: "Population (mid-2025)", fmt: num, log: true },
+    { k: "density", g: "Place", label: "Population density (people per km²)", fmt: num, log: true },
+    { k: "pct_18_24", g: "Place", label: "Aged 18–24 (% of population)", fmt: pct },
+    { k: "pct_65p", g: "Place", label: "Aged 65+ (% of population)", fmt: pct },
+    { k: "pct_nonwhite", g: "Place", label: "Ethnic minority, non-White groups (% of residents)", fmt: pct },
+    { k: "pct_degree", g: "Place", label: "Degree-level qualification, ages 16–64 (%)", fmt: pct },
+    { k: "emp_rate", g: "Place", label: "Employment rate, ages 16–64 (%)", fmt: pct },
+    { k: "median_pay", g: "Place", label: "Median full-time pay of residents (£ a year)", fmt: gbp },
+    { k: "la_gva_m", g: "Place", label: "Local GVA, 2024 (£m)", fmt: gbpm, log: true },
+    { k: "gva_per_head", g: "Place", label: "Local GVA per resident (£; City of London omitted)", fmt: gbp, log: true },
+    { k: "house_price", g: "Place", label: "Average house price (£)", fmt: gbp, log: true },
+    { k: "deprived_pct", g: "Place", label: "Neighbourhoods in own nation's most deprived 20% (%)", fmt: pct, nation: true },
+    { k: "iod_imd", g: "England", label: "IMD 2025 average score (higher = more deprived)", fmt: f1, eng: true },
+    { k: "iod_imd_10pct", g: "England", label: "Neighbourhoods in England's most deprived 10% (%)", fmt: pct, eng: true },
+    { k: "iod_imd_extent", g: "England", label: "IMD extent: residents in highly deprived areas (%)", fmt: pct, eng: true },
+    { k: "iod_income", g: "England", label: "Income deprivation rate (% of residents)", fmt: pct, eng: true },
+    { k: "iod_employment", g: "England", label: "Employment deprivation rate (% of working age)", fmt: pct, eng: true },
+    { k: "iod_idaci", g: "England", label: "Children in income-deprived families (IDACI, %)", fmt: pct, eng: true },
+    { k: "iod_idaopi", g: "England", label: "Older people in income deprivation (IDAOPI, %)", fmt: pct, eng: true },
+    { k: "iod_education", g: "England", label: "Education, skills and training deprivation score", fmt: f1, eng: true },
+    { k: "iod_health", g: "England", label: "Health deprivation and disability score", fmt: f2, eng: true },
+    { k: "iod_crime", g: "England", label: "Crime deprivation score", fmt: f2, eng: true },
+    { k: "iod_barriers", g: "England", label: "Barriers to housing and services score", fmt: f1, eng: true },
+    { k: "iod_living", g: "England", label: "Living environment deprivation score", fmt: f1, eng: true },
+    { k: "control", g: "Politics", label: "Council control (2026)", cat: true },
+    { k: "largest_party", g: "Politics", label: "Largest party on council (2026)", cat: true },
+    { k: "seat_lab", g: "Politics", label: "Labour seats (% of council)", fmt: pct },
+    { k: "seat_con", g: "Politics", label: "Conservative seats (% of council)", fmt: pct },
+    { k: "seat_ld", g: "Politics", label: "Lib Dem seats (% of council)", fmt: pct },
+    { k: "seat_grn", g: "Politics", label: "Green seats (% of council)", fmt: pct },
+    { k: "seat_ref", g: "Politics", label: "Reform UK seats (% of council)", fmt: pct },
+    { k: "seat_snp", g: "Politics", label: "SNP seats (% of council)", fmt: pct },
+    { k: "seat_pc", g: "Politics", label: "Plaid Cymru seats (% of council)", fmt: pct },
+    { k: "seat_oth", g: "Politics", label: "Independent and other seats (% of council)", fmt: pct },
+  ];
+  const V = Object.fromEntries(VARS.map(v => [v.k, v]));
+  const PARTY = { "Labour": "--lab", "Conservative": "--con", "Lib Dem": "--ld", "Green": "--grn", "Reform UK": "--ref", "SNP": "--snp",
+    "Plaid Cymru": "--pc", "Independents and others": "--oth", "No overall control": "--noc" };
+  const NATION = { England: "--eng", Wales: "--wal", Scotland: "--sco" };
+  const SEATS = [["seat_lab", "Labour"], ["seat_con", "Conservative"], ["seat_ld", "Lib Dem"], ["seat_grn", "Green"], ["seat_ref", "Reform UK"],
+    ["seat_snp", "SNP"], ["seat_pc", "Plaid Cymru"], ["seat_oth", "Independents and others"]];
+  const RAMP = ["--s1", "--s2", "--s3", "--s4", "--s5", "--s6"];
+
+  function fillSelect(sel, filter, value) {
+    sel.innerHTML = "";
+    for (const g of ["University", "Place", "England", "Politics"]) {
+      const og = document.createElement("optgroup"); og.label = { Place: "The place", England: "Deprivation, England only (IoD 2025)" }[g] || g;
+      VARS.filter(v => v.g === g && filter(v)).forEach(v => { const o = new Option(v.label, v.k); og.appendChild(o); });
+      if (og.children.length) sel.appendChild(og);
+    }
+    sel.value = value;
+  }
+  const dl = document.getElementById("laList");
+  CODES.map(c => LA[c].name).sort().forEach(n => dl.appendChild(new Option(n)));
+  const byName = Object.fromEntries(CODES.map(c => [LA[c].name.toLowerCase(), c]));
+  const unisBy = d3.group(UNIS, u => u.la);
+
+  // ---------- place card ----------
+  function cardHTML(c) {
+    const r = LA[c]; if (!r) return "";
+    const us = (unisBy.get(c) || []).slice().sort((a, b) => b.gva_m - a.gva_m);
+    const seats = SEATS.filter(([k]) => r[k] > 0);
+    const pill = (txt, varname) => `<span class="pill" style="background:var(${varname})">${txt}</span>`;
+    return `
+      <div><div class="sub">${r.nation}${r.council_type ? " · " + r.council_type : ""}</div><h2>${r.name}</h2></div>
+      ${r.host ? `<div class="big">
+        <div><b>${pct2(r.share_direct)}</b><span>Direct share</span></div>
+        <div><b>${pct2(r.share_central)}</b><span>With spillovers</span></div>
+        <div><b>${pct2(r.share_upper)}</b><span>Upper bound</span></div></div>
+        <dl class="kv"><dt>University GVA</dt><dd>${gbpm(r.he_gva_m)}</dd><dt>University income</dt><dd>${gbpm(r.he_income_m)}</dd>
+        <dt>Full-time students taught here</dt><dd>${num(r.ft_students)}</dd><dt>per 1,000 residents</dt><dd>${f1(r.students_per_1000)}</dd>
+        <dt>International (full-time)</dt><dd>${pct(r.intl_pct)}</dd></dl>
+        <h3>Universities</h3><ul class="unilist">${us.map(u => `<li><span>${u.name}${u.campus ? " (" + u.campus.replace(/^Exeter \(|\)$/g, "").replace(/\)$/, "") + ")" : ""}${u.press ? " · excl. press" : ""}</span><span>${pct2(u.share_direct)}</span></li>`).join("")}</ul>`
+        : `<p style="margin:0;color:var(--ink-2)">No university is based here.</p>`}
+      <h3>The place</h3>
+      <dl class="kv">
+        <dt>Population</dt><dd>${num(r.pop)}</dd><dt>People per km²</dt><dd>${num(r.density)}</dd>
+        <dt>Aged 18–24</dt><dd>${pct(r.pct_18_24)}</dd><dt>Aged 65+</dt><dd>${pct(r.pct_65p)}</dd>
+        <dt>Ethnic minority (non-White)</dt><dd>${pct(r.pct_nonwhite)}</dd><dt>Degree-level (16–64)</dt><dd>${pct(r.pct_degree)}</dd>
+        <dt>Employment rate</dt><dd>${pct(r.emp_rate)}</dd><dt>Median full-time pay</dt><dd>${gbp(r.median_pay)}</dd>
+        <dt>Local GVA (2024)</dt><dd>${gbpBig(r.la_gva_m)}</dd><dt>GVA per resident</dt><dd>${gbp(r.gva_per_head)}</dd><dt>Average house price</dt><dd>${gbp(r.house_price)}</dd>
+        <dt>Most deprived 20% <small style="color:var(--muted)">(${(r.deprivation_index || "").replace(/ \(.*\)/, "")})</small></dt><dd>${pct(r.deprived_pct)}</dd>
+      </dl>
+      ${r.iod_imd != null ? `<h3>Deprivation, IoD 2025</h3>
+      <dl class="kv"><dt>IMD average score</dt><dd>${f1(r.iod_imd)}</dd><dt>Neighbourhoods in England's most deprived 10%</dt><dd>${pct(r.iod_imd_10pct)}</dd>
+        <dt>Income deprivation</dt><dd>${pct(r.iod_income)}</dd><dt>Employment deprivation</dt><dd>${pct(r.iod_employment)}</dd>
+        <dt>Children in income-deprived families</dt><dd>${pct(r.iod_idaci)}</dd><dt>Education and skills score</dt><dd>${f1(r.iod_education)}</dd></dl>` : ""}
+      <h3>Council, 2026</h3>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">${pill(r.control, PARTY[r.control])}
+        <span style="font-size:12px;color:var(--ink-2)">Largest party: ${r.largest_party}${r.administration ? " · Administration: " + r.administration : ""}</span></div>
+      <div class="seatbar" role="img" aria-label="Council seats by party">${seats.map(([k, p]) => `<span title="${p}: ${pct(r[k])}" style="width:${r[k]}%;background:var(${PARTY[p]})"></span>`).join("")}</div>
+      <div class="legend-row">${seats.map(([k, p]) => `<span><i class="sw" style="background:var(${PARTY[p]})"></i>${p.replace("Independents and others", "Ind/other")} ${f0(r[k])}%</span>`).join("")}</div>`;
+  }
+  let selected = "E07000178";
+  function select(c) {
+    if (!LA[c]) return; selected = c;
+    document.getElementById("card").innerHTML = cardHTML(c);
+    document.getElementById("card2").innerHTML = cardHTML(c);
+    d3.selectAll(".la,.hex").classed("sel", d => d && (d.id || d.key) === c).filter(".sel").raise();
+    d3.selectAll(".dot").classed("sel", d => d.code === c);
+    drawScatterLabels();
+  }
+
+  // ---------- colour scales ----------
+  function scaleFor(v, codes) {
+    if (v.cat) {
+      const s = k => css(PARTY[k] || "--oth");
+      const counts = d3.rollup(codes, x => x.length, c => LA[c][v.k]);
+      return { color: c => s(LA[c][v.k]), legend: [...counts].sort((a, b) => b[1] - a[1]).map(([k, n]) => [s(k), `${k} (${n})`]), cat: true };
+    }
+    const pool = codes.filter(c => LA[c][v.k] != null && (!v.host || LA[c].host)).map(c => LA[c][v.k]);
+    const q = d3.scaleQuantile().domain(pool).range(RAMP.map(css));
+    return { color: c => { const x = LA[c][v.k]; return (x == null || (v.host && !LA[c].host)) ? css("--nodata") : q(x); },
+      breaks: [d3.min(pool), ...q.quantiles(), d3.max(pool)] };
+  }
+  function drawLegend(v, sc) {
+    const el = document.getElementById("legend");
+    let h = `<div class="legend-title">${v.label}</div>`;
+    if (sc.cat) h += `<div class="legend-row">${sc.legend.map(([col, t]) => `<span><i class="sw" style="background:${col}"></i>${t}</span>`).join("")}</div>`;
+    else {
+      h += `<div class="ramp">${RAMP.map(r => `<span style="background:var(${r})"></span>`).join("")}</div>
+        <div class="ramp-labels">${sc.breaks.map(b => `<span>${v.fmt(b)}</span>`).join("")}</div>
+        <div class="legend-row">Six equal-sized groups of areas${v.host ? ` · <span><i class="sw" style="background:var(--nodata)"></i>No university</span>` : ""}${v.eng ? ` · <span><i class="sw" style="background:var(--nodata)"></i>Not available (Wales, Scotland)</span>` : ""}</div>`;
+    }
+    if (v.eng) h += `<div class="caution">English Indices of Deprivation 2025, local authority summaries. These measures exist for England only; Wales and Scotland publish their own indices on different bases.</div>`;
+    if (v.nation) h += `<div class="caution">Each nation uses its own deprivation index (England 2025, Wales 2019, Scotland 2020), so about a fifth of neighbourhoods in each nation count as deprived by construction. Compare areas within a nation, not across borders.</div>`;
+    el.innerHTML = h;
+  }
+
+  // ---------- map ----------
+  const svg = d3.select("#mapsvg"), W = 600, H = 760;
+  const gRoot = svg.append("g"), gGeo = gRoot.append("g"), gHex = gRoot.append("g");
+  const proj = d3.geoTransverseMercator().rotate([2, -49]).fitExtent([[12, 12], [W - 12, H - 12]], GEO);
+  const path = d3.geoPath(proj);
+  const tip = d3.select("#mapTip");
+  function showTip(ev, c, el) {
+    const v = V[mapVar.value], r = LA[c];
+    const val = v.cat ? r[v.k] : (v.host && !r.host ? "No university" : v.fmt(r[v.k]));
+    const box = el.getBoundingClientRect(), p = d3.pointer(ev, el);
+    tip.html(`<b>${r.name}</b><br>${val}${r.host && v.k !== "share_direct" ? `<br>Direct share ${pct2(r.share_direct)}` : ""}`)
+      .style("left", Math.min(p[0] + 14, box.width - 200) + "px").style("top", (p[1] + 14) + "px").style("opacity", 1);
+  }
+  gGeo.selectAll("path").data(GEO.features).join("path").attr("class", "la").attr("d", path)
+    .on("mousemove", (ev, d) => showTip(ev, d.id, document.querySelector("#mapsvg").parentNode))
+    .on("mouseleave", () => tip.style("opacity", 0)).on("click", (ev, d) => select(d.id));
+
+  // hexes: odd-r offset, rows counted upwards
+  const hexes = Object.entries(HEX.hexes).map(([key, h]) => ({ key, ...h }));
+  const qx = d3.extent(hexes, h => h.q), rx = d3.extent(hexes, h => h.r);
+  const cols = qx[1] - qx[0] + 1.5, rows = rx[1] - rx[0] + 1;
+  const size = Math.min((W - 30) / (cols * Math.sqrt(3)), (H - 30) / (rows * 1.5 + 0.5));
+  const hw = Math.sqrt(3) * size;
+  const hx = h => 15 + (h.q - qx[0]) * hw + ((h.r & 1) ? hw / 2 : 0) + hw / 2;
+  const hy = h => 15 + (rx[1] - h.r) * 1.5 * size + size;
+  const hexPath = d3.range(6).map(i => { const a = Math.PI / 180 * (60 * i - 30); return [size * 0.97 * Math.cos(a), size * 0.97 * Math.sin(a)]; });
+  gHex.selectAll("path").data(hexes).join("path").attr("class", "hex")
+    .attr("d", "M" + hexPath.map(p => p.join(",")).join("L") + "Z").attr("transform", h => `translate(${hx(h)},${hy(h)})`)
+    .on("mousemove", (ev, d) => showTip(ev, d.key, document.querySelector("#mapsvg").parentNode))
+    .on("mouseleave", () => tip.style("opacity", 0)).on("click", (ev, d) => select(d.key));
+
+  const zoom = d3.zoom().scaleExtent([1, 14]).on("zoom", ev => gRoot.attr("transform", ev.transform));
+  svg.call(zoom);
+  document.getElementById("zoomReset").onclick = () => svg.transition().duration(300).call(zoom.transform, d3.zoomIdentity);
+
+  let shape = "geo";
+  const mapVar = document.getElementById("mapVar");
+  fillSelect(mapVar, () => true, "share_direct");
+  function drawMap() {
+    const v = V[mapVar.value], sc = scaleFor(v, CODES);
+    gGeo.attr("display", shape === "geo" ? null : "none"); gHex.attr("display", shape === "hex" ? null : "none");
+    gGeo.selectAll("path").attr("fill", d => LA[d.id] ? sc.color(d.id) : css("--nodata"));
+    gHex.selectAll("path").attr("fill", d => LA[d.key] ? sc.color(d.key) : css("--nodata"));
+    drawLegend(v, sc);
+    svg.attr("aria-label", `${shape === "geo" ? "Map" : "Hex map"} of ${v.label} by local authority`);
+    select(selected);
+  }
+  mapVar.onchange = drawMap;
+  document.querySelectorAll("#shapeSeg button").forEach(b => b.onclick = () => {
+    shape = b.dataset.shape; document.querySelectorAll("#shapeSeg button").forEach(x => x.setAttribute("aria-pressed", x === b));
+    svg.call(zoom.transform, d3.zoomIdentity); drawMap();
+  });
+  const go = inp => { const c = byName[inp.value.trim().toLowerCase()]; if (c) select(c); };
+  document.getElementById("laSearch").addEventListener("change", e => go(e.target));
+
+  // ---------- scatter ----------
+  const xVar = document.getElementById("xVar"), yVar = document.getElementById("yVar");
+  fillSelect(xVar, v => !v.cat, "pct_degree"); fillSelect(yVar, v => !v.cat, "share_direct");
+  const sv = d3.select("#scatter"), SW = 760, SH = 520, m = { l: 64, r: 16, t: 16, b: 48 };
+  const gGrid = sv.append("g"), gAx = sv.append("g"), gAy = sv.append("g"), gFit = sv.append("g"), gDots = sv.append("g"), gLbl = sv.append("g");
+  const xlab = sv.append("text").attr("x", m.l + (SW - m.l - m.r) / 2).attr("y", SH - 8).attr("text-anchor", "middle").attr("fill", "currentColor").style("font-size", "12px");
+  const ylab = sv.append("text").attr("transform", `translate(14,${m.t + (SH - m.t - m.b) / 2}) rotate(-90)`).attr("text-anchor", "middle").attr("fill", "currentColor").style("font-size", "12px");
+  const stip = d3.select("#scTip");
+  let scX, scY, pts = [];
+  function pearson(a, b) {
+    const n = a.length; if (n < 3) return NaN;
+    const ma = d3.mean(a), mb = d3.mean(b); let sab = 0, saa = 0, sbb = 0;
+    for (let i = 0; i < n; i++) { const da = a[i] - ma, db = b[i] - mb; sab += da * db; saa += da * da; sbb += db * db; }
+    return sab / Math.sqrt(saa * sbb);
+  }
+  function drawScatter() {
+    const vx = V[xVar.value], vy = V[yVar.value];
+    const hostOnly = document.getElementById("hostsOnly").checked || vx.host || vy.host;
+    document.getElementById("hostsOnly").checked = hostOnly;
+    const logX = document.getElementById("logX").checked, logY = document.getElementById("logY").checked;
+    const noOxbridge = document.getElementById("noOxbridge").checked;
+    pts = CODES.map(c => LA[c]).filter(r => r[vx.k] != null && r[vy.k] != null && (!hostOnly || r.host) && (!logX || r[vx.k] > 0) && (!logY || r[vy.k] > 0)
+      && !(noOxbridge && (r.code === "E07000178" || r.code === "E07000008")));
+    const ex = d3.extent(pts, r => r[vx.k]), ey = d3.extent(pts, r => r[vy.k]);
+    const pad = (e, lg) => lg ? [e[0] / 1.15, e[1] * 1.15] : [Math.min(0, e[0]) === 0 && e[0] >= 0 && e[0] < (e[1] - e[0]) * 0.25 ? 0 : e[0] - (e[1] - e[0]) * 0.05, e[1] + (e[1] - e[0]) * 0.05];
+    scX = (logX ? d3.scaleLog() : d3.scaleLinear()).domain(pad(ex, logX)).range([m.l, SW - m.r]);
+    scY = (logY ? d3.scaleLog() : d3.scaleLinear()).domain(pad(ey, logY)).range([SH - m.b, m.t]);
+    if (!logX) scX.nice(); if (!logY) scY.nice();
+    const tf = v => v.fmt === pct || v.fmt === pct2 ? (d => d3.format("~g")(d) + "%") : (v.fmt === gbp ? (d => "£" + d3.format("~s")(d)) : (v.fmt === gbpm ? (d => "£" + d3.format("~s")(d) + "m") : d3.format("~s")));
+    gAx.attr("class", "axis").attr("transform", `translate(0,${SH - m.b})`).call(d3.axisBottom(scX).ticks(logX ? 5 : 7, logX ? "~s" : undefined).tickFormat(tf(vx)));
+    gAy.attr("class", "axis").attr("transform", `translate(${m.l},0)`).call(d3.axisLeft(scY).ticks(logY ? 5 : 6).tickFormat(tf(vy)));
+    gGrid.attr("class", "gridline").selectAll("line").data(scY.ticks(logY ? 5 : 6)).join("line")
+      .attr("x1", m.l).attr("x2", SW - m.r).attr("y1", d => scY(d)).attr("y2", d => scY(d));
+    xlab.text(vx.label + (logX ? " (log scale)" : "")); ylab.text(vy.label + (logY ? " (log scale)" : ""));
+    const sizeBy = document.getElementById("sizeBy").value, colBy = document.getElementById("colBy").value;
+    const rs = sizeBy === "none" ? () => 4.5 : d3.scaleSqrt().domain([0, d3.max(pts, r => r[sizeBy]) || 1]).range([2.5, 20]);
+    const col = r => css(colBy === "nation" ? NATION[r.nation] : (PARTY[r[colBy]] || "--oth"));
+    gDots.selectAll("circle").data(pts.slice().sort((a, b) => (b[sizeBy] || 0) - (a[sizeBy] || 0)), d => d.code).join("circle")
+      .attr("class", "dot").attr("cx", r => scX(r[vx.k])).attr("cy", r => scY(r[vy.k]))
+      .attr("r", r => sizeBy === "none" ? 4.5 : rs(r[sizeBy] || 0)).attr("fill", col).attr("fill-opacity", 0.8)
+      .on("mousemove", (ev, r) => {
+        const box = document.querySelector("#scatter").getBoundingClientRect(), p = d3.pointer(ev, document.querySelector("#scatter").parentNode);
+        stip.html(`<b>${r.name}</b> · ${r.nation}<br>${vx.label}: ${vx.fmt(r[vx.k])}<br>${vy.label}: ${vy.fmt(r[vy.k])}`)
+          .style("left", Math.min(p[0] + 14, box.width - 240) + "px").style("top", (p[1] + 14) + "px").style("opacity", 1);
+      })
+      .on("mouseleave", () => stip.style("opacity", 0)).on("click", (ev, r) => select(r.code));
+    // fit (linear on displayed scale) + correlation
+    const tx = logX ? Math.log : x => x, ty = logY ? Math.log : y => y;
+    const xs = pts.map(r => tx(r[vx.k])), ys = pts.map(r => ty(r[vy.k]));
+    const rr = pearson(xs, ys);
+    gFit.selectAll("*").remove();
+    if (pts.length > 4) {
+      const mx = d3.mean(xs), my = d3.mean(ys), b = d3.sum(xs.map((x, i) => (x - mx) * (ys[i] - my))) / d3.sum(xs.map(x => (x - mx) ** 2)), a = my - b * mx;
+      const [x0, x1] = scX.domain(), inv = logY ? Math.exp : y => y;
+      const line = d3.range(0, 41).map(i => { const xv = logX ? Math.exp(Math.log(x0) + i / 40 * (Math.log(x1) - Math.log(x0))) : x0 + i / 40 * (x1 - x0); return [scX(xv), scY(inv(a + b * tx(xv)))]; })
+        .filter(p => p[1] >= m.t && p[1] <= SH - m.b);
+      gFit.append("path").attr("class", "fit").attr("d", d3.line()(line));
+    }
+    let h = `<div><strong>${pts.length}</strong> local authorities${hostOnly ? " with a university" : ""}${noOxbridge ? ", leaving out Oxford and Cambridge" : ""} · correlation <strong>r = ${isNaN(rr) ? "–" : rr.toFixed(2)}</strong>${logX || logY ? " (on the log scale shown)" : ""}. The dashed line is a straight-line fit.</div>`;
+    if (vx.eng || vy.eng) h += `<div class="caution">English Indices of Deprivation 2025: English local authorities only.</div>`;
+    if (vx.nation || vy.nation) {
+      const byN = d3.groups(pts, r => r.nation).map(([n, rs_]) => `${n} r = ${pearson(rs_.map(r => tx(r[vx.k])), rs_.map(r => ty(r[vy.k]))).toFixed(2)} (${rs_.length})`);
+      h += `<div class="caution">Deprivation is measured with each nation's own index, so read the relationship within each nation: ${byN.join(" · ")}.</div>`;
+    }
+    const legend = colBy === "nation" ? Object.keys(NATION) : [...new Set(pts.map(r => r[colBy]))].sort();
+    h += `<div class="legend-row">${legend.map(k => `<span><i class="sw" style="background:var(${colBy === "nation" ? NATION[k] : (PARTY[k] || "--oth")})"></i>${k}</span>`).join("")}${sizeBy !== "none" ? ` · Circle area ∝ ${sizeBy === "pop" ? "population" : "university GVA"}` : ""}</div>`;
+    document.getElementById("scStats").innerHTML = h;
+    sv.attr("aria-label", `Scatterplot of ${vy.label} against ${vx.label}`);
+    select(selected);
+  }
+  function drawScatterLabels() {
+    if (!scX || !pts.length) return;
+    const vx = V[xVar.value], vy = V[yVar.value];
+    const top = pts.slice().sort((a, b) => b[vy.k] - a[vy.k]).slice(0, 4).concat(pts.slice().sort((a, b) => b[vx.k] - a[vx.k]).slice(0, 2));
+    const sel = pts.find(r => r.code === selected);
+    const lab = [...new Map([...top, ...(sel ? [sel] : [])].map(r => [r.code, r])).values()];
+    const placed = [];
+    const lab2 = lab.sort((a, b) => (b.code === selected) - (a.code === selected)).filter(r => {
+      const x = scX(r[vx.k]), y = scY(r[vy.k]) - 6, w = r.name.length * 6.2;
+      const x0 = x > SW - 150 ? x - 8 - w : x + 8;
+      if (placed.some(p => Math.abs(p.y - y) < 13 && x0 < p.x1 && x0 + w > p.x0)) return false;
+      placed.push({ x0, x1: x0 + w, y }); return true;
+    });
+    gLbl.selectAll("text").data(lab2, d => d.code).join("text").attr("class", "lbl")
+      .attr("x", r => scX(r[vx.k]) + (scX(r[vx.k]) > SW - 150 ? -8 : 8)).attr("text-anchor", r => scX(r[vx.k]) > SW - 150 ? "end" : "start")
+      .attr("y", r => scY(r[vy.k]) - 6).style("font-weight", r => r.code === selected ? 700 : 400).text(r => r.name);
+  }
+  ["xVar", "yVar", "colBy", "sizeBy", "logX", "logY", "hostsOnly", "noOxbridge"].forEach(id => document.getElementById(id).addEventListener("change", e => {
+    if (id === "hostsOnly" && !e.target.checked && (V[xVar.value].host || V[yVar.value].host)) { e.target.checked = true; }
+    drawScatter();
+  }));
+  document.getElementById("scSearch").addEventListener("change", e => go(e.target));
+
+  // ---------- universities table ----------
+  const COLS = [
+    { k: "name", t: "University", f: (u) => u.name + (u.campus ? ` – ${u.campus}` : "") + (u.press ? " (excl. press)" : "") + (u.year !== "2023/24" ? " †" : "") },
+    { k: "laname", t: "Local authority", f: u => LA[u.la] ? LA[u.la].name : u.la },
+    { k: "gva_m", t: "GVA £m", f: u => f1(u.gva_m) }, { k: "income_m", t: "Income £m", f: u => f1(u.income_m) },
+    { k: "share_direct", t: "Direct %", f: u => f2(u.share_direct) }, { k: "share_central", t: "With spillovers %", f: u => f2(u.share_central) },
+    { k: "share_upper", t: "Upper bound %", f: u => f2(u.share_upper) }, { k: "ft_local", t: "FT students taught", f: u => f0(u.ft_local) },
+    { k: "intl_pct", t: "International %", f: u => f1(u.intl_pct) },
+  ];
+  UNIS.forEach(u => u.laname = LA[u.la] ? LA[u.la].name : u.la);
+  let sortK = "share_direct", sortDir = -1;
+  const thead = d3.select("#uniTable thead"), tbody = d3.select("#uniTable tbody");
+  thead.html("<tr>" + COLS.map(c => `<th scope="col" data-k="${c.k}" tabindex="0">${c.t}</th>`).join("") + "</tr>");
+  thead.selectAll("th").on("click", function () { const k = this.dataset.k; sortDir = k === sortK ? -sortDir : (k === "name" || k === "laname" ? 1 : -1); sortK = k; drawTable(); })
+    .on("keydown", function (ev) { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); this.click(); } });
+  function drawTable() {
+    const q = document.getElementById("uniSearch").value.trim().toLowerCase();
+    const rows = UNIS.filter(u => !q || (u.name + " " + u.laname + " " + (u.campus || "")).toLowerCase().includes(q))
+      .sort((a, b) => sortDir * (typeof a[sortK] === "string" ? a[sortK].localeCompare(b[sortK]) : (a[sortK] - b[sortK])));
+    thead.selectAll("th").attr("aria-sort", function () { return this.dataset.k === sortK ? (sortDir > 0 ? "ascending" : "descending") : null; });
+    tbody.selectAll("tr").data(rows).join("tr").html(u => COLS.map(c => `<td>${c.f(u)}</td>`).join(""))
+      .style("cursor", "pointer").on("click", (ev, u) => { select(u.la); location.hash = "map"; });
+    document.getElementById("uniCount").textContent = `${rows.length} of ${UNIS.length} rows · † 2022/23 data · click a row to see its area on the map`;
+  }
+  document.getElementById("uniSearch").addEventListener("input", drawTable);
+
+  // ---------- routing ----------
+  const views = ["map", "compare", "universities", "about"];
+  function route() {
+    const v = views.includes(location.hash.slice(1)) ? location.hash.slice(1) : "map";
+    document.querySelectorAll("section[data-view]").forEach(s => s.hidden = s.dataset.view !== v);
+    document.querySelectorAll("nav.tabs a").forEach(a => a.toggleAttribute("aria-current", a.dataset.view === v) || a.dataset.view === v && a.setAttribute("aria-current", "page"));
+    document.querySelectorAll("nav.tabs a").forEach(a => { if (a.dataset.view === v) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+    if (v === "compare") drawScatter();
+  }
+  window.addEventListener("hashchange", route);
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => { drawMap(); if (!document.getElementById("view-compare").hidden) drawScatter(); });
+  new MutationObserver(() => { drawMap(); if (!document.getElementById("view-compare").hidden) drawScatter(); })
+    .observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
+  const host = CODES.filter(c => LA[c].host).length;
+  document.getElementById("foot").innerHTML = `Universities sit in ${host} of ${CODES.length} local authorities. University data: HESA 2023/24. Population: mid-2025. APS: ${META.aps_period}. House prices: ${META.hpi_window}. Built ${META.built}.`;
+  drawMap(); drawTable(); route();
+})();
+</script>
+</body>
+</html>
