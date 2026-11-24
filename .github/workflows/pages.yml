@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: read
+  actions: read   # the wait step lists this run's artifacts
   pages: write
   id-token: write
 
@@ -32,5 +33,22 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: '.'
+      # deploy-pages queries the artifacts API less than a second after the
+      # upload finalises, and often gets back 0 results because the listing has
+      # not caught up yet. Wait for the artifact to be visible before deploying.
+      - name: Wait for the artifact to appear in the API
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for i in $(seq 1 30); do
+            count=$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/artifacts?name=github-pages" --jq '.total_count')
+            if [ "$count" -ge 1 ]; then
+              echo "artifact visible after ${i} attempt(s)"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "artifact never became visible" >&2
+          exit 1
       - id: deployment
         uses: actions/deploy-pages@v4
