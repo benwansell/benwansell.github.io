@@ -1,0 +1,581 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<title>Meltzer–Richard Explorer</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="An interactive Meltzer–Richard model of redistribution: set the income distribution, the pivotal voter and the fiscal rules, and see the tax rate and benefits that voter prefers, with labour supply responding to taxes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: control desk (left, sticky) beside a results sheet: summary sentence, figure tiles, three linked charts, model notes. */
+:root{
+  color-scheme:light;
+  --bg:#f3f6f7; --surface:#ffffff; --sunk:#e9eef0;
+  --ink:#13212b; --ink-2:#465765; --muted:#72818d; --rule:#d6dee3; --grid:#e6ecef;
+  --accent:#0080a3; --accent-soft:rgba(0,128,163,.12);
+  --voter:#c2560c; --voter-soft:rgba(194,86,12,.12);
+  --neg:#b0405a; --neg-soft:rgba(176,64,90,.14);
+  --f-display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --f-body:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0d1318; --surface:#141c23; --sunk:#1a242c;
+  --ink:#e4ecf1; --ink-2:#a7b5c0; --muted:#7d8c98; --rule:#26333d; --grid:#1e2a33;
+  --accent:#1aa3ad; --accent-soft:rgba(26,163,173,.16);
+  --voter:#d46f28; --voter-soft:rgba(212,111,40,.16);
+  --neg:#d9707f; --neg-soft:rgba(217,112,127,.16); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0d1318; --surface:#141c23; --sunk:#1a242c;
+  --ink:#e4ecf1; --ink-2:#a7b5c0; --muted:#7d8c98; --rule:#26333d; --grid:#1e2a33;
+  --accent:#1aa3ad; --accent-soft:rgba(26,163,173,.16);
+  --voter:#d46f28; --voter-soft:rgba(212,111,40,.16);
+  --neg:#d9707f; --neg-soft:rgba(217,112,127,.16); color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.5}
+img{max-width:100%}
+[hidden]{display:none!important}
+.wrap{max-width:1280px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.top{padding-block:20px 18px;border-bottom:1px solid var(--rule)}
+.home{display:inline-flex;align-items:center;gap:6px;width:fit-content;margin-bottom:14px;padding:6px 11px;border:1px solid var(--rule);border-radius:6px;color:var(--ink);background:var(--surface);text-decoration:none;font:600 13px var(--f-body)}
+.home svg{display:inline;width:14px;height:14px;flex:none}
+.home:hover{border-color:var(--accent);color:var(--accent)}
+.eyebrow{font:600 11px/1 var(--f-body);letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin:0 0 10px}
+h1{font:800 clamp(28px,4vw,40px)/1.05 var(--f-display);letter-spacing:-.02em;margin:0 0 10px;text-wrap:balance}
+.lede{max-width:68ch;color:var(--ink-2);margin:0 0 16px;font-size:15px}
+.presets{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.presets span{color:var(--muted);font-size:12px;margin-right:4px}
+.chip{font:500 12.5px/1 var(--f-body);padding:8px 12px;border-radius:999px;border:1px solid var(--rule);background:var(--surface);color:var(--ink);cursor:pointer}
+.chip:hover{border-color:var(--accent);color:var(--accent)}
+.app{display:grid;grid-template-columns:330px minmax(0,1fr);gap:28px;padding-block:24px 48px;align-items:start}
+@media (max-width:900px){.app{grid-template-columns:minmax(0,1fr)}}
+.panel{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);display:flex;flex-direction:column;gap:18px;background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:18px}
+@media (max-width:900px){.panel{position:static}}
+fieldset{border:0;margin:0;padding:0;display:flex;flex-direction:column;gap:14px}
+fieldset+fieldset{border-top:1px solid var(--rule);padding-top:16px}
+legend{font:700 12px/1 var(--f-display);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);padding:0;margin-bottom:12px;display:flex;gap:8px;align-items:center}
+.badge{font:600 10px/1 var(--f-body);letter-spacing:.06em;padding:4px 7px;border-radius:4px;background:var(--voter-soft);color:var(--voter);text-transform:uppercase}
+.ctl{display:flex;flex-direction:column;gap:6px}
+.ctl .row{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.ctl label,.ctl .lab{font-weight:600;font-size:13px}
+.ctl output{font:500 12.5px/1 var(--f-mono);color:var(--accent);font-variant-numeric:tabular-nums;white-space:nowrap}
+.hint{font-size:12px;color:var(--muted);line-height:1.4;margin:0}
+input[type=range]{width:100%;accent-color:var(--accent);margin:0;height:22px}
+input[type=range]:disabled{opacity:.4}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--sunk);border-radius:7px;padding:3px;gap:3px}
+.seg button{font:500 12.5px/1 var(--f-body);border:0;background:transparent;color:var(--ink-2);padding:8px 6px;border-radius:5px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.seg button:disabled{cursor:not-allowed;opacity:.55}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:13px;font-weight:600;cursor:pointer}
+.check input{margin-top:3px;accent-color:var(--voter);width:16px;height:16px}
+.check small{display:block;font-weight:400;color:var(--muted);font-size:12px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.out{display:flex;flex-direction:column;gap:22px;min-width:0}
+.verdict{font:500 clamp(17px,2vw,21px)/1.45 var(--f-display);margin:0;max-width:62ch;text-wrap:pretty}
+.verdict b{color:var(--voter);font-weight:700}
+.verdict em{font-style:normal;color:var(--accent);font-weight:700}
+.note{font-size:12.5px;color:var(--ink-2);background:var(--sunk);border-radius:7px;padding:9px 12px;margin:0;max-width:80ch}
+.note.warn{background:var(--voter-soft);color:var(--ink)}
+.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:10px;overflow:hidden}
+@media (max-width:620px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.tile{background:var(--surface);padding:14px 16px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.tile .k{font:600 11px/1.2 var(--f-body);letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.tile .v{font:600 26px/1.1 var(--f-mono);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.tile .v.hero{color:var(--voter)}
+.tile .s{font-size:12px;color:var(--ink-2)}
+.charts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.charts .wide{grid-column:1/-1}
+@media (max-width:760px){.charts{grid-template-columns:minmax(0,1fr)}}
+figure{margin:0;background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:14px 14px 10px;min-width:0}
+figcaption h2{font:700 15px/1.25 var(--f-display);margin:0 0 3px}
+figcaption p{margin:0 0 8px;font-size:12.5px;color:var(--muted)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--ink-2);margin:0 0 6px}
+.legend i{display:inline-block;width:14px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.chart{position:relative;width:100%;touch-action:pan-y}
+.chart svg{display:block;width:100%;overflow:visible}
+.grid{stroke:var(--grid);stroke-width:1}
+.axis{stroke:var(--rule);stroke-width:1}
+.zero{stroke:var(--muted);stroke-width:1}
+.tick{fill:var(--muted);font:11px var(--f-mono)}
+.axlab{fill:var(--muted);font:11px var(--f-body)}
+.ln{fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round}
+.ln.accent{stroke:var(--accent)} .ln.voter{stroke:var(--voter)} .ln.neg{stroke:var(--neg)}
+.area.accent{fill:var(--accent-soft)} .area.neg{fill:var(--neg-soft)}
+.rule{stroke:var(--muted);stroke-width:1;stroke-dasharray:3 3}
+.rule.voter{stroke:var(--voter);stroke-dasharray:none;stroke-width:1.5}
+.rlab{font:600 11px var(--f-body);fill:var(--ink-2)}
+.rlab.voter{fill:var(--voter)}
+.pt{stroke:var(--surface);stroke-width:2}
+.pt.voter{fill:var(--voter)} .pt.accent{fill:var(--accent)}
+.cross{stroke:var(--ink-2);stroke-width:1;opacity:.5}
+.hdot{fill:var(--ink);stroke:var(--surface);stroke-width:2}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);font-size:12px;line-height:1.45;padding:7px 9px;border-radius:6px;white-space:nowrap;z-index:2;font-variant-numeric:tabular-nums}
+.tip b{font-weight:600}
+details.model{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:14px 18px}
+details.model summary{font:700 15px var(--f-display);cursor:pointer}
+.model-body{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 28px;margin-top:12px}
+@media (max-width:760px){.model-body{grid-template-columns:minmax(0,1fr)}}
+.model-body p{margin:0 0 10px;max-width:65ch;color:var(--ink-2);font-size:13px}
+.model-body b{color:var(--ink)}
+.eq{font-family:var(--f-mono);font-size:12.5px;color:var(--ink);background:var(--sunk);padding:2px 6px;border-radius:4px;white-space:nowrap}
+.busy{opacity:.6;transition:opacity .15s}
+@media (prefers-reduced-motion:reduce){.busy{transition:none}}
+</style>
+</head>
+<body>
+
+<header class="top"><div class="wrap">
+  <a class="home" href="https://benwansell.github.io/" aria-label="Home: Ben Ansell's website"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M2 7.5 8 2l6 5.5M3.5 6.5V14h3.2v-4h2.6v4h3.2V6.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Home</a>
+  <p class="eyebrow">Political economy of redistribution</p>
+  <h1>Meltzer–Richard Explorer</h1>
+  <p class="lede">Set the income distribution, the pivotal voter and the fiscal rules. The model solves for the tax take and benefits that voter prefers, with everyone’s labour supply responding to the taxes chosen.</p>
+  <div class="presets"><span>Scenarios</span>
+    <button type="button" class="chip" data-preset="mr">Classic Meltzer–Richard</button>
+    <button type="button" class="chip" data-preset="ins">Insurance motive</button>
+    <button type="button" class="chip" data-preset="alt">Altruistic affluent voter</button>
+    <button type="button" class="chip" data-preset="bis">Bismarckian middle</button>
+    <button type="button" class="chip" data-preset="unequal">High inequality, low turnout</button>
+  </div>
+</div></header>
+
+<main class="wrap app">
+  <aside class="panel" aria-label="Model settings">
+    <fieldset>
+      <legend>Economy</legend>
+      <div class="ctl">
+        <div class="row"><label for="gini">Pre-tax income inequality</label><output id="gini-o" for="gini"></output></div>
+        <input type="range" id="gini" min="0.15" max="0.65" step="0.01" value="0.40">
+        <p class="hint">Gini of market income with no taxes. Income is lognormal.</p>
+      </div>
+      <div class="ctl">
+        <div class="row"><label for="eps">Cost of labour effort</label><output id="eps-o" for="eps"></output></div>
+        <input type="range" id="eps" min="0.05" max="1.5" step="0.05" value="0.30">
+        <p class="hint">Sets the labour-supply elasticity ε. Left: effort is steeply costly at the margin, so hours barely move with taxes. Right: effort is easily withdrawn, so taxes shrink the pie.</p>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Pivotal voter</legend>
+      <div class="ctl">
+        <div class="row"><label for="pct">Position in the income distribution</label><output id="pct-o" for="pct"></output></div>
+        <input type="range" id="pct" min="1" max="99" step="1" value="50">
+        <p class="hint">50th = the median voter. Move right to mimic turnout skewed toward the affluent.</p>
+      </div>
+      <div class="ctl">
+        <div class="row"><label for="rho">Relative risk aversion ρ</label><output id="rho-o" for="rho"></output></div>
+        <input type="range" id="rho" min="0" max="6" step="0.1" value="2">
+        <p class="hint">Bites only when the voter faces income risk or cares about others. It then also works as inequality aversion.</p>
+      </div>
+      <div class="ctl">
+        <div class="row"><label for="risk">Own income risk</label><output id="risk-o" for="risk"></output></div>
+        <input type="range" id="risk" min="0" max="1" step="0.05" value="0">
+        <p class="hint">Standard deviation of a log shock to the voter’s own earning power, realised after the vote.</p>
+      </div>
+      <div class="ctl">
+        <div class="row"><label for="alpha">Altruism</label><output id="alpha-o" for="alpha"></output></div>
+        <input type="range" id="alpha" min="0" max="0.9" step="0.05" value="0">
+        <p class="hint">Weight on average welfare of the whole population versus own welfare.</p>
+      </div>
+    </fieldset>
+
+    <fieldset id="fs-struct">
+      <legend>Fiscal structure <span class="badge" id="struct-badge" hidden>Chosen by voter</span></legend>
+      <div class="ctl">
+        <span class="lab" id="tax-lab">Tax schedule</span>
+        <div class="seg" role="group" aria-labelledby="tax-lab">
+          <button type="button" id="tax-flat" data-v="flat" aria-pressed="true">Flat</button>
+          <button type="button" id="tax-prog" data-v="prog" aria-pressed="false">Progressive</button>
+        </div>
+      </div>
+      <div class="ctl" id="z-ctl" hidden>
+        <div class="row"><label for="z">Tax-free allowance</label><output id="z-o" for="z"></output></div>
+        <input type="range" id="z" min="0.1" max="1.5" step="0.05" value="0.5">
+        <p class="hint">Share of mean market income untaxed. Average rates rise with income.</p>
+      </div>
+      <div class="ctl">
+        <span class="lab" id="ben-lab">Benefits</span>
+        <div class="seg" role="group" aria-labelledby="ben-lab">
+          <button type="button" id="ben-flat" data-v="flat" aria-pressed="true">Flat</button>
+          <button type="button" id="ben-prop" data-v="prop" aria-pressed="false">Proportional</button>
+          <button type="button" id="ben-mix" data-v="mix" aria-pressed="false">Mix</button>
+        </div>
+        <p class="hint">Flat: equal lump sum to everyone. Proportional: paid in proportion to earnings.</p>
+      </div>
+      <div class="ctl" id="th-ctl" hidden>
+        <div class="row"><label for="theta">Earnings-related share</label><output id="theta-o" for="theta"></output></div>
+        <input type="range" id="theta" min="0" max="1" step="0.05" value="0.5">
+      </div>
+      <label class="check"><input type="checkbox" id="vstruct"><span>Let the voter choose the structure too<small>Searches over allowance (0–150% of mean income) and benefit mix as well as the tax rate.</small></span></label>
+    </fieldset>
+  </aside>
+
+  <section class="out" id="out" aria-live="polite">
+    <p class="verdict" id="verdict"></p>
+    <p class="note" id="note" hidden></p>
+    <div class="tiles">
+      <div class="tile"><span class="k">Preferred tax take</span><span class="v hero" id="t-take"></span><span class="s" id="t-take-s"></span></div>
+      <div class="tile"><span class="k">Flat benefit</span><span class="v" id="t-flat"></span><span class="s">per person, % of no-tax mean income</span></div>
+      <div class="tile"><span class="k">Earnings-related benefit</span><span class="v" id="t-prop"></span><span class="s">paid on each £1 of own earnings</span></div>
+      <div class="tile"><span class="k">Voter’s net transfer</span><span class="v" id="t-net"></span><span class="s" id="t-net-s"></span></div>
+      <div class="tile"><span class="k">Output vs laissez-faire</span><span class="v" id="t-gdp"></span><span class="s">labour-supply response to the tax</span></div>
+      <div class="tile"><span class="k">Gini after taxes and benefits</span><span class="v" id="t-gini"></span><span class="s" id="t-gini-s"></span></div>
+    </div>
+
+    <div class="charts">
+      <figure>
+        <figcaption><h2>The voter’s welfare at each tax rate</h2><p>Certainty-equivalent welfare, % change from no tax. The peak is the preferred rate.</p></figcaption>
+        <div class="chart" id="c-welfare"><svg role="img" aria-label="Voter welfare by statutory tax rate"></svg></div>
+      </figure>
+      <figure>
+        <figcaption><h2>Preferred tax take by voter position</h2><p>What a pivotal voter at each percentile would choose, holding the structure fixed.</p></figcaption>
+        <div class="chart" id="c-pct"><svg role="img" aria-label="Preferred tax take by income percentile"></svg></div>
+      </figure>
+      <figure class="wide">
+        <figcaption><h2>Who gains under the voter’s policy</h2><p>Benefits received minus taxes paid, % of mean market income, across the income distribution.</p></figcaption>
+        <div class="legend"><span><i style="background:var(--accent)"></i>Net recipient</span><span><i style="background:var(--neg)"></i>Net contributor</span><span><i style="background:var(--voter)"></i>Pivotal voter</span></div>
+        <div class="chart" id="c-inc"><svg role="img" aria-label="Net fiscal transfer by income percentile"></svg></div>
+      </figure>
+    </div>
+
+    <details class="model">
+      <summary>How the model works</summary>
+      <div class="model-body">
+        <div>
+          <p><b>Population.</b> Earning power <span class="eq">w</span> is lognormal across 400 quantiles. Its spread is set so that market income has the Gini you choose; mean market income at zero tax is normalised to 1.</p>
+          <p><b>Preferences.</b> Each person maximises <span class="eq">U(c − v(l))</span> with <span class="eq">v(l) = l^(1+1/ε)/(1+1/ε)</span> and CRRA <span class="eq">U</span> with coefficient ρ. These GHH preferences have no income effects, so hours depend only on the net marginal wage: <span class="eq">l = ((1−t)w)^ε</span>.</p>
+          <p><b>Taxes.</b> <span class="eq">T(y) = τ · max(0, y − z)</span>. A flat tax has <span class="eq">z = 0</span>. With an allowance, people near <span class="eq">z</span> bunch at the kink.</p>
+          <p><b>Benefits.</b> Revenue <span class="eq">R</span> is returned as <span class="eq">b = (1−θ)R + θ(R/Y)·y</span>. Workers take the earnings-related part into account when choosing hours, so it offsets the tax at the margin. Budgets balance at a fixed point.</p>
+        </div>
+        <div>
+          <p><b>The pivotal voter</b> maximises <span class="eq">(1−α)·E[U(x_v)] + α·mean U(x_j)</span>, where <span class="eq">x</span> is consumption net of effort cost. The expectation is over a log shock to their own earning power, <span class="eq">w_v·exp(σζ − σ²/2)</span>, integrated by 7-point Gauss–Hermite quadrature.</p>
+          <p><b>Benchmark.</b> With a flat tax, flat benefits, no risk and no altruism, the solution matches Meltzer and Richard’s closed form <span class="eq">τ* = (1−m)/(1+ε−m)</span>, where <span class="eq">m</span> is the voter’s income over the mean. Risk aversion is then irrelevant.</p>
+          <p><b>Scale.</b> Under these preferences the <i>level</i> of effort cost scales everyone’s output equally and leaves preferred policy unchanged. The effort-cost control therefore moves the curvature, which sets the elasticity ε.</p>
+          <p><b>Solver.</b> Grid search over statutory rates 0–95% in 0.5-point steps. In voter-chooses mode it first searches allowance and benefit mix on a coarse grid.</p>
+        </div>
+      </div>
+    </details>
+  </section>
+</main>
+
+<script>
+/*MODEL*/
+const N = 400;
+const GH_X = [0, 1.154405394739968, -1.154405394739968, 2.366759410734541, -2.366759410734541, 3.750439717725742, -3.750439717725742];
+const GH_W = [0.457142857142857, 0.240123178605013, 0.240123178605013, 0.030757123967586, 0.030757123967586, 0.000548268855972, 0.000548268855972];
+
+function invNorm(p){
+  const a=[-3.969683028665376e+01,2.209460984245205e+02,-2.759285104469687e+02,1.383577518672690e+02,-3.066479806614716e+01,2.506628277459239e+00];
+  const b=[-5.447609879822406e+01,1.615858368580409e+02,-1.556989798598866e+02,6.680131188771972e+01,-1.328068155288572e+01];
+  const c=[-7.784894002430293e-03,-3.223964580411365e-01,-2.400758277161838e+00,-2.549732539343734e+00,4.374664141464968e+00,2.938163982698783e+00];
+  const d=[7.784695709041462e-03,3.224671290700398e-01,2.445134137142996e+00,3.754408661907416e+00];
+  const pl=0.02425; let q,r;
+  if(p<pl){q=Math.sqrt(-2*Math.log(p));return(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}
+  if(p>1-pl){q=Math.sqrt(-2*Math.log(1-p));return-(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}
+  q=p-0.5;r=q*q;return(((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q/(((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);
+}
+
+function giniSorted(v){ let s=0,t=0; const n=v.length; for(let i=0;i<n;i++){s+=(i+1)*v[i];t+=v[i];} return 2*s/(n*t)-(n+1)/n; }
+
+function makeModel(S){
+  const eps=S.eps, rho=S.rho, alpha=S.alpha, risk=S.risk;
+  const logU = Math.abs(rho-1)<1e-6;
+  const U = logU ? (x=>Math.log(x)) : (x=>(Math.pow(x,1-rho)-1)/(1-rho));
+  const Uinv = logU ? (u=>Math.exp(u)) : (u=>Math.pow(1+(1-rho)*u, 1/(1-rho)));
+  const sy = Math.SQRT2*invNorm((S.gini+1)/2), sw = sy/(1+eps);
+  const w=new Float64Array(N), a=new Float64Array(N); let m=0;
+  for(let j=0;j<N;j++){ const q=Math.exp(sw*invNorm((j+0.5)/N)); w[j]=q; a[j]=Math.pow(q,1+eps); m+=a[j]; }
+  m/=N; const A=Math.pow(m,-1/(1+eps));
+  for(let j=0;j<N;j++){ w[j]*=A; a[j]/=m; }
+  const pe=1+1/eps;
+  const wOf = p => A*Math.exp(sw*invNorm(p));
+  function choose(aj,e0,e1,z){
+    if(z<=0) return aj*e1;
+    const y0=aj*e0; if(y0<=z) return y0;
+    const y1=aj*e1; return y1>=z ? y1 : z;
+  }
+  function equilibrium(tau,z,th){
+    let s=th*tau, Y=1, R=0, e0=1, e1=1;
+    for(let it=0; it<60; it++){
+      e0=Math.pow(1+s,eps); e1=Math.pow(1-tau+s,eps); Y=0; R=0;
+      for(let j=0;j<N;j++){ const y=choose(a[j],e0,e1,z); Y+=y; if(y>z) R+=tau*(y-z); }
+      Y/=N; R/=N;
+      const sn = Y>0 ? th*R/Y : 0;
+      if(Math.abs(sn-s)<1e-10){ s=sn; break; }
+      s=sn;
+    }
+    return {tau,z,th,s,R,Y,B:(1-th)*R,e0,e1};
+  }
+  function outcome(wi,eq){
+    const ai=Math.pow(wi,1+eps), y=choose(ai,eq.e0,eq.e1,eq.z);
+    const tax = y>eq.z ? eq.tau*(y-eq.z) : 0;
+    const c = y - tax + eq.B + eq.s*y;
+    const l = y/wi;
+    return {y, c, tax, x: c - Math.pow(l,pe)/pe};
+  }
+  function popAlt(eq){
+    let t=0;
+    for(let j=0;j<N;j++){
+      const y=choose(a[j],eq.e0,eq.e1,eq.z), tax=y>eq.z?eq.tau*(y-eq.z):0;
+      const c=y-tax+eq.B+eq.s*y, l=y/w[j];
+      t+=U(c-Math.pow(l,pe)/pe);
+    }
+    return t/N;
+  }
+  function popDist(eq){
+    const ys=new Float64Array(N), cs=new Float64Array(N);
+    for(let j=0;j<N;j++){
+      const y=choose(a[j],eq.e0,eq.e1,eq.z), tax=y>eq.z?eq.tau*(y-eq.z):0;
+      ys[j]=y; cs[j]=y-tax+eq.B+eq.s*y;
+    }
+    return {ys,cs};
+  }
+  function voterEU(wv,eq){
+    if(risk<=0) return U(outcome(wv,eq).x);
+    let t=0;
+    for(let i=0;i<7;i++) t+=GH_W[i]*U(outcome(wv*Math.exp(risk*GH_X[i]-risk*risk/2),eq).x);
+    return t;
+  }
+  function voterW(wv,eq,alt){ return alpha>0 ? (1-alpha)*voterEU(wv,eq)+alpha*alt : voterEU(wv,eq); }
+  function searchStructure(wv){
+    let best=-Infinity, bz=0, bt=0;
+    for(let zi=0;zi<=15;zi++){ const z=zi/10;
+      for(let ti=0;ti<=10;ti++){ const th=ti/10;
+        for(let k=1;k<=38;k++){ const tau=k*0.025, e=equilibrium(tau,z,th);
+          const W=voterW(wv,e, alpha>0?popAlt(e):0);
+          if(W>best+1e-12){best=W;bz=z;bt=th;}
+        }}}
+    const e0=equilibrium(0,0,0), W0=voterW(wv,e0,alpha>0?popAlt(e0):0);
+    if(W0>=best-1e-12) return {z:0,th:0};
+    return {z:bz,th:bt};
+  }
+  return {U,Uinv,w,a,A,sw,sy,meanMedian:m,wOf,equilibrium,outcome,popAlt,popDist,voterW,searchStructure};
+}
+
+function solve(S){
+  const M=makeModel(S);
+  let z = S.prog ? S.z : 0;
+  let th = S.ben==='flat' ? 0 : S.ben==='prop' ? 1 : S.theta;
+  const wv=M.wOf(S.pct/100);
+  if(S.voterStruct){ const r=M.searchStructure(wv); z=r.z; th=r.th; }
+  const TG=[]; for(let i=0;i<=190;i++) TG.push(i*0.005);
+  const eqs=TG.map(t=>M.equilibrium(t,z,th));
+  const alts=eqs.map(e=>S.alpha>0?M.popAlt(e):0);
+  const Ws=eqs.map((e,i)=>M.voterW(wv,e,alts[i]));
+  const argmax = arr => { let b=0; for(let i=1;i<arr.length;i++) if(arr[i]>arr[b]+1e-13) b=i; return b; };
+  const bi=argmax(Ws);
+  let mn=Infinity,mx=-Infinity; for(const v of Ws){ if(v<mn)mn=v; if(v>mx)mx=v; }
+  const indifferent = (mx-mn) < 1e-9*(1+Math.abs(mx));
+  const ce0=M.Uinv(Ws[0]);
+  const welfare=Ws.map(v=>(M.Uinv(v)/ce0-1)*100);
+  // preferred take by percentile
+  const pcts=[]; for(let p=1;p<=99;p+=2) pcts.push(p);
+  const pctTake=pcts.map(p=>{
+    const wp=M.wOf(p/100); let b=0, bw=-Infinity;
+    for(let i=0;i<eqs.length;i++){ const v=M.voterW(wp,eqs[i],alts[i]); if(v>bw+1e-13){bw=v;b=i;} }
+    const e=eqs[b]; return {p, take:e.R/e.Y, tau:e.tau, inc:Math.pow(wp,1+S.eps)};
+  });
+  const eq=eqs[bi];
+  const vo=M.outcome(wv,eq), v0=M.outcome(wv,eqs[0]);
+  const dist=M.popDist(eq), dist0=M.popDist(eqs[0]);
+  return {S,M,z,th,wv,TG,eqs,Ws,welfare,bi,eq,indifferent,pctTake,vo,v0,
+    yv0:v0.y, gini0:giniSorted(dist0.ys), giniPost:giniSorted(dist.cs), dist};
+}
+/*END MODEL*/
+</script>
+
+<script>
+const S={gini:.40,eps:.30,pct:50,rho:2,risk:0,alpha:0,prog:false,z:.5,ben:'flat',theta:.5,voterStruct:false};
+const PRESETS={
+  mr:{gini:.40,eps:.30,pct:50,rho:2,risk:0,alpha:0,prog:false,ben:'flat',voterStruct:false},
+  ins:{gini:.35,eps:.30,pct:70,rho:4,risk:.6,alpha:0,prog:false,ben:'flat',voterStruct:false},
+  alt:{gini:.40,eps:.30,pct:80,rho:2,risk:0,alpha:.4,prog:false,ben:'flat',voterStruct:false},
+  bis:{gini:.33,eps:.40,pct:60,rho:3,risk:.5,alpha:0,prog:false,ben:'mix',theta:.7,voterStruct:false},
+  unequal:{gini:.55,eps:.30,pct:65,rho:2,risk:.2,alpha:0,prog:true,z:.5,ben:'flat',voterStruct:false}
+};
+const $=id=>document.getElementById(id);
+const pctF=(v,d=1)=>(v*100).toFixed(d)+'%';
+const ord=n=>{const s=['th','st','nd','rd'],v=n%100;return n+(s[(v-20)%10]||s[v]||s[0]);};
+const FMT={gini:v=>v.toFixed(2),eps:v=>'ε = '+v.toFixed(2),pct:v=>ord(v)+' pct',rho:v=>v.toFixed(1),risk:v=>'σ = '+v.toFixed(2),alpha:v=>v.toFixed(2),z:v=>Math.round(v*100)+'% of mean',theta:v=>Math.round(v*100)+'%'};
+
+function syncControls(){
+  for(const k of Object.keys(FMT)){ $(k).value=S[k]; $(k+'-o').textContent=FMT[k](S[k]); }
+  $('tax-flat').setAttribute('aria-pressed',!S.prog); $('tax-prog').setAttribute('aria-pressed',S.prog);
+  for(const b of ['flat','prop','mix']) $('ben-'+b).setAttribute('aria-pressed',S.ben===b);
+  $('vstruct').checked=S.voterStruct;
+  const lock=S.voterStruct;
+  $('z-ctl').hidden=!(S.prog||lock); $('th-ctl').hidden=!(S.ben==='mix'||lock);
+  for(const id of ['tax-flat','tax-prog','ben-flat','ben-prop','ben-mix','z','theta']) $(id).disabled=lock;
+  $('struct-badge').hidden=!lock;
+}
+
+for(const k of Object.keys(FMT)){
+  $(k).addEventListener('input',e=>{S[k]=parseFloat(e.target.value); $(k+'-o').textContent=FMT[k](S[k]); schedule();});
+}
+$('tax-flat').onclick=()=>{S.prog=false;syncControls();schedule();};
+$('tax-prog').onclick=()=>{S.prog=true;syncControls();schedule();};
+for(const b of ['flat','prop','mix']) $('ben-'+b).onclick=()=>{S.ben=b;syncControls();schedule();};
+$('vstruct').onchange=e=>{S.voterStruct=e.target.checked;syncControls();schedule();};
+document.querySelectorAll('[data-preset]').forEach(btn=>btn.onclick=()=>{Object.assign(S,PRESETS[btn.dataset.preset]);syncControls();schedule();});
+
+let timer=null, rafId=null, last=null;
+function schedule(){
+  if(S.voterStruct){ $('out').classList.add('busy'); clearTimeout(timer); timer=setTimeout(run,140); }
+  else { cancelAnimationFrame(rafId); rafId=requestAnimationFrame(run); }
+}
+function run(){ last=solve({...S}); render(last); $('out').classList.remove('busy'); }
+
+function render(r){
+  const {eq,z,th,S:s}=r;
+  const take=eq.R/eq.Y, net=r.vo.c-r.vo.y;
+  // structure readouts in voter mode
+  if(s.voterStruct){
+    $('z').value=Math.max(0.1,z); $('z-o').textContent = z>0 ? Math.round(z*100)+'% of mean' : 'none (flat)';
+    $('theta').value=th; $('theta-o').textContent=Math.round(th*100)+'%';
+  }
+  $('t-take').textContent = pctF(take);
+  const emr=eq.tau-eq.s;
+  $('t-take-s').textContent = 'of output · statutory '+pctF(eq.tau,1)+(z>0?' above '+Math.round(z*100)+'% of mean':' flat')+(eq.s>0?' · effective marginal '+pctF(emr,1):'');
+  $('t-flat').textContent = (eq.B*100).toFixed(1)+'%';
+  $('t-prop').textContent = th>0 ? (eq.s*100).toFixed(1)+'p' : '—';
+  $('t-net').textContent = (net>=0?'+':'−')+Math.abs(net*100).toFixed(1)+'%';
+  $('t-net-s').textContent = 'of mean income · '+(r.vo.y>0?((net/r.vo.y>=0?'+':'−')+Math.abs(net/r.vo.y*100).toFixed(0)+'% of own earnings'):'');
+  const gdp=(eq.Y-1)*100;
+  $('t-gdp').textContent = (gdp>=0?'+':'−')+Math.abs(gdp).toFixed(1)+'%';
+  $('t-gini').textContent = r.giniPost.toFixed(3);
+  $('t-gini-s').textContent = 'from '+r.gini0.toFixed(3)+' before · mean/median '+r.M.meanMedian.toFixed(2);
+
+  // verdict
+  const who=`The voter at the <b>${ord(s.pct)} percentile</b> earns <b>${r.yv0.toFixed(2)}×</b> mean income.`;
+  let v;
+  if(r.indifferent){
+    v=who+' Every tax rate leaves them equally well off, so they have no preferred tax.';
+  } else if(eq.tau===0){
+    v=who+' They prefer <em>no redistribution at all</em>.';
+  } else {
+    const taxD = z>0 ? `a <em>${pctF(eq.tau,1)}</em> marginal rate above an allowance of ${Math.round(z*100)}% of mean income` : `a <em>${pctF(eq.tau,1)}</em> flat tax`;
+    let benD;
+    if(th===0) benD=`returned as a flat benefit worth ${(eq.B*100).toFixed(1)}% of mean income`;
+    else if(th>=1) benD=`returned in proportion to earnings, ${(eq.s*100).toFixed(1)}p per £1 earned`;
+    else benD=`split into a flat benefit of ${(eq.B*100).toFixed(1)}% of mean income and an earnings-related ${(eq.s*100).toFixed(1)}p per £1 earned`;
+    v=who+` They prefer ${taxD}, raising <em>${pctF(take)}</em> of output, ${benD}.`;
+  }
+  $('verdict').innerHTML=v;
+
+  // note
+  const notes=[]; let warn=false;
+  if(r.indifferent){ notes.push('With a flat tax and fully earnings-related benefits, everyone gets back exactly what they pay and effective marginal rates are zero. Policy is neutral, so no voter cares about the tax rate.'); warn=true; }
+  if(!s.prog && th===0 && s.alpha===0 && s.risk===0 && !s.voterStruct){
+    const m=r.yv0, cf=Math.max(0,(1-m)/(1+s.eps-m));
+    notes.push(`Closed-form benchmark: τ* = (1−m)/(1+ε−m) = ${pctF(cf,1)} with m = ${m.toFixed(3)}. The grid solution is ${pctF(eq.tau,1)}. Risk aversion has no effect here.`);
+  }
+  if(!r.indifferent && r.bi===r.TG.length-1){ notes.push(`The voter wants more than the 95% statutory ceiling allows. Earnings-related benefits hand back ${(eq.s*100).toFixed(1)}p per £1 earned, so the effective marginal rate is only ${pctF(eq.tau-eq.s,1)}.`); warn=true; }
+  if(s.voterStruct) notes.push(`Structure chosen by the voter: ${z>0?'allowance of '+Math.round(z*100)+'% of mean income':'flat tax, no allowance'}; benefits ${Math.round(th*100)}% earnings-related.`);
+  $('note').hidden=!notes.length; $('note').textContent=notes.join(' '); $('note').classList.toggle('warn',warn);
+
+  drawCharts(r);
+}
+
+/* ---------- charts ---------- */
+function niceTicks(lo,hi,n=5){
+  const span=hi-lo||1, step0=span/n, mag=Math.pow(10,Math.floor(Math.log10(step0)));
+  const step=[1,2,2.5,5,10].map(f=>f*mag).find(s=>s>=step0)||mag*10;
+  const t=[]; for(let v=Math.ceil(lo/step-1e-9)*step; v<=hi+1e-9; v+=step) t.push(+v.toFixed(10));
+  return {ticks:t, lo:Math.min(lo,t[0]), hi:Math.max(hi,t[t.length-1])};
+}
+function draw(id,cfg){
+  const box=$(id), svg=box.querySelector('svg');
+  const W=Math.max(260,box.clientWidth), H=cfg.h||220, m={l:44,r:14,t:18,b:32};
+  const [x0,x1]=cfg.xDom, [y0,y1]=cfg.yDom;
+  const X=v=>m.l+(v-x0)/(x1-x0)*(W-m.l-m.r);
+  const Y=v=>m.t+(1-(v-y0)/(y1-y0))*(H-m.t-m.b);
+  let s='';
+  for(const t of cfg.yTicks){ s+=`<line class="grid" x1="${m.l}" x2="${W-m.r}" y1="${Y(t)}" y2="${Y(t)}"/><text class="tick" x="${m.l-7}" y="${Y(t)}" text-anchor="end" dominant-baseline="middle">${cfg.yFmt(t)}</text>`; }
+  for(const t of cfg.xTicks){ s+=`<text class="tick" x="${X(t)}" y="${H-m.b+16}" text-anchor="middle">${cfg.xFmt(t)}</text>`; }
+  s+=`<line class="axis" x1="${m.l}" x2="${W-m.r}" y1="${H-m.b}" y2="${H-m.b}"/>`;
+  if(cfg.xLab) s+=`<text class="axlab" x="${W-m.r}" y="${H-2}" text-anchor="end">${cfg.xLab}</text>`;
+  if(y0<0&&y1>0) s+=`<line class="zero" x1="${m.l}" x2="${W-m.r}" y1="${Y(0)}" y2="${Y(0)}"/>`;
+  const pts=cfg.x.map((xv,i)=>[X(xv),Y(cfg.y[i])]);
+  const path='M'+pts.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join('L');
+  if(cfg.diverge){
+    const base=Y(Math.max(y0,Math.min(y1,0)));
+    const area=path+`L${pts[pts.length-1][0].toFixed(1)},${base}L${pts[0][0].toFixed(1)},${base}Z`;
+    s+=`<defs><clipPath id="${id}-up"><rect x="0" y="0" width="${W}" height="${base}"/></clipPath><clipPath id="${id}-dn"><rect x="0" y="${base}" width="${W}" height="${H}"/></clipPath></defs>`;
+    s+=`<path class="area accent" d="${area}" clip-path="url(#${id}-up)"/><path class="area neg" d="${area}" clip-path="url(#${id}-dn)"/>`;
+    s+=`<path class="ln accent" d="${path}" clip-path="url(#${id}-up)"/><path class="ln neg" d="${path}" clip-path="url(#${id}-dn)"/>`;
+  } else {
+    if(cfg.fill){ const base=Y(Math.max(y0,0)); s+=`<path class="area accent" d="${path}L${pts[pts.length-1][0]},${base}L${pts[0][0]},${base}Z"/>`; }
+    s+=`<path class="ln accent" d="${path}"/>`;
+  }
+  for(const rl of (cfg.rules||[])){
+    const xx=X(rl.x);
+    s+=`<line class="rule ${rl.cls||''}" x1="${xx}" x2="${xx}" y1="${m.t-4}" y2="${H-m.b}"/>`;
+    const anchor = xx > W-90 ? 'end' : xx < m.l+60 ? 'start' : 'middle';
+    s+=`<text class="rlab ${rl.cls||''}" x="${xx+(anchor==='end'?-4:anchor==='start'?4:0)}" y="${m.t-7}" text-anchor="${anchor}">${rl.label}</text>`;
+  }
+  for(const p of (cfg.points||[])) s+=`<circle class="pt ${p.cls}" cx="${X(p.x)}" cy="${Y(p.y)}" r="5"/>`;
+  s+=`<line class="cross" id="${id}-cx" y1="${m.t}" y2="${H-m.b}" x1="0" x2="0" visibility="hidden"/><circle class="hdot" id="${id}-hd" r="4" cx="0" cy="0" visibility="hidden"/>`;
+  s+=`<rect x="${m.l}" y="${m.t}" width="${W-m.l-m.r}" height="${H-m.t-m.b}" fill="transparent" id="${id}-hit"/>`;
+  svg.setAttribute('viewBox',`0 0 ${W} ${H}`); svg.setAttribute('height',H); svg.innerHTML=s;
+  box._c={cfg,pts,W};
+  if(!box._wired){
+    box._wired=true;
+    const tip=document.createElement('div'); tip.className='tip'; tip.hidden=true; box.appendChild(tip);
+    const move=e=>{
+      const c=box._c; if(!c) return;
+      const rect=box.getBoundingClientRect(), px=e.clientX-rect.left;
+      let bi=0,bd=Infinity; c.pts.forEach((p,i)=>{const d=Math.abs(p[0]-px); if(d<bd){bd=d;bi=i;}});
+      const [hx,hy]=c.pts[bi];
+      const cx=$(id+'-cx'), hd=$(id+'-hd');
+      cx.setAttribute('x1',hx);cx.setAttribute('x2',hx);cx.setAttribute('visibility','visible');
+      hd.setAttribute('cx',hx);hd.setAttribute('cy',hy);hd.setAttribute('visibility','visible');
+      tip.innerHTML=c.cfg.tip(bi); tip.hidden=false;
+      const tw=tip.offsetWidth; let left=hx+12; if(left+tw>c.W) left=hx-12-tw;
+      tip.style.left=Math.max(0,left)+'px'; tip.style.top=Math.max(0,hy-48)+'px';
+    };
+    const leave=()=>{ tip.hidden=true; const cx=$(id+'-cx'),hd=$(id+'-hd'); if(cx)cx.setAttribute('visibility','hidden'); if(hd)hd.setAttribute('visibility','hidden'); };
+    box.addEventListener('pointermove',move); box.addEventListener('pointerdown',move); box.addEventListener('pointerleave',leave);
+  }
+}
+
+function drawCharts(r){
+  const {eqs,welfare,bi,TG}=r;
+  // 1 welfare vs tau
+  let lo=Math.min(...welfare), hi=Math.max(...welfare);
+  if(hi-lo<0.05){ lo-=0.5; hi+=0.5; }
+  const ny=niceTicks(lo,hi,4);
+  draw('c-welfare',{x:TG.map(t=>t*100),y:welfare,xDom:[0,95],yDom:[ny.lo,ny.hi],
+    xTicks:[0,20,40,60,80],yTicks:ny.ticks,xFmt:v=>v+'%',yFmt:v=>(v>0?'+':'')+(+v.toFixed(2))+'%',xLab:'statutory tax rate',
+    rules: r.indifferent?[]:[{x:TG[bi]*100,label:'preferred '+(TG[bi]*100).toFixed(1)+'%',cls:'voter'}],
+    points: r.indifferent?[]:[{x:TG[bi]*100,y:welfare[bi],cls:'voter'}],
+    tip:i=>{const e=eqs[i];return `<b>Tax rate ${(e.tau*100).toFixed(1)}%</b><br>Tax take ${(e.R/e.Y*100).toFixed(1)}% · flat benefit ${(e.B*100).toFixed(1)}%<br>Voter welfare ${(welfare[i]>=0?'+':'')}${welfare[i].toFixed(2)}%`;}});
+  // 2 take by percentile
+  const P=r.pctTake, ys=P.map(d=>d.take*100), mx=Math.max(10,...ys);
+  const np=niceTicks(0,mx*1.05,4);
+  const vIdx=P.reduce((b,d,i)=>Math.abs(d.p-r.S.pct)<Math.abs(P[b].p-r.S.pct)?i:b,0);
+  const rules2=[{x:50,label:'median',cls:''}];
+  if(Math.abs(r.S.pct-50)>6) rules2.push({x:r.S.pct,label:'voter',cls:'voter'});
+  draw('c-pct',{x:P.map(d=>d.p),y:ys,xDom:[0,100],yDom:[0,np.hi],fill:true,
+    xTicks:[0,25,50,75,100],yTicks:np.ticks,xFmt:v=>v===0?'poorest':v===100?'richest':ord(v),yFmt:v=>v+'%',xLab:'',
+    rules:rules2, points:[{x:r.S.pct,y:(r.indifferent?0:r.eq.R/r.eq.Y*100),cls:'voter'}],
+    tip:i=>{const d=P[i];return `<b>${ord(d.p)} percentile</b> · earns ${d.inc.toFixed(2)}× mean<br>Prefers tax take ${(d.take*100).toFixed(1)}%<br>Statutory rate ${(d.tau*100).toFixed(1)}%`;}});
+  // 3 incidence
+  const step=4, xs=[], yi=[], yy=[], cc=[];
+  for(let j=step/2;j<N;j+=step){ xs.push((j+0.5)/N*100); yi.push((r.dist.cs[j]-r.dist.ys[j])*100); yy.push(r.dist.ys[j]); cc.push(r.dist.cs[j]); }
+  let ilo=Math.min(0,...yi), ihi=Math.max(0,...yi); if(ihi-ilo<1){ilo-=1;ihi+=1;}
+  const ni=niceTicks(ilo,ihi,5);
+  const vnet=(r.vo.c-r.vo.y)*100;
+  draw('c-inc',{x:xs,y:yi,xDom:[0,100],yDom:[ni.lo,ni.hi],diverge:true,h:240,
+    xTicks:[0,10,25,50,75,90,100],yTicks:ni.ticks,xFmt:v=>v===0?'poorest':v===100?'richest':ord(v),yFmt:v=>(v>0?'+':'')+v+'%',
+    rules:[{x:r.S.pct,label:'voter · '+(vnet>=0?'+':'−')+Math.abs(vnet).toFixed(1)+'%',cls:'voter'}],
+    points:[{x:r.S.pct,y:vnet,cls:'voter'}],
+    tip:i=>`<b>${ord(Math.round(xs[i]))} percentile</b><br>Market income ${yy[i].toFixed(2)}× mean · after transfers ${cc[i].toFixed(2)}×<br>Net transfer ${(yi[i]>=0?'+':'−')}${Math.abs(yi[i]).toFixed(1)}% of mean income`});
+}
+let rz; window.addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(()=>last&&drawCharts(last),120);});
+syncControls(); run();
+</script>
+
+</body>
+</html>
